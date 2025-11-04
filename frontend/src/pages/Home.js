@@ -42,8 +42,8 @@ export default function Home() {
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#8B5A3C] mb-6 leading-tight">
-            Mais que um presente,<br />
-            um ritual de chamego
+            Presenteie com Ritual:<br />
+            Cada Caixa, Uma Experiência de Chamego
           </h1>
           
           <p className="text-base sm:text-lg text-[#6B5244] mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -135,13 +135,22 @@ export default function Home() {
                   </div>
                   <p className="text-[#6B5244] mb-4 text-sm text-center">{kit.description}</p>
                   <p className="text-3xl font-bold text-[#C19A6B] text-center mb-4">{priceDisplay}</p>
-                  <Button 
-                    data-testid={`add-kit-${kit.tier}-btn`}
-                    onClick={() => navigate('/checkout', { state: { kit } })}
-                    className="w-full bg-[#C19A6B] hover:bg-[#8B5A3C] text-white py-3 rounded-full"
-                  >
-                    Escolher este ritual
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button 
+                      data-testid={`add-kit-${kit.tier}-btn`}
+                      onClick={() => navigate('/checkout', { state: { kit } })}
+                      className="w-full bg-[#C19A6B] hover:bg-[#8B5A3C] text-white py-3 rounded-full"
+                    >
+                      Escolher Kit Pronto
+                    </Button>
+                    <Button 
+                      data-testid={`personalize-kit-${kit.tier}-btn`}
+                      onClick={() => navigate('/quiz')}
+                      className="w-full bg-transparent border-2 border-[#C19A6B] text-[#C19A6B] hover:bg-[#C19A6B]/10 py-3 rounded-full"
+                    >
+                      Personalizar Meu Ritual
+                    </Button>
+                  </div>
                 </div>
               </div>
             );
@@ -149,17 +158,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Por que Xodózin */}
+      {/* O que é um Ritual de Presente? */}
       <section className="container py-16">
         <div className="card max-w-3xl mx-auto">
           <div className="text-center">
             <Leaf className="w-12 h-12 text-[#C19A6B] mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-[#8B5A3C] mb-6">Por que Xodózin?</h2>
+            <h2 className="text-3xl font-bold text-[#8B5A3C] mb-6">O que é um Ritual de Presente?</h2>
             <p className="text-[#6B5244] mb-4 leading-relaxed">
-              Acreditamos que o verdadeiro valor de um presente não está no objeto em si, mas na <strong>experiência simbólica</strong> e no <strong>ritual de afeto</strong> que o acompanha.
+              Um Ritual de Presente não é apenas uma caixa com objetos. É um <strong>mecanismo de Transferência de Significado</strong> - uma experiência cuidadosamente elaborada que transforma o ato de presentear em um momento mágico e carregado de afeto.
+            </p>
+            <p className="text-[#6B5244] mb-4 leading-relaxed">
+              Cada item foi escolhido com intenção, cada detalhe foi pensado para criar conexão. Não são apenas produtos, mas símbolos que carregam sentimentos, memórias e significados especiais.
             </p>
             <p className="text-[#6B5244] leading-relaxed">
-              Cada caixa Xodózin é cuidadosamente montada para criar momentos de conexão verdadeira, transformando o ato de presentear em um ritual de magia e significado.
+              Quando você presenteia com um ritual Xodózin, você não está apenas entregando uma caixa. Você está compartilhando uma experiência, criando um momento especial e transformando o presente em algo que verdadeiramente importa - tanto para quem dá quanto para quem recebe.
             </p>
           </div>
         </div>

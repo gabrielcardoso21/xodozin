@@ -1,8 +1,15 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
-import { Sparkles, Leaf, Heart, BookOpen, ShoppingCart } from 'lucide-react';
+import { Sparkles, Leaf, Heart, BookOpen, Filter, X } from 'lucide-react';
 import { toast } from 'sonner';
+import SummaryPanel from '../components/SummaryPanel';
+
+const CATEGORIES = {
+  sensorial: { label: 'Elemento Sensorial', icon: Leaf, color: 'text-green-600' },
+  afetivo: { label: 'Símbolo Afetivo', icon: Heart, color: 'text-red-600' },
+  ritualistico: { label: 'Guia Ritualístico', icon: BookOpen, color: 'text-purple-600' }
+};
 
 export default function CustomRitual() {
   const location = useLocation();
@@ -10,6 +17,8 @@ export default function CustomRitual() {
   const ritualData = location.state?.ritualData;
   
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     if (!ritualData) {
@@ -17,20 +26,17 @@ export default function CustomRitual() {
     }
   }, [ritualData, navigate]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!ritualData) return null;
 
-  const categoryIcons = {
-    sensorial: Leaf,
-    afetivo: Heart,
-    ritualistico: BookOpen
-  };
-
-  const categoryLabels = {
-    sensorial: 'Elemento Sensorial',
-    afetivo: 'Símbolo Afetivo',
-    ritualistico: 'Guia Ritualístico'
-  };
-
+  // Organizar produtos por categoria
   const productsByCategory = ritualData.suggested_products.reduce((acc, product) => {
     if (!acc[product.category]) {
       acc[product.category] = [];
@@ -39,16 +45,48 @@ export default function CustomRitual() {
     return acc;
   }, {});
 
+  // Filtrar produtos por categoria selecionada
+  const getFilteredProducts = () => {
+    if (selectedCategories.length === 0) {
+      return productsByCategory;
+    }
+    const filtered = {};
+    selectedCategories.forEach(category => {
+      if (productsByCategory[category]) {
+        filtered[category] = productsByCategory[category];
+      }
+    });
+    return filtered;
+  };
+
+  const filteredProductsByCategory = getFilteredProducts();
+
   const handleToggleProduct = (product) => {
     const isSelected = selectedProducts.find(p => p.id === product.id);
     if (isSelected) {
       setSelectedProducts(selectedProducts.filter(p => p.id !== product.id));
+      toast.success(`${product.name} removido do ritual`);
     } else {
       setSelectedProducts([...selectedProducts, product]);
+      toast.success(`${product.name} adicionado ao ritual`);
     }
   };
 
-  const totalPrice = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+  const handleRemoveProduct = (productId) => {
+    const product = selectedProducts.find(p => p.id === productId);
+    if (product) {
+      setSelectedProducts(selectedProducts.filter(p => p.id !== productId));
+      toast.success(`${product.name} removido do ritual`);
+    }
+  };
+
+  const handleToggleCategory = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
 
   const handleProceedToCheckout = () => {
     if (selectedProducts.length === 0) {
@@ -89,96 +127,159 @@ export default function CustomRitual() {
         </p>
       </div>
 
-      {/* Products by Category */}
-      <div className="container py-8">
-        {Object.entries(productsByCategory).map(([category, products], catIndex) => {
-          const Icon = categoryIcons[category] || Sparkles;
-          return (
-            <div key={category} className="mb-12 fade-in-up" style={{ animationDelay: `${catIndex * 0.1}s` }}>
-              <div className="flex items-center justify-center mb-6">
-                <Icon className="w-6 h-6 text-[#C19A6B] mr-2" />
-                <h2 className="text-2xl font-bold text-[#8B5A3C]">
-                  {categoryLabels[category]}
-                </h2>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => {
-                  const isSelected = selectedProducts.find(p => p.id === product.id);
-                  return (
-                    <div 
-                      key={product.id}
-                      data-testid={`product-card-${product.id}`}
-                      onClick={() => handleToggleProduct(product)}
-                      className={`product-card cursor-pointer ${
-                        isSelected ? 'ring-4 ring-[#C19A6B] shadow-2xl' : ''
-                      }`}
-                    >
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="product-image"
-                      />
-                      <div className="p-5">
-                        <h3 className="text-lg font-semibold text-[#8B5A3C] mb-2">
-                          {product.name}
-                        </h3>
-                        <p className="text-sm text-[#6B5244] mb-3">
-                          {product.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xl font-bold text-[#C19A6B]">
-                            R${product.price.toFixed(2)}
-                          </span>
-                          <Button
-                            data-testid={`select-product-${product.id}-btn`}
-                            className={`${
-                              isSelected 
-                                ? 'bg-[#8B5A3C] hover:bg-[#6B5244]' 
-                                : 'bg-[#C19A6B] hover:bg-[#8B5A3C]'
-                            } text-white px-4 py-2 rounded-full text-sm`}
-                          >
-                            {isSelected ? 'Selecionado' : 'Selecionar'}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+      {/* Layout Principal - Desktop com Sidebar, Mobile sem */}
+      <div className={`container py-8 ${!isMobile ? 'grid grid-cols-12 gap-8' : ''}`}>
+        {/* Conteúdo Principal */}
+        <div className={!isMobile ? 'col-span-8' : ''}>
+          {/* Filtros por Categoria */}
+          <div className="mb-8 fade-in-up">
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="w-5 h-5 text-[#C19A6B]" />
+              <h3 className="text-lg font-semibold text-[#8B5A3C]">Filtros por Categoria</h3>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Fixed Bottom Bar */}
-      {selectedProducts.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-[#C19A6B]/20 shadow-lg">
-          <div className="container py-4">
-            <div className="flex items-center justify-between max-w-4xl mx-auto">
-              <div>
-                <p className="text-sm text-[#6B5244]">
-                  {selectedProducts.length} {selectedProducts.length === 1 ? 'item selecionado' : 'itens selecionados'}
-                </p>
-                <p className="text-2xl font-bold text-[#8B5A3C]">
-                  R${totalPrice.toFixed(2)}
-                </p>
-              </div>
-              <Button
-                data-testid="proceed-to-checkout-btn"
-                onClick={handleProceedToCheckout}
-                className="btn-primary px-8 py-6 text-lg flex items-center gap-2"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Finalizar ritual
-              </Button>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(CATEGORIES).map(([category, info]) => {
+                const Icon = info.icon;
+                const isSelected = selectedCategories.includes(category);
+                const hasProducts = productsByCategory[category]?.length > 0;
+                
+                if (!hasProducts) return null;
+                
+                return (
+                  <button
+                    key={category}
+                    onClick={() => handleToggleCategory(category)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all ${
+                      isSelected
+                        ? 'border-[#C19A6B] bg-[#FFF8F0] text-[#8B5A3C]'
+                        : 'border-[#C19A6B]/30 text-[#6B5244] hover:border-[#C19A6B]/50'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${info.color}`} />
+                    <span className="text-sm font-medium">{info.label}</span>
+                    {isSelected && (
+                      <X className="w-4 h-4" />
+                    )}
+                  </button>
+                );
+              })}
+              {selectedCategories.length > 0 && (
+                <button
+                  onClick={() => setSelectedCategories([])}
+                  className="px-4 py-2 rounded-full border-2 border-[#C19A6B]/30 text-[#6B5244] hover:border-[#C19A6B]/50 text-sm font-medium"
+                >
+                  Limpar filtros
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Products by Category */}
+          <div className="space-y-12">
+            {Object.entries(filteredProductsByCategory).map(([category, products], catIndex) => {
+              const categoryInfo = CATEGORIES[category] || { label: category, icon: Sparkles };
+              const Icon = categoryInfo.icon;
+              
+              return (
+                <div key={category} className="fade-in-up" style={{ animationDelay: `${catIndex * 0.1}s` }}>
+                  <div className="flex items-center justify-center mb-6">
+                    <Icon className={`w-6 h-6 ${categoryInfo.color} mr-2`} />
+                    <h2 className="text-2xl font-bold text-[#8B5A3C]">
+                      {categoryInfo.label}
+                    </h2>
+                    <span className="ml-2 text-sm text-[#6B5244]">
+                      ({products.length} {products.length === 1 ? 'item' : 'itens'})
+                    </span>
+                  </div>
+                  
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => {
+                      const isSelected = selectedProducts.find(p => p.id === product.id);
+                      return (
+                        <div 
+                          key={product.id}
+                          data-testid={`product-card-${product.id}`}
+                          onClick={() => handleToggleProduct(product)}
+                          className={`product-card cursor-pointer transition-all ${
+                            isSelected 
+                              ? 'ring-4 ring-[#C19A6B] shadow-2xl bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0]' 
+                              : 'hover:ring-2 hover:ring-[#C19A6B]/50 hover:shadow-lg'
+                          }`}
+                        >
+                          <img 
+                            src={product.image_url} 
+                            alt={product.name}
+                            className="product-image"
+                          />
+                          <div className="p-5">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-lg font-semibold text-[#8B5A3C]">
+                                {product.name}
+                              </h3>
+                              <Icon className={`w-5 h-5 ${categoryInfo.color}`} />
+                            </div>
+                            <p className="text-sm text-[#6B5244] mb-3">
+                              {product.description}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xl font-bold text-[#C19A6B]">
+                                R${product.price.toFixed(2)}
+                              </span>
+                              <Button
+                                data-testid={`select-product-${product.id}-btn`}
+                                className={`${
+                                  isSelected 
+                                    ? 'bg-[#8B5A3C] hover:bg-[#6B5244]' 
+                                    : 'bg-[#C19A6B] hover:bg-[#8B5A3C]'
+                                } text-white px-4 py-2 rounded-full text-sm`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleProduct(product);
+                                }}
+                              >
+                                {isSelected ? 'Selecionado' : 'Selecionar'}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Painel Lateral - Desktop */}
+        {!isMobile && (
+          <div className="col-span-4">
+            <SummaryPanel
+              ritualName={ritualData.ritual_name}
+              selectedProducts={selectedProducts}
+              onRemoveProduct={handleRemoveProduct}
+              onProceedToCheckout={handleProceedToCheckout}
+              isMobile={false}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Painel Inferior - Mobile */}
+      {isMobile && (
+        <SummaryPanel
+          ritualName={ritualData.ritual_name}
+          selectedProducts={selectedProducts}
+          onRemoveProduct={handleRemoveProduct}
+          onProceedToCheckout={handleProceedToCheckout}
+          isMobile={true}
+        />
       )}
 
-      {/* Bottom spacing */}
-      <div className="h-32"></div>
+      {/* Bottom spacing para mobile */}
+      {isMobile && selectedProducts.length > 0 && (
+        <div className="h-32"></div>
+      )}
     </div>
   );
 }

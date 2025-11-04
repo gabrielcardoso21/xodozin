@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Heart, Users, Home as HomeIcon, Smile, Sparkles, Moon, Sun } from 'lucide-react';
+import { Heart, Users, Home as HomeIcon, Smile, Sparkles, Moon, Sun, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -90,12 +90,43 @@ export default function Quiz() {
         </button>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar - Melhorado */}
       <div className="container mb-8">
-        <div className="progress-container">
-          <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          {questions.map((_, index) => (
+            <div
+              key={index}
+              className={`flex-1 h-2 rounded-full transition-all ${
+                index < currentQuestion
+                  ? 'bg-[#C19A6B]'
+                  : index === currentQuestion
+                  ? 'bg-[#C19A6B]'
+                  : 'bg-[#C19A6B]/20'
+              }`}
+            />
+          ))}
         </div>
-        <p className="text-center text-[#6B5244] mt-2 text-sm">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          {questions.map((_, index) => (
+            <div
+              key={index}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                index < currentQuestion
+                  ? 'bg-[#C19A6B] text-white'
+                  : index === currentQuestion
+                  ? 'bg-[#8B5A3C] text-white ring-2 ring-[#C19A6B] ring-offset-2'
+                  : 'bg-[#C19A6B]/20 text-[#6B5244]'
+              }`}
+            >
+              {index < currentQuestion ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : (
+                <span className="text-sm font-bold">{index + 1}</span>
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-[#6B5244] mt-2 text-sm font-medium">
           Pergunta {currentQuestion + 1} de {questions.length}
         </p>
       </div>
@@ -110,16 +141,32 @@ export default function Quiz() {
           <div className="grid sm:grid-cols-2 gap-4 mb-8">
             {currentQ.options.map((option, index) => {
               const Icon = option.icon;
+              const isSelected = currentAnswer === option.value;
               return (
                 <div
                   key={option.value}
                   data-testid={`quiz-option-${option.value}`}
                   onClick={() => handleAnswer(currentQ.id, option.value)}
-                  className={`quiz-option fade-in-up ${currentAnswer === option.value ? 'selected' : ''}`}
+                  className={`quiz-option fade-in-up transition-all cursor-pointer ${
+                    isSelected 
+                      ? 'ring-4 ring-[#C19A6B] shadow-xl bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0]' 
+                      : 'hover:ring-2 hover:ring-[#C19A6B]/50 hover:shadow-lg'
+                  }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <Icon className={`w-10 h-10 mx-auto mb-3 ${currentAnswer === option.value ? 'text-[#8B5A3C]' : 'text-[#C19A6B]'}`} />
-                  <p className="font-medium text-[#6B5244]">{option.label}</p>
+                  <div className="relative">
+                    {isSelected && (
+                      <CheckCircle2 className="absolute -top-2 -right-2 w-6 h-6 text-[#C19A6B] bg-white rounded-full" />
+                    )}
+                    <Icon className={`w-10 h-10 mx-auto mb-3 transition-colors ${
+                      isSelected ? 'text-[#8B5A3C]' : 'text-[#C19A6B]'
+                    }`} />
+                  </div>
+                  <p className={`font-medium transition-colors ${
+                    isSelected ? 'text-[#8B5A3C] font-bold' : 'text-[#6B5244]'
+                  }`}>
+                    {option.label}
+                  </p>
                 </div>
               );
             })}
