@@ -26,7 +26,21 @@ const BACKEND_URL = normalizeUrl(rawBackendUrl);
 // Cria a URL da API garantindo que não há barras duplicadas
 // Remove qualquer barra no final do BACKEND_URL e adiciona /api
 const cleanBackendUrl = BACKEND_URL.replace(/\/+$/, '');
-export const API_BASE_URL = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
+let API_BASE_URL = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
+
+// Garante que a URL é absoluta (começa com http:// ou https://)
+// Isso é importante porque o Vercel pode processar variáveis de ambiente de forma diferente
+if (!API_BASE_URL.match(/^https?:\/\//i)) {
+  API_BASE_URL = `https://${API_BASE_URL}`;
+}
+
+// Debug: log apenas em desenvolvimento
+if (process.env.NODE_ENV === 'development') {
+  console.log('API_BASE_URL:', API_BASE_URL);
+  console.log('REACT_APP_BACKEND_URL:', rawBackendUrl);
+}
+
+export { API_BASE_URL };
 
 // Exporta também a URL do backend para uso direto se necessário
 export { BACKEND_URL };
