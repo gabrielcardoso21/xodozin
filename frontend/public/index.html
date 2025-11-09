@@ -23,6 +23,105 @@
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
+        <script>
+            // Monitora todas as operações que podem apagar o HTML
+            (function() {
+                console.log('[HTML Monitor] Script de monitoramento iniciado');
+                console.log('[HTML Monitor] document.readyState:', document.readyState);
+                console.log('[HTML Monitor] document.body existe?', !!document.body);
+                console.log('[HTML Monitor] document.getElementById("root") existe?', !!document.getElementById("root"));
+                
+                // Monitora mudanças no body
+                function monitorBody() {
+                    if (!document.body) {
+                        console.warn('[HTML Monitor] document.body não existe!');
+                        setTimeout(monitorBody, 100);
+                        return;
+                    }
+                    
+                    console.log('[HTML Monitor] document.body encontrado');
+                    console.log('[HTML Monitor] document.body.innerHTML.length:', document.body.innerHTML?.length);
+                    console.log('[HTML Monitor] document.body.children.length:', document.body.children.length);
+                    
+                    const rootElement = document.getElementById("root");
+                    if (rootElement) {
+                        console.log('[HTML Monitor] #root encontrado');
+                        console.log('[HTML Monitor] #root.innerHTML.length:', rootElement.innerHTML?.length);
+                        console.log('[HTML Monitor] #root.children.length:', rootElement.children.length);
+                    } else {
+                        console.error('[HTML Monitor] ERRO: #root não encontrado!');
+                    }
+                    
+                    // Monitora mudanças no DOM
+                    const observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            if (mutation.type === 'childList') {
+                                if (mutation.removedNodes.length > 0) {
+                                    console.warn('[HTML Monitor] ⚠️ ELEMENTOS REMOVIDOS DO DOM:');
+                                    Array.from(mutation.removedNodes).forEach(function(node, index) {
+                                        console.warn(`[HTML Monitor]   [${index}] Removido:`, node.nodeName, node.nodeType);
+                                        if (node.nodeType === 1) { // Element node
+                                            console.warn(`[HTML Monitor]     - id:`, node.id);
+                                            console.warn(`[HTML Monitor]     - class:`, node.className);
+                                            console.warn(`[HTML Monitor]     - tagName:`, node.tagName);
+                                            if (node.id === 'root' || node.querySelector && node.querySelector('#root')) {
+                                                console.error('[HTML Monitor]     ⚠️⚠️⚠️ ELEMENTO #root OU SEU CONTEÚDO FOI REMOVIDO! ⚠️⚠️⚠️');
+                                            }
+                                        }
+                                    });
+                                }
+                                
+                                if (mutation.addedNodes.length > 0) {
+                                    console.log('[HTML Monitor] Elementos adicionados ao DOM:', mutation.addedNodes.length);
+                                }
+                            }
+                            
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                                const target = mutation.target;
+                                if (target && (target.id === 'root' || target.closest && target.closest('#root'))) {
+                                    console.warn('[HTML Monitor] ⚠️ Atributo style modificado em elemento relacionado ao #root:', target);
+                                }
+                            }
+                        });
+                    });
+                    
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['style', 'class', 'id'],
+                        characterData: false
+                    });
+                    
+                    console.log('[HTML Monitor] MutationObserver iniciado');
+                    
+                    // Monitora periodicamente o estado do root
+                    setInterval(function() {
+                        const root = document.getElementById("root");
+                        if (root) {
+                            const childrenCount = root.children.length;
+                            const innerHTMLLength = root.innerHTML?.length || 0;
+                            
+                            if (childrenCount === 0 && innerHTMLLength === 0) {
+                                console.error('[HTML Monitor] ⚠️⚠️⚠️ #root está VAZIO! ⚠️⚠️⚠️');
+                                console.error('[HTML Monitor] #root.innerHTML:', root.innerHTML);
+                                console.error('[HTML Monitor] #root.children:', root.children);
+                            } else {
+                                console.log('[HTML Monitor] #root OK - children:', childrenCount, 'innerHTML length:', innerHTMLLength);
+                            }
+                        } else {
+                            console.error('[HTML Monitor] ⚠️⚠️⚠️ #root NÃO EXISTE! ⚠️⚠️⚠️');
+                        }
+                    }, 2000);
+                }
+                
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', monitorBody);
+                } else {
+                    monitorBody();
+                }
+            })();
+        </script>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

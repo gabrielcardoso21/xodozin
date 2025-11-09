@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '@/App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -14,6 +14,40 @@ import Sidebar from './components/Sidebar';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
+  useEffect(() => {
+    console.log('[App] Componente App montado');
+    console.log('[App] document.body existe?', !!document.body);
+    console.log('[App] document.getElementById("root") existe?', !!document.getElementById("root"));
+    
+    const rootElement = document.getElementById("root");
+    if (rootElement) {
+      console.log('[App] #root.innerHTML:', rootElement.innerHTML?.substring(0, 200));
+      console.log('[App] #root.children.length:', rootElement.children.length);
+    }
+    
+    // Monitora mudanças no root
+    const checkRoot = () => {
+      const root = document.getElementById("root");
+      if (root) {
+        const childrenCount = root.children.length;
+        if (childrenCount === 0) {
+          console.warn('[App] AVISO: #root está vazio!');
+          console.warn('[App] #root.innerHTML:', root.innerHTML);
+        }
+      }
+    };
+    
+    checkRoot();
+    const interval = setInterval(checkRoot, 1000);
+    
+    return () => {
+      clearInterval(interval);
+      console.log('[App] Componente App desmontado');
+    };
+  }, []);
+
+  console.log('[App] Renderizando App');
+  
   return (
     <ErrorBoundary>
       <div className="App">
