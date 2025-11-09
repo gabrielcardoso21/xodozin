@@ -140,7 +140,7 @@ export default function Checkout() {
         <button 
           data-testid="back-btn"
           onClick={() => navigate(-1)}
-          className="text-[#Da2c38] hover:text-[#ff595e] font-medium mb-8"
+          className="text-[#Da2c38] hover:text-[#463f3a] font-medium mb-8"
         >
           ← Voltar
         </button>
@@ -151,7 +151,7 @@ export default function Checkout() {
             <h1 className="text-3xl sm:text-4xl font-bold text-[#Da2c38] mb-2">
               Seu ritual está sendo preparado com amor
             </h1>
-            <p className="text-[#ff595e]">
+            <p className="text-[#463f3a]">
               Complete os detalhes para finalizar
             </p>
           </div>
@@ -164,13 +164,13 @@ export default function Checkout() {
               {selectedProducts.length > 0 ? (
                 selectedProducts.map((product) => (
                   <div key={product.id} className="flex justify-between items-center">
-                    <span className="text-[#ff595e]">{product.name}</span>
+                    <span className="text-[#463f3a]">{product.name}</span>
                     <span className="font-semibold text-[#Da2c38]">R${product.price.toFixed(2)}</span>
                   </div>
                 ))
               ) : kit ? (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#ff595e]">{kit.name}</span>
+                  <span className="text-[#463f3a]">{kit.name}</span>
                   <span className="font-semibold text-[#Da2c38]">R${kit.price_min.toFixed(2)}</span>
                 </div>
               ) : null}
@@ -200,7 +200,7 @@ export default function Checkout() {
                 className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 min-h-32"
                 maxLength={200}
               />
-              <p className="text-xs text-[#ff595e] mt-1">
+              <p className="text-xs text-[#463f3a] mt-1">
                 {dedication.length}/200 caracteres
               </p>
             </div>
@@ -272,7 +272,7 @@ export default function Checkout() {
                   onChange={(e) => setRecipient({ ...recipient, whatsappUpdates: e.target.checked })}
                   className="w-4 h-4 text-[#da2c38] border-[#da2c38]/30 rounded focus:ring-[#da2c38]"
                 />
-                <Label htmlFor="whatsappUpdates" className="text-[#ff595e] text-sm cursor-pointer">
+                <Label htmlFor="whatsappUpdates" className="text-[#463f3a] text-sm cursor-pointer">
                   Desejo receber atualizações sobre meu pedido via WhatsApp
                 </Label>
               </div>
@@ -296,7 +296,7 @@ export default function Checkout() {
                   <Calendar className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-[#Da2c38]">Prazo de Entrega</p>
-                    <p className="text-[#ff595e] text-sm">5 dias úteis</p>
+                    <p className="text-[#463f3a] text-sm">5 dias úteis</p>
                   </div>
                 </div>
                 
@@ -304,7 +304,7 @@ export default function Checkout() {
                   <MapPinIcon className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-[#Da2c38]">Área de Entrega</p>
-                    <p className="text-[#ff595e] text-sm">São Paulo (capital e região metropolitana)</p>
+                    <p className="text-[#463f3a] text-sm">São Paulo (capital e região metropolitana)</p>
                   </div>
                 </div>
                 
@@ -312,7 +312,7 @@ export default function Checkout() {
                   <Package className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-[#Da2c38]">Envio</p>
-                    <p className="text-[#ff595e] text-sm">Embalagem especial para preservar o ritual</p>
+                    <p className="text-[#463f3a] text-sm">Embalagem especial para preservar o ritual</p>
                   </div>
                 </div>
                 
@@ -320,7 +320,7 @@ export default function Checkout() {
                   <Mail className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-[#Da2c38]">Confirmação</p>
-                    <p className="text-[#ff595e] text-sm">Você receberá um e-mail com o código de rastreamento</p>
+                    <p className="text-[#463f3a] text-sm">Você receberá um e-mail com o código de rastreamento</p>
                   </div>
                 </div>
               </div>

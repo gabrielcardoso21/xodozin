@@ -211,7 +211,7 @@ export default function Quiz() {
               <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 font-serif">
                 Vamos criar um presente que vai direto no coração? 💜
               </h1>
-              <p className="text-lg text-[#ff595e]">
+              <p className="text-lg text-[#463f3a]">
                 Responde essas perguntinhas pra gente montar o ritual perfeito.
               </p>
             </div>
@@ -233,7 +233,7 @@ export default function Quiz() {
                 />
               ))}
             </div>
-            <p className="text-center text-[#ff595e] text-sm font-medium">
+            <p className="text-center text-[#463f3a] text-sm font-medium">
               Pergunta {currentQuestion + 1} de {screen1Questions.length}
             </p>
           </div>
@@ -259,8 +259,8 @@ export default function Quiz() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`h-6 w-6 ${isSelected ? 'text-[#da2c38]' : 'text-[#ff595e]'}`} />
-                      <p className={`font-medium ${isSelected ? 'text-[#Da2c38]' : 'text-[#ff595e]'}`}>
+                      <Icon className={`h-6 w-6 ${isSelected ? 'text-[#da2c38]' : 'text-[#463f3a]'}`} />
+                      <p className={`font-medium ${isSelected ? 'text-[#Da2c38]' : 'text-[#463f3a]'}`}>
                         {option.label}
                       </p>
                       {isSelected && (
@@ -380,7 +380,7 @@ export default function Quiz() {
                           : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
                       }`}
                     >
-                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#ff595e]'}`}>
+                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#463f3a]'}`}>
                         {option.label}
                       </p>
                     </div>
@@ -407,7 +407,7 @@ export default function Quiz() {
                           : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
                       }`}
                     >
-                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#ff595e]'}`}>
+                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#463f3a]'}`}>
                         {option.label}
                       </p>
                     </div>
@@ -434,7 +434,7 @@ export default function Quiz() {
                           : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
                       }`}
                     >
-                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#ff595e]'}`}>
+                      <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#463f3a]'}`}>
                         {option.label}
                       </p>
                     </div>
@@ -505,7 +505,7 @@ export default function Quiz() {
               maxLength={280}
               className="border-[#da2c38] focus:border-[#da2c38] min-h-[120px]"
             />
-            <p className="text-sm text-[#ff595e] mt-2">
+            <p className="text-sm text-[#463f3a] mt-2">
               {answers.message?.length || 0}/280 caracteres
             </p>
           </div>

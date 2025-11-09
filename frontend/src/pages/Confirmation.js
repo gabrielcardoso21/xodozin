@@ -32,7 +32,7 @@ export default function Confirmation() {
             Seu ritual foi recebido!
           </h1>
           
-          <p className="text-lg text-[#ff595e] mb-8 max-w-xl mx-auto fade-in-up">
+          <p className="text-lg text-[#463f3a] mb-8 max-w-xl mx-auto fade-in-up">
             Estamos preparando tudo com o mesmo carinho que você sente.
           </p>
 
@@ -46,7 +46,7 @@ export default function Confirmation() {
             <div className="space-y-2 mb-4">
               {order.items.map((item, index) => (
                 <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="text-[#ff595e]">{item.product_name}</span>
+                  <span className="text-[#463f3a]">{item.product_name}</span>
                   <span className="font-medium text-[#Da2c38]">R${item.price.toFixed(2)}</span>
                 </div>
               ))}
@@ -62,7 +62,7 @@ export default function Confirmation() {
             {order.dedication && (
               <div className="mt-4 pt-4 border-t border-[#da2c38]/20">
                 <p className="text-xs text-[#Da2c38] font-medium mb-1">Sua mensagem:</p>
-                <p className="text-sm text-[#ff595e] italic">"{order.dedication}"</p>
+                <p className="text-sm text-[#463f3a] italic">"{order.dedication}"</p>
               </div>
             )}
           </div>
@@ -79,7 +79,7 @@ export default function Confirmation() {
                 <Calendar className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-[#Da2c38]">Prazo de Entrega</p>
-                  <p className="text-[#ff595e] text-sm">5 dias úteis</p>
+                  <p className="text-[#463f3a] text-sm">5 dias úteis</p>
                 </div>
               </div>
               
@@ -87,7 +87,7 @@ export default function Confirmation() {
                 <MapPin className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-[#Da2c38]">Área de Entrega</p>
-                  <p className="text-[#ff595e] text-sm">São Paulo (capital e região metropolitana)</p>
+                  <p className="text-[#463f3a] text-sm">São Paulo (capital e região metropolitana)</p>
                 </div>
               </div>
               
@@ -95,7 +95,7 @@ export default function Confirmation() {
                 <Package className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-[#Da2c38]">Envio</p>
-                  <p className="text-[#ff595e] text-sm">Embalagem especial para preservar o ritual</p>
+                  <p className="text-[#463f3a] text-sm">Embalagem especial para preservar o ritual</p>
                 </div>
               </div>
               
@@ -103,7 +103,7 @@ export default function Confirmation() {
                 <Mail className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-[#Da2c38]">Confirmação</p>
-                  <p className="text-[#ff595e] text-sm">Você receberá um e-mail com o código de rastreamento</p>
+                  <p className="text-[#463f3a] text-sm">Você receberá um e-mail com o código de rastreamento</p>
                 </div>
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function Confirmation() {
           {/* Message */}
           <div className="mb-8 fade-in-up">
             <Heart className="w-8 h-8 text-[#da2c38] mx-auto mb-3" />
-            <p className="text-[#ff595e] italic">
+            <p className="text-[#463f3a] italic">
               "O presente não é o objeto, é a experiência de amor que o acompanha."
             </p>
           </div>

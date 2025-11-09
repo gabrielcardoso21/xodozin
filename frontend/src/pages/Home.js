@@ -47,7 +47,7 @@ export default function Home() {
             gente de verdade
           </h1>
           
-          <p className="text-base sm:text-lg text-[#ff595e] mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-[#463f3a] mb-8 max-w-2xl mx-auto leading-relaxed">
             A Xodózin é aquele presente que faz a pessoa pensar "caramba, fulano me conhece MESMO". 
             É pra quem tá cansado de dar (e receber) presente genérico e quer criar um momento especial de verdade. 
             Cada caixa é um portal - você entrega, a pessoa atravessa sozinha.
@@ -87,7 +87,7 @@ export default function Home() {
               <Heart className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-[#Da2c38] mb-3">① Escolha o ritual</h3>
-            <p className="text-[#ff595e] text-sm leading-relaxed">Selecione entre nossos kits prontos ou crie um ritual personalizado</p>
+            <p className="text-[#463f3a] text-sm leading-relaxed">Selecione entre nossos kits prontos ou crie um ritual personalizado</p>
           </div>
           
           <div className="card text-center fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -95,7 +95,7 @@ export default function Home() {
               <Sparkles className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-[#Da2c38] mb-3">② Personalize o presente</h3>
-            <p className="text-[#ff595e] text-sm leading-relaxed">Escolha cada item com carinho e adicione uma mensagem especial</p>
+            <p className="text-[#463f3a] text-sm leading-relaxed">Escolha cada item com carinho e adicione uma mensagem especial</p>
           </div>
           
           <div className="card text-center fade-in-up" style={{ animationDelay: '0.3s' }}>
@@ -103,7 +103,7 @@ export default function Home() {
               <Gift className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-[#Da2c38] mb-3">③ Receba com chamego</h3>
-            <p className="text-[#ff595e] text-sm leading-relaxed">Entregamos em São Paulo com todo cuidado e afeto</p>
+            <p className="text-[#463f3a] text-sm leading-relaxed">Entregamos em São Paulo com todo cuidado e afeto</p>
           </div>
         </div>
       </section>
@@ -113,7 +113,7 @@ export default function Home() {
         <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#Da2c38] mb-4 font-serif">
           Kits Pré-Prontos
         </h2>
-        <p className="text-center text-[#ff595e] mb-12 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-[#463f3a] mb-12 max-w-2xl mx-auto leading-relaxed">
           Cada caixa é um convite para atravessar: um momento de pausa, de reconexão, de reencontro com o que há de mais humano em nós. 
           Não é sobre ter mais uma coisa bonita - é sobre viver uma experiência que transfere significado, que cria vínculo, que marca a memória afetiva.
         </p>
@@ -137,7 +137,7 @@ export default function Home() {
                     <Icon className="w-6 h-6 text-[#da2c38] mr-2" />
                     <h3 className="text-2xl font-bold text-[#Da2c38]">{kit.name}</h3>
                   </div>
-                  <p className="text-[#ff595e] mb-4 text-sm text-center">{kit.description}</p>
+                  <p className="text-[#463f3a] mb-4 text-sm text-center">{kit.description}</p>
                   <p className="text-3xl font-bold text-[#da2c38] text-center mb-4">{priceDisplay}</p>
                   <div className="flex flex-col gap-2">
                     <Button 
@@ -168,17 +168,17 @@ export default function Home() {
           <div className="text-center">
             <Leaf className="w-12 h-12 text-[#da2c38] mx-auto mb-6" />
             <h2 className="text-3xl font-bold text-[#Da2c38] mb-6 font-serif">Por que Xodózin?</h2>
-            <p className="text-[#ff595e] mb-4 leading-relaxed">
+            <p className="text-[#463f3a] mb-4 leading-relaxed">
               <strong>Não é só um presente</strong> - é uma experiência de reconexão. 
               <strong> Não é genérico</strong> - cada elemento tem significado específico. 
               <strong> Não é raso</strong> - tem profundidade teórica com leveza na entrega. 
               <strong> Não é solitário</strong> - mesmo sozinha, a pessoa sente que alguém a viu de verdade.
             </p>
-            <p className="text-[#ff595e] mb-4 leading-relaxed">
+            <p className="text-[#463f3a] mb-4 leading-relaxed">
               Cada elemento aqui foi escolhido pra transferir um significado específico. É ciência + afeto. 
               Rituais transferem significados do mundo cultural para os objetos, e dos objetos para as pessoas.
             </p>
-            <p className="text-[#ff595e] leading-relaxed italic">
+            <p className="text-[#463f3a] leading-relaxed italic">
               A gente te dá colo (e algumas perguntas que vão cutucar com carinho). 
               Porque você merece esse chamego todo - e uns questionamentos saudáveis também.
             </p>
@@ -192,10 +192,10 @@ export default function Home() {
           <p className="text-[#Da2c38] text-lg font-medium mb-4 italic">
             Feito com escuta afetuosa, provocação gentil e muito xodó 💜
           </p>
-          <p className="text-[#ff595e] text-sm">
+          <p className="text-[#463f3a] text-sm">
             Portal não tem validade. Atravessa no seu tempo.
           </p>
-          <p className="text-[#ff595e] text-xs mt-4">
+          <p className="text-[#463f3a] text-xs mt-4">
             Entregas exclusivas em São Paulo (capital e região metropolitana)
           </p>
         </div>

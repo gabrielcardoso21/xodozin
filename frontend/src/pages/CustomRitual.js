@@ -108,7 +108,7 @@ export default function CustomRitual() {
         <button 
           data-testid="back-to-home-btn"
           onClick={() => navigate('/')}
-          className="text-[#Da2c38] hover:text-[#ff595e] font-medium"
+          className="text-[#Da2c38] hover:text-[#463f3a] font-medium"
         >
           ← Voltar ao início
         </button>
@@ -122,7 +122,7 @@ export default function CustomRitual() {
         <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 fade-in-up">
           {ritualData.ritual_name}
         </h1>
-        <p className="text-[#ff595e] max-w-2xl mx-auto">
+        <p className="text-[#463f3a] max-w-2xl mx-auto">
           Escolha os itens que farão parte deste ritual especial
         </p>
       </div>
@@ -152,7 +152,7 @@ export default function CustomRitual() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all ${
                       isSelected
                         ? 'border-[#da2c38] bg-[#F2cc8f] text-[#Da2c38]'
-                        : 'border-[#da2c38]/30 text-[#ff595e] hover:border-[#da2c38]/50'
+                        : 'border-[#da2c38]/30 text-[#463f3a] hover:border-[#da2c38]/50'
                     }`}
                   >
                     <Icon className={`w-4 h-4 ${info.color}`} />
@@ -166,7 +166,7 @@ export default function CustomRitual() {
               {selectedCategories.length > 0 && (
                 <button
                   onClick={() => setSelectedCategories([])}
-                  className="px-4 py-2 rounded-full border-2 border-[#da2c38]/30 text-[#ff595e] hover:border-[#da2c38]/50 text-sm font-medium"
+                  className="px-4 py-2 rounded-full border-2 border-[#da2c38]/30 text-[#463f3a] hover:border-[#da2c38]/50 text-sm font-medium"
                 >
                   Limpar filtros
                 </button>
@@ -187,7 +187,7 @@ export default function CustomRitual() {
                     <h2 className="text-2xl font-bold text-[#Da2c38]">
                       {categoryInfo.label}
                     </h2>
-                    <span className="ml-2 text-sm text-[#ff595e]">
+                    <span className="ml-2 text-sm text-[#463f3a]">
                       ({products.length} {products.length === 1 ? 'item' : 'itens'})
                     </span>
                   </div>
@@ -218,7 +218,7 @@ export default function CustomRitual() {
                               </h3>
                               <Icon className={`w-5 h-5 ${categoryInfo.color}`} />
                             </div>
-                            <p className="text-sm text-[#ff595e] mb-3">
+                            <p className="text-sm text-[#463f3a] mb-3">
                               {product.description}
                             </p>
                             <div className="flex items-center justify-between">
@@ -229,7 +229,7 @@ export default function CustomRitual() {
                                 data-testid={`select-product-${product.id}-btn`}
                                 className={`${
                                   isSelected 
-                                    ? 'bg-[#Da2c38] hover:bg-[#ff595e]' 
+                                    ? 'bg-[#Da2c38] hover:bg-[#463f3a]' 
                                     : 'bg-[#da2c38] hover:bg-[#Da2c38]'
                                 } text-white px-4 py-2 rounded-full text-sm`}
                                 onClick={(e) => {

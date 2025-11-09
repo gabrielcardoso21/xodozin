@@ -263,7 +263,7 @@ export default function PaymentForm({ payment = {}, onChange }) {
       {/* PIX */}
       {selectedMethod === PAYMENT_METHODS.PIX && (
         <div className="space-y-4 p-6 bg-[#F2cc8f] rounded-xl">
-          <p className="text-[#ff595e] mb-4 text-center">
+          <p className="text-[#463f3a] mb-4 text-center">
             Escaneie o QR Code ou copie o código PIX para pagar
           </p>
           <div className="mb-4 text-center">
@@ -294,7 +294,7 @@ export default function PaymentForm({ payment = {}, onChange }) {
               Copiar código
             </button>
           </div>
-          <p className="text-xs text-[#ff595e] mt-4 text-center">
+          <p className="text-xs text-[#463f3a] mt-4 text-center">
             Válido por 30 minutos
           </p>
         </div>
@@ -304,7 +304,7 @@ export default function PaymentForm({ payment = {}, onChange }) {
       {selectedMethod === PAYMENT_METHODS.BOLETO && (
         <div className="space-y-4 p-6 bg-[#F2cc8f] rounded-xl">
           <div>
-            <p className="text-[#ff595e] mb-4">
+            <p className="text-[#463f3a] mb-4">
               O boleto será gerado após a confirmação do pedido
             </p>
             <div>
@@ -319,10 +319,10 @@ export default function PaymentForm({ payment = {}, onChange }) {
               />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-[#ff595e]">
+              <p className="text-sm text-[#463f3a]">
                 <strong>Vencimento:</strong> {formData.boletoDueDate}
               </p>
-              <p className="text-xs text-[#ff595e] mt-2">
+              <p className="text-xs text-[#463f3a] mt-2">
                 O boleto vence em 3 dias úteis após a confirmação do pedido
               </p>
             </div>

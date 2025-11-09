@@ -76,7 +76,7 @@ export default function Rituais() {
           <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 font-serif">
             Rituais que Transformam
           </h1>
-          <p className="text-lg text-[#ff595e] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-[#463f3a] max-w-2xl mx-auto leading-relaxed">
             Cada ritual é um portal de reconexão. Não é sobre seguir regras - é sobre criar um momento intencional que marca a memória afetiva.
           </p>
         </div>
@@ -99,18 +99,18 @@ export default function Rituais() {
                     <h3 className="text-xl font-bold text-[#Da2c38] font-serif">
                       {ritual.name}
                     </h3>
-                    <p className="text-sm text-[#ff595e]">
+                    <p className="text-sm text-[#463f3a]">
                       {ritual.duration}
                     </p>
                   </div>
                 </div>
                 
-                <p className="text-[#ff595e] leading-relaxed mb-4">
+                <p className="text-[#463f3a] leading-relaxed mb-4">
                   {ritual.description}
                 </p>
                 
                 <div className="bg-[#F2cc8f] rounded-lg p-4 border-l-4 border-[#da2c38]">
-                  <p className="text-sm text-[#ff595e] italic">
+                  <p className="text-sm text-[#463f3a] italic">
                     "{ritual.exemplo}"
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export default function Rituais() {
           <h2 className="text-2xl font-bold text-[#Da2c38] mb-4 font-serif">
             Pronto pra criar seu ritual?
           </h2>
-          <p className="text-[#ff595e] mb-6">
+          <p className="text-[#463f3a] mb-6">
             Cada ritual é único e pensado especialmente pra você ou pra quem você ama.
           </p>
           <a

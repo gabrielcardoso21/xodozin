@@ -48,7 +48,7 @@ export default function SummaryPanel({
         <div className="container py-4">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
             <div>
-              <p className="text-sm text-[#ff595e]">
+              <p className="text-sm text-[#463f3a]">
                 {selectedProducts.length} {selectedProducts.length === 1 ? 'item' : 'itens'}
               </p>
               <p className="text-2xl font-bold text-[#Da2c38]">
@@ -85,7 +85,7 @@ export default function SummaryPanel({
           </h4>
           
           {selectedProducts.length === 0 ? (
-            <p className="text-sm text-[#ff595e] italic">
+            <p className="text-sm text-[#463f3a] italic">
               Nenhum item selecionado ainda
             </p>
           ) : (
@@ -102,13 +102,13 @@ export default function SummaryPanel({
                       <p className="text-sm font-medium text-[#Da2c38] truncate">
                         {product.name}
                       </p>
-                      <p className="text-xs text-[#ff595e]">
+                      <p className="text-xs text-[#463f3a]">
                         R${product.price.toFixed(2)}
                       </p>
                     </div>
                     <button
                       onClick={() => onRemoveProduct(product.id)}
-                      className="text-[#ff595e] hover:text-red-500 transition-colors flex-shrink-0"
+                      className="text-[#463f3a] hover:text-red-500 transition-colors flex-shrink-0"
                       aria-label="Remover item"
                     >
                       <X className="w-4 h-4" />
@@ -137,7 +137,7 @@ export default function SummaryPanel({
                   >
                     <div className="flex items-center gap-2">
                       <CategoryIcon className="w-4 h-4 text-[#da2c38]" />
-                      <span className="text-xs text-[#ff595e]">{label}</span>
+                      <span className="text-xs text-[#463f3a]">{label}</span>
                     </div>
                     <span className="text-xs font-semibold text-[#Da2c38]">
                       {count}
@@ -176,7 +176,7 @@ export default function SummaryPanel({
         </Button>
 
         {selectedProducts.length === 0 && (
-          <p className="text-xs text-center text-[#ff595e] mt-2">
+          <p className="text-xs text-center text-[#463f3a] mt-2">
             Selecione pelo menos um item para continuar
           </p>
         )}

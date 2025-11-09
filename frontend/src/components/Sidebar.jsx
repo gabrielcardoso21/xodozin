@@ -72,7 +72,7 @@ export default function Sidebar() {
                   Xodózin
                 </h1>
               </div>
-              <p className="text-sm text-[#ff595e]/70 italic">
+              <p className="text-sm text-[#463f3a]/70 italic">
                 O xodó que conecta gente de verdade
               </p>
             </Link>
@@ -94,12 +94,12 @@ export default function Sidebar() {
                     "hover:bg-white/50 hover:shadow-sm",
                     active
                       ? "bg-white/70 shadow-md text-[#Da2c38] font-medium"
-                      : "text-[#ff595e] hover:text-[#Da2c38]"
+                      : "text-[#463f3a] hover:text-[#Da2c38]"
                   )}
                 >
                   <Icon className={cn(
                     "h-5 w-5",
-                    active ? "text-[#da2c38]" : "text-[#ff595e]"
+                    active ? "text-[#da2c38]" : "text-[#463f3a]"
                   )} />
                   <span>{item.label}</span>
                 </Link>
@@ -109,7 +109,7 @@ export default function Sidebar() {
 
           {/* Footer */}
           <div className="pt-6 border-t border-[#da2c38]/20">
-            <p className="text-xs text-[#ff595e]/60 text-center">
+            <p className="text-xs text-[#463f3a]/60 text-center">
               Feito com xodó 💜
             </p>
           </div>

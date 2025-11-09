@@ -57,7 +57,7 @@ export default function Kits() {
           <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 font-serif">
             Kits Pré-Prontos
           </h1>
-          <p className="text-lg text-[#ff595e] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-[#463f3a] max-w-2xl mx-auto leading-relaxed">
             Cada caixa é um portal - você entrega, a pessoa atravessa sozinha. 
             Rituais prontos pra transformar presentes em momentos de conexão verdadeira.
           </p>
@@ -121,7 +121,7 @@ export default function Kits() {
                   <h3 className="text-2xl font-bold text-[#Da2c38] mb-2 font-serif">
                     {kit.name}
                   </h3>
-                  <p className="text-[#ff595e] mb-4 leading-relaxed">
+                  <p className="text-[#463f3a] mb-4 leading-relaxed">
                     {kit.description}
                   </p>
                   
@@ -131,7 +131,7 @@ export default function Kits() {
                         R$ {price.toFixed(2)}
                       </span>
                       {kit.price_max && (
-                        <span className="text-sm text-[#ff595e]/60 ml-2">
+                        <span className="text-sm text-[#463f3a]/60 ml-2">
                           (R$ {kit.price_min.toFixed(2)} - R$ {kit.price_max.toFixed(2)})
                         </span>
                       )}
@@ -153,7 +153,7 @@ export default function Kits() {
 
         {filteredKits.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-[#ff595e] text-lg">
+            <p className="text-[#463f3a] text-lg">
               Nenhum kit encontrado nesta categoria.
             </p>
           </div>
