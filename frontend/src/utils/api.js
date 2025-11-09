@@ -29,21 +29,12 @@ const getApiBaseUrl = () => {
   // Obtém a URL do backend da variável de ambiente
   const rawBackendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
   
-  // Normaliza a URL do backend (remove protocolos duplicados, etc)
+  // Normaliza a URL do backend
   const BACKEND_URL = normalizeUrl(rawBackendUrl);
   
   // Cria a URL da API garantindo que não há barras duplicadas
   const cleanBackendUrl = BACKEND_URL.replace(/\/+$/, '');
-  let apiUrl = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
-  
-  // Garante que a URL é absoluta (começa com http:// ou https://)
-  // Mas NÃO adiciona se já tiver (para evitar duplicação)
-  if (!apiUrl.match(/^https?:\/\//i)) {
-    apiUrl = `https://${apiUrl}`;
-  }
-  
-  // Verificação final: remove protocolos duplicados que possam ter sido criados
-  apiUrl = normalizeUrl(apiUrl);
+  const apiUrl = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
   
   return apiUrl;
 };
