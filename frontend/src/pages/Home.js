@@ -3,9 +3,7 @@ import { Sparkles, Heart, Gift, Leaf } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API_BASE_URL as API } from '../utils/api';
 
 export default function Home() {
   const navigate = useNavigate();

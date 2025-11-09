@@ -10,9 +10,7 @@ import { toast } from 'sonner';
 import AddressForm from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
 import { formatPhone, cleanPhone } from '../utils/viaCep';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API_BASE_URL as API } from '../utils/api';
 
 export default function Checkout() {
   const location = useLocation();

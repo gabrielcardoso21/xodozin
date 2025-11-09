@@ -4,9 +4,7 @@ import { Button } from '../components/ui/button';
 import { Heart, Users, Home as HomeIcon, Smile, Sparkles, Moon, Sun, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { API_BASE_URL as API } from '../utils/api';
 
 const questions = [
   {

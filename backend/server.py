@@ -216,10 +216,18 @@ async def get_order(order_id: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Configure CORS
+cors_origins = os.environ.get('CORS_ORIGINS', '*')
+# Remove espaços e filtra valores vazios
+if cors_origins == '*':
+    allowed_origins = ['*']
+else:
+    allowed_origins = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
