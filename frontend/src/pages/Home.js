@@ -38,7 +38,11 @@ export default function Home() {
         <div className="hero-content fade-in-up text-center">
           <div className="mb-6 flex justify-center">
             <div className="float-animation">
-              <Sparkles className="w-16 h-16 text-[#da2c38]" />
+              <img 
+                src="/logo.png" 
+                alt="Xodózin" 
+                className="h-24 w-auto object-contain"
+              />
             </div>
           </div>
           

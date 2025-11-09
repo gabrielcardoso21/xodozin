@@ -63,20 +63,21 @@ export default function Sidebar() {
         )}
       >
         <div className="flex flex-col h-full p-6">
-          {/* Logo/Brand */}
-          <div className="mb-8 pt-4">
-            <Link to="/" onClick={() => setIsOpen(false)}>
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-8 w-8 text-[#da2c38]" />
-                <h1 className="text-2xl font-bold text-[#Da2c38] font-serif">
-                  Xodózin
-                </h1>
-              </div>
-              <p className="text-sm text-[#463f3a]/70 italic">
-                O xodó que conecta gente de verdade
-              </p>
-            </Link>
-          </div>
+                {/* Logo/Brand */}
+                <div className="mb-8 pt-4">
+                  <Link to="/" onClick={() => setIsOpen(false)}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <img 
+                        src="/logo.png" 
+                        alt="Xodózin" 
+                        className="h-10 w-auto object-contain"
+                      />
+                    </div>
+                    <p className="text-sm text-[#463f3a]/70 italic">
+                      O xodó que conecta gente de verdade
+                    </p>
+                  </Link>
+                </div>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-2">
