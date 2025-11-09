@@ -1,8 +1,16 @@
 // Normaliza a URL do backend removendo barras duplicadas e finais
 const normalizeUrl = (url) => {
   if (!url) return '';
-  // Remove espaços, barras finais e normaliza todas as barras duplicadas
-  return url.trim().replace(/\/+$/, '').replace(/\/+/g, '/');
+  // Remove espaços
+  url = url.trim();
+  
+  // Se não começar com http:// ou https://, adiciona https://
+  if (!url.match(/^https?:\/\//i)) {
+    url = `https://${url}`;
+  }
+  
+  // Remove barras finais e normaliza todas as barras duplicadas
+  return url.replace(/\/+$/, '').replace(/\/+/g, '/');
 };
 
 // Obtém a URL do backend da variável de ambiente
