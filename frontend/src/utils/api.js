@@ -4,16 +4,23 @@ const normalizeUrl = (url) => {
   // Remove espaços e converte para string
   url = String(url).trim();
   
-  // Remove TODOS os protocolos duplicados no início de forma mais simples
-  // Primeiro, remove todos os protocolos repetidos
-  url = url.replace(/^(https?:\/\/)+/gi, '');
-  
   // Se não começar com http:// ou https://, adiciona https://
   if (!url.match(/^https?:\/\//i)) {
     url = `https://${url}`;
   }
   
-  // Remove barras finais e normaliza todas as barras duplicadas
+  // Remove barras finais e normaliza todas as barras duplicadas (mas mantém o protocolo)
+  // Primeiro separa o protocolo do resto da URL
+  const protocolMatch = url.match(/^(https?:\/\/)/i);
+  if (protocolMatch) {
+    const protocol = protocolMatch[0];
+    const restOfUrl = url.substring(protocol.length);
+    // Normaliza o resto da URL (remove barras duplicadas e finais)
+    const normalizedRest = restOfUrl.replace(/\/+$/, '').replace(/\/+/g, '/');
+    return `${protocol}${normalizedRest}`;
+  }
+  
+  // Fallback: remove barras finais e normaliza
   return url.replace(/\/+$/, '').replace(/\/+/g, '/');
 };
 
