@@ -27,14 +27,21 @@
             // Remove o badge "Made with Emergent" de forma agressiva
             (function() {
                 function removeEmergentBadge() {
-                    if (!document.body) return;
+                    if (!document.body) {
+                        console.log('[Badge Removal] document.body não existe ainda');
+                        return;
+                    }
+                    
+                    let removedCount = 0;
                     
                     try {
                         // Remove por ID
                         const badgeById = document.getElementById('emergent-badge');
                         if (badgeById && badgeById.parentNode) {
+                            console.log('[Badge Removal] Removendo badge por ID:', badgeById.id, badgeById);
                             badgeById.style.display = 'none';
                             badgeById.remove();
+                            removedCount++;
                         }
                         
                         // Remove por texto - procura em todos os elementos
@@ -50,8 +57,10 @@
                                         (parent.getAttribute && (parent.getAttribute('id')?.includes('emergent') ||
                                         parent.getAttribute('class')?.includes('emergent')))) {
                                         if (parent.parentNode) {
+                                            console.log('[Badge Removal] Removendo elemento pai por texto:', parent.id, parent.className, parent);
                                             parent.style.display = 'none';
                                             parent.remove();
+                                            removedCount++;
                                         }
                                         return;
                                     }
@@ -59,8 +68,10 @@
                                 }
                                 // Remove o próprio elemento
                                 if (el.parentNode) {
+                                    console.log('[Badge Removal] Removendo elemento por texto:', el.tagName, el.id, el.className, el);
                                     el.style.display = 'none';
                                     el.remove();
+                                    removedCount++;
                                 }
                             }
                         });
@@ -69,8 +80,10 @@
                         const badgesByAttr = document.querySelectorAll('[id*="emergent"], [class*="emergent"], [href*="emergent"]');
                         badgesByAttr.forEach(function(badge) {
                             if (badge && badge.parentNode) {
+                                console.log('[Badge Removal] Removendo badge por atributos:', badge.id, badge.className, badge.href, badge);
                                 badge.style.display = 'none';
                                 badge.remove();
+                                removedCount++;
                             }
                         });
                         
@@ -78,26 +91,38 @@
                         const links = document.querySelectorAll('a');
                         links.forEach(function(link) {
                             if (link && link.textContent && link.textContent.includes('Made with Emergent') && link.parentNode) {
+                                console.log('[Badge Removal] Removendo link por texto:', link.href, link.textContent, link);
                                 link.style.display = 'none';
                                 link.remove();
+                                removedCount++;
                             }
                         });
+                        
+                        if (removedCount > 0) {
+                            console.log(`[Badge Removal] Total de elementos removidos: ${removedCount}`);
+                        }
                     } catch (e) {
-                        // Ignora erros silenciosamente
-                        console.debug('Error removing badge:', e);
+                        console.error('[Badge Removal] Erro ao remover badge:', e);
+                        console.error('[Badge Removal] Stack trace:', e.stack);
                     }
                 }
                 
                 // Aguarda o DOM estar completamente carregado
                 function initRemoval() {
+                    console.log('[Badge Removal] Iniciando remoção do badge. readyState:', document.readyState);
+                    
                     if (document.readyState === 'loading') {
+                        console.log('[Badge Removal] Aguardando DOMContentLoaded...');
                         document.addEventListener('DOMContentLoaded', function() {
+                            console.log('[Badge Removal] DOMContentLoaded disparado');
                             setTimeout(function() {
+                                console.log('[Badge Removal] Executando remoção após DOMContentLoaded');
                                 removeEmergentBadge();
                                 startObserver();
                             }, 100);
                         });
                     } else {
+                        console.log('[Badge Removal] DOM já está pronto, executando remoção imediatamente');
                         setTimeout(function() {
                             removeEmergentBadge();
                             startObserver();
@@ -105,22 +130,38 @@
                     }
                     
                     // Remove após delays (para scripts que carregam depois)
-                    setTimeout(removeEmergentBadge, 500);
-                    setTimeout(removeEmergentBadge, 1000);
-                    setTimeout(removeEmergentBadge, 2000);
+                    console.log('[Badge Removal] Agendando remoções com delays: 500ms, 1000ms, 2000ms');
+                    setTimeout(function() {
+                        console.log('[Badge Removal] Executando remoção após 500ms');
+                        removeEmergentBadge();
+                    }, 500);
+                    setTimeout(function() {
+                        console.log('[Badge Removal] Executando remoção após 1000ms');
+                        removeEmergentBadge();
+                    }, 1000);
+                    setTimeout(function() {
+                        console.log('[Badge Removal] Executando remoção após 2000ms');
+                        removeEmergentBadge();
+                    }, 2000);
                     
                     // Remove periodicamente (caso seja adicionado dinamicamente)
-                    setInterval(removeEmergentBadge, 1000);
+                    console.log('[Badge Removal] Configurando remoção periódica a cada 1000ms');
+                    setInterval(function() {
+                        removeEmergentBadge();
+                    }, 1000);
                 }
                 
                 function startObserver() {
                     if (!document.body || !document.body.parentNode) {
+                        console.log('[Badge Removal] document.body não está pronto, tentando novamente em 100ms');
                         setTimeout(startObserver, 100);
                         return;
                     }
                     
                     try {
+                        console.log('[Badge Removal] Iniciando MutationObserver');
                         const observer = new MutationObserver(function(mutations) {
+                            console.log('[Badge Removal] MutationObserver detectou mudanças:', mutations.length, 'mutações');
                             removeEmergentBadge();
                         });
                         
@@ -130,17 +171,24 @@
                             attributes: false,
                             characterData: false
                         });
+                        console.log('[Badge Removal] MutationObserver iniciado com sucesso');
                     } catch (e) {
-                        // Ignora erros do observer
-                        console.debug('Error starting observer:', e);
+                        console.error('[Badge Removal] Erro ao iniciar MutationObserver:', e);
+                        console.error('[Badge Removal] Stack trace:', e.stack);
                     }
                 }
                 
                 // Inicia apenas quando o DOM estiver pronto
+                console.log('[Badge Removal] Script de remoção carregado. readyState:', document.readyState);
                 if (document.readyState === 'complete') {
+                    console.log('[Badge Removal] DOM já está completo, iniciando remoção');
                     initRemoval();
                 } else {
-                    window.addEventListener('load', initRemoval);
+                    console.log('[Badge Removal] Aguardando evento load para iniciar remoção');
+                    window.addEventListener('load', function() {
+                        console.log('[Badge Removal] Evento load disparado');
+                        initRemoval();
+                    });
                 }
             })();
         </script>
