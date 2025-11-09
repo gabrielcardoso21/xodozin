@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <meta name="description" content="A product of emergent.sh" />
+        <meta name="description" content="Xodózin - O xodó que conecta gente de verdade. Rituais personalizados que transformam presentes em momentos de conexão." />
         <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -18,40 +18,156 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-        <title>Emergent | Fullstack App</title>
-        <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
-        <!--
-        These two scripts have been added for the testing, please do not edit or remove them
-        -->
-        <script src="https://unpkg.com/rrweb@latest/dist/rrweb.min.js"></script>
-        <script src="https://d2adkz2s9zrlge.cloudfront.net/rrweb-recorder-20250919-1.js"></script>
-        <!--
-        These two scripts have been added for the Visual Edits, please do not edit or remove them
-        -->
-        <script>
-            // Only load visual edit scripts when inside an iframe and visual edits are enabled
-            if (window.self !== window.top && '%REACT_APP_ENABLE_VISUAL_EDITS%' === 'true') {
-                // Load debug monitor script
-                var debugScript = document.createElement('script');
-                debugScript.src = 'https://assets.emergent.sh/scripts/debug-monitor.js';
-                document.head.appendChild(debugScript);
-
-                // Configure Tailwind
-                window.tailwind = window.tailwind || {};
-                tailwind.config = {
-                    corePlugins: { preflight: false },
-                };
-
-                // Load Tailwind CDN
-                var tailwindScript = document.createElement('script');
-                tailwindScript.src = 'https://cdn.tailwindcss.com';
-                document.head.appendChild(tailwindScript);
-            }
-        </script>
+        <title>Xodózin - O xodó que conecta gente de verdade</title>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
+        <script>
+            // Remove o badge "Made with Emergent" de forma agressiva
+            (function() {
+                function removeEmergentBadge() {
+                    if (!document.body) return;
+                    
+                    try {
+                        // Remove por ID
+                        const badgeById = document.getElementById('emergent-badge');
+                        if (badgeById && badgeById.parentNode) {
+                            badgeById.style.display = 'none';
+                            badgeById.remove();
+                        }
+                        
+                        // Remove por texto - procura em todos os elementos
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(function(el) {
+                            if (!el || !el.parentNode) return;
+                            const text = el.textContent || el.innerText || '';
+                            if (text.trim() === 'Made with Emergent' || text.includes('Made with Emergent')) {
+                                // Remove o elemento pai se for um link ou container
+                                let parent = el.parentElement;
+                                while (parent && parent !== document.body && parent !== document.documentElement) {
+                                    if (parent.id === 'emergent-badge' || 
+                                        (parent.getAttribute && (parent.getAttribute('id')?.includes('emergent') ||
+                                        parent.getAttribute('class')?.includes('emergent')))) {
+                                        if (parent.parentNode) {
+                                            parent.style.display = 'none';
+                                            parent.remove();
+                                        }
+                                        return;
+                                    }
+                                    parent = parent.parentElement;
+                                }
+                                // Remove o próprio elemento
+                                if (el.parentNode) {
+                                    el.style.display = 'none';
+                                    el.remove();
+                                }
+                            }
+                        });
+                        
+                        // Remove por atributos
+                        const badgesByAttr = document.querySelectorAll('[id*="emergent"], [class*="emergent"], [href*="emergent"]');
+                        badgesByAttr.forEach(function(badge) {
+                            if (badge && badge.parentNode) {
+                                badge.style.display = 'none';
+                                badge.remove();
+                            }
+                        });
+                        
+                        // Remove elementos <a> que contenham "Made with Emergent"
+                        const links = document.querySelectorAll('a');
+                        links.forEach(function(link) {
+                            if (link && link.textContent && link.textContent.includes('Made with Emergent') && link.parentNode) {
+                                link.style.display = 'none';
+                                link.remove();
+                            }
+                        });
+                    } catch (e) {
+                        // Ignora erros silenciosamente
+                        console.debug('Error removing badge:', e);
+                    }
+                }
+                
+                // Aguarda o DOM estar completamente carregado
+                function initRemoval() {
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            setTimeout(function() {
+                                removeEmergentBadge();
+                                startObserver();
+                            }, 100);
+                        });
+                    } else {
+                        setTimeout(function() {
+                            removeEmergentBadge();
+                            startObserver();
+                        }, 100);
+                    }
+                    
+                    // Remove após delays (para scripts que carregam depois)
+                    setTimeout(removeEmergentBadge, 500);
+                    setTimeout(removeEmergentBadge, 1000);
+                    setTimeout(removeEmergentBadge, 2000);
+                    
+                    // Remove periodicamente (caso seja adicionado dinamicamente)
+                    setInterval(removeEmergentBadge, 1000);
+                }
+                
+                function startObserver() {
+                    if (!document.body || !document.body.parentNode) {
+                        setTimeout(startObserver, 100);
+                        return;
+                    }
+                    
+                    try {
+                        const observer = new MutationObserver(function(mutations) {
+                            removeEmergentBadge();
+                        });
+                        
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true,
+                            attributes: false,
+                            characterData: false
+                        });
+                    } catch (e) {
+                        // Ignora erros do observer
+                        console.debug('Error starting observer:', e);
+                    }
+                }
+                
+                // Inicia apenas quando o DOM estiver pronto
+                if (document.readyState === 'complete') {
+                    initRemoval();
+                } else {
+                    window.addEventListener('load', initRemoval);
+                }
+            })();
+        </script>
+        <style>
+            /* Esconde o badge via CSS também - mais específico */
+            #emergent-badge,
+            [id*="emergent-badge"],
+            [id*="emergent"],
+            [class*="emergent-badge"],
+            [class*="emergent"],
+            a[href*="emergent"],
+            a[href*="emergent.sh"],
+            p:contains("Made with Emergent"),
+            *:has-text("Made with Emergent") {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                left: -9999px !important;
+            }
+            
+            /* Esconde qualquer elemento que contenha o texto */
+            body * {
+                position: relative;
+            }
+        </style>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -62,53 +178,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-        <a
-            id="emergent-badge"
-            target="_blank"
-            href="https://app.emergent.sh/?utm_source=emergent-badge"
-            style="
-                display: flex !important;
-                align-items: center !important;
-                position: fixed !important;
-                bottom: 20px;
-                right: 20px;
-                text-decoration: none;
-                padding: 6px 10px;
-                font-family: -apple-system, BlinkMacSystemFont,
-                    &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell,
-                    &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;,
-                    sans-serif !important;
-                font-size: 12px !important;
-                z-index: 9999 !important;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-                border-radius: 8px !important;
-                background-color: #ffffff !important;
-                border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            "
-        >
-            <div
-                style="display: flex; flex-direction: row; align-items: center"
-            >
-                <img
-                    style="width: 20px; height: 20px; margin-right: 8px"
-                    src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4"
-                />
-                <p
-                    style="
-                        color: #000000;
-                        font-family: -apple-system, BlinkMacSystemFont,
-                            &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu,
-                            Cantarell, &quot;Open Sans&quot;,
-                            &quot;Helvetica Neue&quot;, sans-serif !important;
-                        font-size: 12px !important;
-                        align-items: center;
-                        margin-bottom: 0;
-                    "
-                >
-                    Made with Emergent
-                </p>
-            </div>
-        </a>
         <script>
             !(function (t, e) {
                 var o, n, p, r;
