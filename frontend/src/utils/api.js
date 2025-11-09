@@ -4,15 +4,9 @@ const normalizeUrl = (url) => {
   // Remove espaços e converte para string
   url = String(url).trim();
   
-  // Remove TODOS os protocolos duplicados no início (ex: https://https://https://)
-  // Usa replace global para remover todas as ocorrências
-  while (url.match(/^(https?:\/\/)+/i)) {
-    url = url.replace(/^(https?:\/\/)+/i, (match) => {
-      // Pega apenas o primeiro protocolo encontrado
-      const firstProtocol = match.match(/^(https?:\/\/)/i);
-      return firstProtocol ? firstProtocol[0] : 'https://';
-    });
-  }
+  // Remove TODOS os protocolos duplicados no início de forma mais simples
+  // Primeiro, remove todos os protocolos repetidos
+  url = url.replace(/^(https?:\/\/)+/gi, '');
   
   // Se não começar com http:// ou https://, adiciona https://
   if (!url.match(/^https?:\/\//i)) {
