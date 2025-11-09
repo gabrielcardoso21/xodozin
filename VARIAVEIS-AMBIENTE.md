@@ -42,7 +42,10 @@ Configure esta variável no Vercel:
 ```
 https://xodozin-backend.onrender.com
 ```
-**⚠️ IMPORTANTE:** Substitua `xodozin-backend.onrender.com` pela URL real do seu backend no Render (você vai obter depois do deploy)
+**⚠️ IMPORTANTE:** 
+- Use a URL completa com `https://` (exemplo: `https://xodozin-backend.onrender.com`)
+- **NÃO** adicione barra no final
+- Se você esquecer o `https://`, o código agora adiciona automaticamente, mas é melhor configurar corretamente
 
 ---
 
