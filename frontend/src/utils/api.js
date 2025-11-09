@@ -42,9 +42,11 @@ if (protocolMatch) {
 
 // Log para debug (apenas em desenvolvimento)
 if (process.env.NODE_ENV === 'development') {
-  console.log('API_BASE_URL:', API_BASE_URL);
-  console.log('BACKEND_URL:', BACKEND_URL);
-  console.log('REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
+  console.log('=== API URL Debug ===');
+  console.log('REACT_APP_BACKEND_URL (raw):', process.env.REACT_APP_BACKEND_URL);
+  console.log('BACKEND_URL (normalized):', BACKEND_URL);
+  console.log('API_BASE_URL (final):', API_BASE_URL);
+  console.log('====================');
 }
 
 // Exporta a URL da API
