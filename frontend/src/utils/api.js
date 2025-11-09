@@ -2,7 +2,7 @@
 const normalizeUrl = (url) => {
   if (!url) return '';
   // Remove espaços
-  url = url.trim();
+  url = String(url).trim();
   
   // Remove protocolos duplicados (ex: https://https:// ou http://https://)
   // Mantém apenas o primeiro protocolo encontrado
@@ -19,29 +19,27 @@ const normalizeUrl = (url) => {
   return url.replace(/\/+$/, '').replace(/\/+/g, '/');
 };
 
-// Obtém a URL do backend da variável de ambiente
-const rawBackendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-const BACKEND_URL = normalizeUrl(rawBackendUrl);
+// Função para obter a URL da API (executada em runtime)
+const getApiBaseUrl = () => {
+  // Obtém a URL do backend da variável de ambiente
+  const rawBackendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+  const BACKEND_URL = normalizeUrl(rawBackendUrl);
+  
+  // Cria a URL da API garantindo que não há barras duplicadas
+  const cleanBackendUrl = BACKEND_URL.replace(/\/+$/, '');
+  let apiUrl = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
+  
+  // Garante que a URL é absoluta (começa com http:// ou https://)
+  if (!apiUrl.match(/^https?:\/\//i)) {
+    apiUrl = `https://${apiUrl}`;
+  }
+  
+  return apiUrl;
+};
 
-// Cria a URL da API garantindo que não há barras duplicadas
-// Remove qualquer barra no final do BACKEND_URL e adiciona /api
-const cleanBackendUrl = BACKEND_URL.replace(/\/+$/, '');
-let API_BASE_URL = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
-
-// Garante que a URL é absoluta (começa com http:// ou https://)
-// Isso é importante porque o Vercel pode processar variáveis de ambiente de forma diferente
-if (!API_BASE_URL.match(/^https?:\/\//i)) {
-  API_BASE_URL = `https://${API_BASE_URL}`;
-}
-
-// Debug: log apenas em desenvolvimento
-if (process.env.NODE_ENV === 'development') {
-  console.log('API_BASE_URL:', API_BASE_URL);
-  console.log('REACT_APP_BACKEND_URL:', rawBackendUrl);
-}
-
-export { API_BASE_URL };
+// Exporta função para obter URL em runtime
+export const API_BASE_URL = getApiBaseUrl();
 
 // Exporta também a URL do backend para uso direto se necessário
-export { BACKEND_URL };
+export const BACKEND_URL = normalizeUrl(process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000');
 
