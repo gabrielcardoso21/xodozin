@@ -108,7 +108,7 @@ export default function CustomRitual() {
         <button 
           data-testid="back-to-home-btn"
           onClick={() => navigate('/')}
-          className="text-[#8B5A3C] hover:text-[#6B5244] font-medium"
+          className="text-[#Da2c38] hover:text-[#ff595e] font-medium"
         >
           ← Voltar ao início
         </button>
@@ -117,12 +117,12 @@ export default function CustomRitual() {
       {/* Ritual Name */}
       <div className="container py-8 text-center">
         <div className="flex justify-center mb-4">
-          <Sparkles className="w-12 h-12 text-[#C19A6B]" />
+          <Sparkles className="w-12 h-12 text-[#da2c38]" />
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-[#8B5A3C] mb-4 fade-in-up">
+        <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 fade-in-up">
           {ritualData.ritual_name}
         </h1>
-        <p className="text-[#6B5244] max-w-2xl mx-auto">
+        <p className="text-[#ff595e] max-w-2xl mx-auto">
           Escolha os itens que farão parte deste ritual especial
         </p>
       </div>
@@ -134,8 +134,8 @@ export default function CustomRitual() {
           {/* Filtros por Categoria */}
           <div className="mb-8 fade-in-up">
             <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-[#C19A6B]" />
-              <h3 className="text-lg font-semibold text-[#8B5A3C]">Filtros por Categoria</h3>
+              <Filter className="w-5 h-5 text-[#da2c38]" />
+              <h3 className="text-lg font-semibold text-[#Da2c38]">Filtros por Categoria</h3>
             </div>
             <div className="flex flex-wrap gap-3">
               {Object.entries(CATEGORIES).map(([category, info]) => {
@@ -151,8 +151,8 @@ export default function CustomRitual() {
                     onClick={() => handleToggleCategory(category)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all ${
                       isSelected
-                        ? 'border-[#C19A6B] bg-[#FFF8F0] text-[#8B5A3C]'
-                        : 'border-[#C19A6B]/30 text-[#6B5244] hover:border-[#C19A6B]/50'
+                        ? 'border-[#da2c38] bg-[#F2cc8f] text-[#Da2c38]'
+                        : 'border-[#da2c38]/30 text-[#ff595e] hover:border-[#da2c38]/50'
                     }`}
                   >
                     <Icon className={`w-4 h-4 ${info.color}`} />
@@ -166,7 +166,7 @@ export default function CustomRitual() {
               {selectedCategories.length > 0 && (
                 <button
                   onClick={() => setSelectedCategories([])}
-                  className="px-4 py-2 rounded-full border-2 border-[#C19A6B]/30 text-[#6B5244] hover:border-[#C19A6B]/50 text-sm font-medium"
+                  className="px-4 py-2 rounded-full border-2 border-[#da2c38]/30 text-[#ff595e] hover:border-[#da2c38]/50 text-sm font-medium"
                 >
                   Limpar filtros
                 </button>
@@ -184,10 +184,10 @@ export default function CustomRitual() {
                 <div key={category} className="fade-in-up" style={{ animationDelay: `${catIndex * 0.1}s` }}>
                   <div className="flex items-center justify-center mb-6">
                     <Icon className={`w-6 h-6 ${categoryInfo.color} mr-2`} />
-                    <h2 className="text-2xl font-bold text-[#8B5A3C]">
+                    <h2 className="text-2xl font-bold text-[#Da2c38]">
                       {categoryInfo.label}
                     </h2>
-                    <span className="ml-2 text-sm text-[#6B5244]">
+                    <span className="ml-2 text-sm text-[#ff595e]">
                       ({products.length} {products.length === 1 ? 'item' : 'itens'})
                     </span>
                   </div>
@@ -202,8 +202,8 @@ export default function CustomRitual() {
                           onClick={() => handleToggleProduct(product)}
                           className={`product-card cursor-pointer transition-all ${
                             isSelected 
-                              ? 'ring-4 ring-[#C19A6B] shadow-2xl bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0]' 
-                              : 'hover:ring-2 hover:ring-[#C19A6B]/50 hover:shadow-lg'
+                              ? 'ring-4 ring-[#da2c38] shadow-2xl bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f]' 
+                              : 'hover:ring-2 hover:ring-[#da2c38]/50 hover:shadow-lg'
                           }`}
                         >
                           <img 
@@ -213,24 +213,24 @@ export default function CustomRitual() {
                           />
                           <div className="p-5">
                             <div className="flex items-center justify-between mb-2">
-                              <h3 className="text-lg font-semibold text-[#8B5A3C]">
+                              <h3 className="text-lg font-semibold text-[#Da2c38]">
                                 {product.name}
                               </h3>
                               <Icon className={`w-5 h-5 ${categoryInfo.color}`} />
                             </div>
-                            <p className="text-sm text-[#6B5244] mb-3">
+                            <p className="text-sm text-[#ff595e] mb-3">
                               {product.description}
                             </p>
                             <div className="flex items-center justify-between">
-                              <span className="text-xl font-bold text-[#C19A6B]">
+                              <span className="text-xl font-bold text-[#da2c38]">
                                 R${product.price.toFixed(2)}
                               </span>
                               <Button
                                 data-testid={`select-product-${product.id}-btn`}
                                 className={`${
                                   isSelected 
-                                    ? 'bg-[#8B5A3C] hover:bg-[#6B5244]' 
-                                    : 'bg-[#C19A6B] hover:bg-[#8B5A3C]'
+                                    ? 'bg-[#Da2c38] hover:bg-[#ff595e]' 
+                                    : 'bg-[#da2c38] hover:bg-[#Da2c38]'
                                 } text-white px-4 py-2 rounded-full text-sm`}
                                 onClick={(e) => {
                                   e.stopPropagation();

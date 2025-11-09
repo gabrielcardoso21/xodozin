@@ -60,8 +60,8 @@ export default function AddressForm({
     <div className="space-y-4">
       {/* Título da Seção */}
       <div className="flex items-center gap-2 mb-6">
-        <MapPin className="w-5 h-5 text-[#C19A6B]" />
-        <h3 className="text-xl font-bold text-[#8B5A3C]">
+        <MapPin className="w-5 h-5 text-[#da2c38]" />
+        <h3 className="text-xl font-bold text-[#Da2c38]">
           Onde entregar seu ritual?
         </h3>
       </div>
@@ -69,7 +69,7 @@ export default function AddressForm({
       {/* CEP */}
       <div>
         {showLabel && (
-          <Label htmlFor="cep" className="block text-[#8B5A3C] font-medium mb-2">
+          <Label htmlFor="cep" className="block text-[#Da2c38] font-medium mb-2">
             CEP *
           </Label>
         )}
@@ -85,7 +85,7 @@ export default function AddressForm({
       {/* Logradouro */}
       <div>
         {showLabel && (
-          <Label htmlFor="logradouro" className="block text-[#8B5A3C] font-medium mb-2">
+          <Label htmlFor="logradouro" className="block text-[#Da2c38] font-medium mb-2">
             Rua/Logradouro *
           </Label>
         )}
@@ -94,7 +94,7 @@ export default function AddressForm({
           value={formData.logradouro}
           onChange={(e) => handleFieldChange('logradouro', e.target.value)}
           placeholder="Rua, Avenida, etc."
-          className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+          className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
           required
         />
       </div>
@@ -103,7 +103,7 @@ export default function AddressForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           {showLabel && (
-            <Label htmlFor="numero" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="numero" className="block text-[#Da2c38] font-medium mb-2">
               Número *
             </Label>
           )}
@@ -113,13 +113,13 @@ export default function AddressForm({
             value={formData.numero}
             onChange={(e) => handleFieldChange('numero', e.target.value)}
             placeholder="123"
-            className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+            className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
             required
           />
         </div>
         <div>
           {showLabel && (
-            <Label htmlFor="complemento" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="complemento" className="block text-[#Da2c38] font-medium mb-2">
               Complemento
             </Label>
           )}
@@ -129,7 +129,7 @@ export default function AddressForm({
             value={formData.complemento}
             onChange={(e) => handleFieldChange('complemento', e.target.value)}
             placeholder="Apto, bloco, etc."
-            className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+            className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
           />
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function AddressForm({
       {/* Bairro */}
       <div>
         {showLabel && (
-          <Label htmlFor="bairro" className="block text-[#8B5A3C] font-medium mb-2">
+          <Label htmlFor="bairro" className="block text-[#Da2c38] font-medium mb-2">
             Bairro *
           </Label>
         )}
@@ -146,7 +146,7 @@ export default function AddressForm({
           value={formData.bairro}
           onChange={(e) => handleFieldChange('bairro', e.target.value)}
           placeholder="Bairro"
-          className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+          className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
           required
         />
       </div>
@@ -155,28 +155,28 @@ export default function AddressForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           {showLabel && (
-            <Label htmlFor="cidade" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="cidade" className="block text-[#Da2c38] font-medium mb-2">
               Cidade *
             </Label>
           )}
           <Input
             id="cidade"
             value={formData.cidade}
-            className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4 bg-gray-50"
+            className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 bg-gray-50"
             readOnly
             required
           />
         </div>
         <div>
           {showLabel && (
-            <Label htmlFor="estado" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="estado" className="block text-[#Da2c38] font-medium mb-2">
               Estado *
             </Label>
           )}
           <Input
             id="estado"
             value={formData.estado}
-            className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4 bg-gray-50"
+            className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 bg-gray-50"
             readOnly
             required
           />
@@ -186,7 +186,7 @@ export default function AddressForm({
       {/* Referência (opcional) */}
       <div>
         {showLabel && (
-          <Label htmlFor="referencia" className="block text-[#8B5A3C] font-medium mb-2">
+          <Label htmlFor="referencia" className="block text-[#Da2c38] font-medium mb-2">
             Ponto de referência
           </Label>
         )}
@@ -195,7 +195,7 @@ export default function AddressForm({
           value={formData.referencia}
           onChange={(e) => handleFieldChange('referencia', e.target.value)}
           placeholder="Ex: Próximo ao mercado, próximo ao ponto de ônibus..."
-          className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+          className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
         />
       </div>
     </div>

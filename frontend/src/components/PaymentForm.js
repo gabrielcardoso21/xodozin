@@ -107,7 +107,7 @@ export default function PaymentForm({ payment = {}, onChange }) {
     <div className="space-y-4">
       {/* Título da Seção */}
       <div>
-        <h3 className="text-xl font-bold text-[#8B5A3C] mb-4">
+        <h3 className="text-xl font-bold text-[#Da2c38] mb-4">
           Como deseja pagar?
         </h3>
       </div>
@@ -120,13 +120,13 @@ export default function PaymentForm({ payment = {}, onChange }) {
           onClick={() => handleMethodChange(PAYMENT_METHODS.CREDIT_CARD)}
           className={`p-4 rounded-xl border-2 transition-all ${
             selectedMethod === PAYMENT_METHODS.CREDIT_CARD
-              ? 'border-[#C19A6B] bg-[#FFF8F0]'
-              : 'border-[#C19A6B]/30 hover:border-[#C19A6B]/50'
+              ? 'border-[#da2c38] bg-[#F2cc8f]'
+              : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
-            <CreditCard className="w-5 h-5 text-[#C19A6B]" />
-            <span className="font-semibold text-[#8B5A3C]">Cartão de Crédito</span>
+            <CreditCard className="w-5 h-5 text-[#da2c38]" />
+            <span className="font-semibold text-[#Da2c38]">Cartão de Crédito</span>
           </div>
           {selectedMethod === PAYMENT_METHODS.CREDIT_CARD && (
             <CheckCircle className="w-4 h-4 text-green-500 mt-1" />
@@ -139,13 +139,13 @@ export default function PaymentForm({ payment = {}, onChange }) {
           onClick={() => handleMethodChange(PAYMENT_METHODS.PIX)}
           className={`p-4 rounded-xl border-2 transition-all ${
             selectedMethod === PAYMENT_METHODS.PIX
-              ? 'border-[#C19A6B] bg-[#FFF8F0]'
-              : 'border-[#C19A6B]/30 hover:border-[#C19A6B]/50'
+              ? 'border-[#da2c38] bg-[#F2cc8f]'
+              : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
-            <QrCode className="w-5 h-5 text-[#C19A6B]" />
-            <span className="font-semibold text-[#8B5A3C]">PIX</span>
+            <QrCode className="w-5 h-5 text-[#da2c38]" />
+            <span className="font-semibold text-[#Da2c38]">PIX</span>
           </div>
           {selectedMethod === PAYMENT_METHODS.PIX && (
             <CheckCircle className="w-4 h-4 text-green-500 mt-1" />
@@ -158,13 +158,13 @@ export default function PaymentForm({ payment = {}, onChange }) {
           onClick={() => handleMethodChange(PAYMENT_METHODS.BOLETO)}
           className={`p-4 rounded-xl border-2 transition-all ${
             selectedMethod === PAYMENT_METHODS.BOLETO
-              ? 'border-[#C19A6B] bg-[#FFF8F0]'
-              : 'border-[#C19A6B]/30 hover:border-[#C19A6B]/50'
+              ? 'border-[#da2c38] bg-[#F2cc8f]'
+              : 'border-[#da2c38]/30 hover:border-[#da2c38]/50'
           }`}
         >
           <div className="flex items-center gap-2 mb-2">
-            <FileText className="w-5 h-5 text-[#C19A6B]" />
-            <span className="font-semibold text-[#8B5A3C]">Boleto</span>
+            <FileText className="w-5 h-5 text-[#da2c38]" />
+            <span className="font-semibold text-[#Da2c38]">Boleto</span>
           </div>
           {selectedMethod === PAYMENT_METHODS.BOLETO && (
             <CheckCircle className="w-4 h-4 text-green-500 mt-1" />
@@ -174,9 +174,9 @@ export default function PaymentForm({ payment = {}, onChange }) {
 
       {/* Formulário de Cartão de Crédito */}
       {selectedMethod === PAYMENT_METHODS.CREDIT_CARD && (
-        <div className="space-y-4 p-6 bg-[#FFF8F0] rounded-xl">
+        <div className="space-y-4 p-6 bg-[#F2cc8f] rounded-xl">
           <div>
-            <Label htmlFor="cardNumber" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="cardNumber" className="block text-[#Da2c38] font-medium mb-2">
               Número do Cartão *
             </Label>
             <Input
@@ -186,13 +186,13 @@ export default function PaymentForm({ payment = {}, onChange }) {
               onChange={(e) => handleFieldChange('cardNumber', formatCardNumber(e.target.value))}
               placeholder="0000 0000 0000 0000"
               maxLength={19}
-              className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+              className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="cardName" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="cardName" className="block text-[#Da2c38] font-medium mb-2">
               Nome no Cartão *
             </Label>
             <Input
@@ -201,14 +201,14 @@ export default function PaymentForm({ payment = {}, onChange }) {
               value={formData.cardName}
               onChange={(e) => handleFieldChange('cardName', e.target.value)}
               placeholder="Nome completo"
-              className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+              className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="cardExpiry" className="block text-[#8B5A3C] font-medium mb-2">
+              <Label htmlFor="cardExpiry" className="block text-[#Da2c38] font-medium mb-2">
                 Validade (MM/AA) *
               </Label>
               <Input
@@ -218,12 +218,12 @@ export default function PaymentForm({ payment = {}, onChange }) {
                 onChange={(e) => handleFieldChange('cardExpiry', formatExpiry(e.target.value))}
                 placeholder="MM/AA"
                 maxLength={5}
-                className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+                className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="cardCvv" className="block text-[#8B5A3C] font-medium mb-2">
+              <Label htmlFor="cardCvv" className="block text-[#Da2c38] font-medium mb-2">
                 CVV *
               </Label>
               <Input
@@ -233,21 +233,21 @@ export default function PaymentForm({ payment = {}, onChange }) {
                 onChange={(e) => handleFieldChange('cardCvv', formatCvv(e.target.value))}
                 placeholder="123"
                 maxLength={3}
-                className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+                className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
                 required
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="installments" className="block text-[#8B5A3C] font-medium mb-2">
+            <Label htmlFor="installments" className="block text-[#Da2c38] font-medium mb-2">
               Parcelas *
             </Label>
             <select
               id="installments"
               value={formData.installments}
               onChange={(e) => handleFieldChange('installments', e.target.value)}
-              className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4 bg-white"
+              className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 bg-white"
               required
             >
               {[...Array(12)].map((_, i) => (
@@ -262,26 +262,26 @@ export default function PaymentForm({ payment = {}, onChange }) {
 
       {/* PIX */}
       {selectedMethod === PAYMENT_METHODS.PIX && (
-        <div className="space-y-4 p-6 bg-[#FFF8F0] rounded-xl">
-          <p className="text-[#6B5244] mb-4 text-center">
+        <div className="space-y-4 p-6 bg-[#F2cc8f] rounded-xl">
+          <p className="text-[#ff595e] mb-4 text-center">
             Escaneie o QR Code ou copie o código PIX para pagar
           </p>
           <div className="mb-4 text-center">
             <img 
               src={formData.pixQrCode} 
               alt="QR Code PIX" 
-              className="mx-auto max-w-xs border-2 border-[#C19A6B]/30 rounded-xl p-4 bg-white"
+              className="mx-auto max-w-xs border-2 border-[#da2c38]/30 rounded-xl p-4 bg-white"
             />
           </div>
           <div>
-            <Label className="block text-[#8B5A3C] font-medium mb-2">
+            <Label className="block text-[#Da2c38] font-medium mb-2">
               Código PIX (copiar)
             </Label>
             <Input
               type="text"
               value={formData.pixCode}
               readOnly
-              className="w-full border-[#C19A6B]/30 rounded-xl p-4 bg-white font-mono text-xs"
+              className="w-full border-[#da2c38]/30 rounded-xl p-4 bg-white font-mono text-xs"
             />
             <button
               type="button"
@@ -289,12 +289,12 @@ export default function PaymentForm({ payment = {}, onChange }) {
                 navigator.clipboard.writeText(formData.pixCode);
                 alert('Código PIX copiado!');
               }}
-              className="mt-2 text-sm text-[#C19A6B] hover:text-[#8B5A3C]"
+              className="mt-2 text-sm text-[#da2c38] hover:text-[#Da2c38]"
             >
               Copiar código
             </button>
           </div>
-          <p className="text-xs text-[#6B5244] mt-4 text-center">
+          <p className="text-xs text-[#ff595e] mt-4 text-center">
             Válido por 30 minutos
           </p>
         </div>
@@ -302,27 +302,27 @@ export default function PaymentForm({ payment = {}, onChange }) {
 
       {/* Boleto */}
       {selectedMethod === PAYMENT_METHODS.BOLETO && (
-        <div className="space-y-4 p-6 bg-[#FFF8F0] rounded-xl">
+        <div className="space-y-4 p-6 bg-[#F2cc8f] rounded-xl">
           <div>
-            <p className="text-[#6B5244] mb-4">
+            <p className="text-[#ff595e] mb-4">
               O boleto será gerado após a confirmação do pedido
             </p>
             <div>
-              <Label className="block text-[#8B5A3C] font-medium mb-2">
+              <Label className="block text-[#Da2c38] font-medium mb-2">
                 Código de Barras
               </Label>
               <Input
                 type="text"
                 value={formData.boletoCode}
                 readOnly
-                className="w-full border-[#C19A6B]/30 rounded-xl p-4 bg-white font-mono text-xs"
+                className="w-full border-[#da2c38]/30 rounded-xl p-4 bg-white font-mono text-xs"
               />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-[#6B5244]">
+              <p className="text-sm text-[#ff595e]">
                 <strong>Vencimento:</strong> {formData.boletoDueDate}
               </p>
-              <p className="text-xs text-[#6B5244] mt-2">
+              <p className="text-xs text-[#ff595e] mt-2">
                 O boleto vence em 3 dias úteis após a confirmação do pedido
               </p>
             </div>

@@ -98,7 +98,7 @@ export default function CEPInput({
   };
 
   const getInputClassName = () => {
-    let baseClasses = `w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4 ${className}`;
+    let baseClasses = `w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 ${className}`;
     
     if (hasBlurred && validation.valid === false) {
       baseClasses += ' border-red-500 focus:border-red-500';
@@ -112,7 +112,7 @@ export default function CEPInput({
   return (
     <div className="w-full">
       <div className="relative">
-        <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#C19A6B]" />
+        <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#da2c38]" />
         <Input
           type="text"
           value={cep}
@@ -126,7 +126,7 @@ export default function CEPInput({
         />
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
           {isLoading ? (
-            <Loader2 className="w-5 h-5 text-[#C19A6B] animate-spin" />
+            <Loader2 className="w-5 h-5 text-[#da2c38] animate-spin" />
           ) : validation.valid === true ? (
             <CheckCircle className="w-5 h-5 text-green-500" />
           ) : validation.valid === false ? (

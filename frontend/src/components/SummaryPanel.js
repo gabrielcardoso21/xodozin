@@ -44,14 +44,14 @@ export default function SummaryPanel({
 
   if (isMobile) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-[#C19A6B]/20 shadow-lg z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-[#da2c38]/20 shadow-lg z-50">
         <div className="container py-4">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
             <div>
-              <p className="text-sm text-[#6B5244]">
+              <p className="text-sm text-[#ff595e]">
                 {selectedProducts.length} {selectedProducts.length === 1 ? 'item' : 'itens'}
               </p>
-              <p className="text-2xl font-bold text-[#8B5A3C]">
+              <p className="text-2xl font-bold text-[#Da2c38]">
                 R${totalPrice.toFixed(2)}
               </p>
             </div>
@@ -71,21 +71,21 @@ export default function SummaryPanel({
 
   return (
     <div className="sticky top-4 h-fit">
-      <div className="bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] rounded-2xl p-6 border border-[#C19A6B]/30 shadow-lg">
+      <div className="bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f] rounded-2xl p-6 border border-[#da2c38]/30 shadow-lg">
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-[#C19A6B]" />
-          <h3 className="text-xl font-bold text-[#8B5A3C]">{ritualName}</h3>
+          <Sparkles className="w-5 h-5 text-[#da2c38]" />
+          <h3 className="text-xl font-bold text-[#Da2c38]">{ritualName}</h3>
         </div>
 
         {/* Itens Selecionados */}
         <div className="mb-6">
-          <h4 className="text-sm font-semibold text-[#8B5A3C] mb-3">
+          <h4 className="text-sm font-semibold text-[#Da2c38] mb-3">
             Itens Selecionados ({selectedProducts.length})
           </h4>
           
           {selectedProducts.length === 0 ? (
-            <p className="text-sm text-[#6B5244] italic">
+            <p className="text-sm text-[#ff595e] italic">
               Nenhum item selecionado ainda
             </p>
           ) : (
@@ -97,18 +97,18 @@ export default function SummaryPanel({
                     key={product.id}
                     className="flex items-start gap-2 p-2 rounded-lg bg-white/50 hover:bg-white/80 transition-colors"
                   >
-                    <CategoryIcon className="w-4 h-4 text-[#C19A6B] mt-0.5 flex-shrink-0" />
+                    <CategoryIcon className="w-4 h-4 text-[#da2c38] mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#8B5A3C] truncate">
+                      <p className="text-sm font-medium text-[#Da2c38] truncate">
                         {product.name}
                       </p>
-                      <p className="text-xs text-[#6B5244]">
+                      <p className="text-xs text-[#ff595e]">
                         R${product.price.toFixed(2)}
                       </p>
                     </div>
                     <button
                       onClick={() => onRemoveProduct(product.id)}
-                      className="text-[#6B5244] hover:text-red-500 transition-colors flex-shrink-0"
+                      className="text-[#ff595e] hover:text-red-500 transition-colors flex-shrink-0"
                       aria-label="Remover item"
                     >
                       <X className="w-4 h-4" />
@@ -123,7 +123,7 @@ export default function SummaryPanel({
         {/* Categorias Balanceadas */}
         {selectedProducts.length > 0 && (
           <div className="mb-6">
-            <h4 className="text-sm font-semibold text-[#8B5A3C] mb-3">
+            <h4 className="text-sm font-semibold text-[#Da2c38] mb-3">
               Categorias
             </h4>
             <div className="space-y-2">
@@ -136,10 +136,10 @@ export default function SummaryPanel({
                     className="flex items-center justify-between p-2 rounded-lg bg-white/50"
                   >
                     <div className="flex items-center gap-2">
-                      <CategoryIcon className="w-4 h-4 text-[#C19A6B]" />
-                      <span className="text-xs text-[#6B5244]">{label}</span>
+                      <CategoryIcon className="w-4 h-4 text-[#da2c38]" />
+                      <span className="text-xs text-[#ff595e]">{label}</span>
                     </div>
-                    <span className="text-xs font-semibold text-[#8B5A3C]">
+                    <span className="text-xs font-semibold text-[#Da2c38]">
                       {count}
                     </span>
                   </div>
@@ -156,10 +156,10 @@ export default function SummaryPanel({
         )}
 
         {/* Total */}
-        <div className="border-t border-[#C19A6B]/20 pt-4 mb-6">
+        <div className="border-t border-[#da2c38]/20 pt-4 mb-6">
           <div className="flex justify-between items-center">
-            <span className="text-lg font-bold text-[#8B5A3C]">Total</span>
-            <span className="text-2xl font-bold text-[#C19A6B]">
+            <span className="text-lg font-bold text-[#Da2c38]">Total</span>
+            <span className="text-2xl font-bold text-[#da2c38]">
               R${totalPrice.toFixed(2)}
             </span>
           </div>
@@ -176,7 +176,7 @@ export default function SummaryPanel({
         </Button>
 
         {selectedProducts.length === 0 && (
-          <p className="text-xs text-center text-[#6B5244] mt-2">
+          <p className="text-xs text-center text-[#ff595e] mt-2">
             Selecione pelo menos um item para continuar
           </p>
         )}

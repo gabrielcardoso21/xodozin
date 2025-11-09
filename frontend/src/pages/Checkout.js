@@ -140,46 +140,46 @@ export default function Checkout() {
         <button 
           data-testid="back-btn"
           onClick={() => navigate(-1)}
-          className="text-[#8B5A3C] hover:text-[#6B5244] font-medium mb-8"
+          className="text-[#Da2c38] hover:text-[#ff595e] font-medium mb-8"
         >
           ← Voltar
         </button>
 
         <div className="card">
           <div className="text-center mb-8">
-            <Heart className="w-12 h-12 text-[#C19A6B] mx-auto mb-4" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#8B5A3C] mb-2">
+            <Heart className="w-12 h-12 text-[#da2c38] mx-auto mb-4" />
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#Da2c38] mb-2">
               Seu ritual está sendo preparado com amor
             </h1>
-            <p className="text-[#6B5244]">
+            <p className="text-[#ff595e]">
               Complete os detalhes para finalizar
             </p>
           </div>
 
           {/* Ritual Summary */}
-          <div className="bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] rounded-2xl p-6 mb-8">
-            <h2 className="text-2xl font-bold text-[#8B5A3C] mb-4">Seu Ritual</h2>
+          <div className="bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f] rounded-2xl p-6 mb-8">
+            <h2 className="text-2xl font-bold text-[#Da2c38] mb-4">Seu Ritual</h2>
             
             <div className="space-y-3 mb-4">
               {selectedProducts.length > 0 ? (
                 selectedProducts.map((product) => (
                   <div key={product.id} className="flex justify-between items-center">
-                    <span className="text-[#6B5244]">{product.name}</span>
-                    <span className="font-semibold text-[#8B5A3C]">R${product.price.toFixed(2)}</span>
+                    <span className="text-[#ff595e]">{product.name}</span>
+                    <span className="font-semibold text-[#Da2c38]">R${product.price.toFixed(2)}</span>
                   </div>
                 ))
               ) : kit ? (
                 <div className="flex justify-between items-center">
-                  <span className="text-[#6B5244]">{kit.name}</span>
-                  <span className="font-semibold text-[#8B5A3C]">R${kit.price_min.toFixed(2)}</span>
+                  <span className="text-[#ff595e]">{kit.name}</span>
+                  <span className="font-semibold text-[#Da2c38]">R${kit.price_min.toFixed(2)}</span>
                 </div>
               ) : null}
             </div>
 
-            <div className="border-t border-[#C19A6B]/20 pt-4">
+            <div className="border-t border-[#da2c38]/20 pt-4">
               <div className="flex justify-between items-center">
-                <span className="text-xl font-bold text-[#8B5A3C]">Total</span>
-                <span className="text-2xl font-bold text-[#C19A6B]">R${total.toFixed(2)}</span>
+                <span className="text-xl font-bold text-[#Da2c38]">Total</span>
+                <span className="text-2xl font-bold text-[#da2c38]">R${total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function Checkout() {
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Mensagem Dedicatória */}
             <div>
-              <label className="block text-[#8B5A3C] font-medium mb-2" htmlFor="dedication">
+              <label className="block text-[#Da2c38] font-medium mb-2" htmlFor="dedication">
                 Mensagem dedicatória (opcional)
               </label>
               <Textarea
@@ -197,10 +197,10 @@ export default function Checkout() {
                 value={dedication}
                 onChange={(e) => setDedication(e.target.value)}
                 placeholder="Escreva uma mensagem especial para acompanhar o ritual..."
-                className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4 min-h-32"
+                className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4 min-h-32"
                 maxLength={200}
               />
-              <p className="text-xs text-[#6B5244] mt-1">
+              <p className="text-xs text-[#ff595e] mt-1">
                 {dedication.length}/200 caracteres
               </p>
             </div>
@@ -213,12 +213,12 @@ export default function Checkout() {
 
             {/* Dados do Destinatário */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-[#8B5A3C] mb-4">
+              <h3 className="text-xl font-bold text-[#Da2c38] mb-4">
                 Dados do Destinatário
               </h3>
               
               <div>
-                <Label htmlFor="recipientName" className="block text-[#8B5A3C] font-medium mb-2">
+                <Label htmlFor="recipientName" className="block text-[#Da2c38] font-medium mb-2">
                   Nome Completo *
                 </Label>
                 <Input
@@ -227,14 +227,14 @@ export default function Checkout() {
                   value={recipient.name}
                   onChange={(e) => setRecipient({ ...recipient, name: e.target.value })}
                   placeholder="Nome completo"
-                  className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+                  className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="recipientPhone" className="block text-[#8B5A3C] font-medium mb-2">
+                  <Label htmlFor="recipientPhone" className="block text-[#Da2c38] font-medium mb-2">
                     Telefone *
                   </Label>
                   <Input
@@ -244,12 +244,12 @@ export default function Checkout() {
                     onChange={handlePhoneChange}
                     placeholder="(11) 99999-9999"
                     maxLength={15}
-                    className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+                    className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="recipientEmail" className="block text-[#8B5A3C] font-medium mb-2">
+                  <Label htmlFor="recipientEmail" className="block text-[#Da2c38] font-medium mb-2">
                     E-mail *
                   </Label>
                   <Input
@@ -258,7 +258,7 @@ export default function Checkout() {
                     value={recipient.email}
                     onChange={(e) => setRecipient({ ...recipient, email: e.target.value })}
                     placeholder="email@exemplo.com"
-                    className="w-full border-[#C19A6B]/30 focus:border-[#8B5A3C] rounded-xl p-4"
+                    className="w-full border-[#da2c38]/30 focus:border-[#Da2c38] rounded-xl p-4"
                     required
                   />
                 </div>
@@ -270,9 +270,9 @@ export default function Checkout() {
                   id="whatsappUpdates"
                   checked={recipient.whatsappUpdates}
                   onChange={(e) => setRecipient({ ...recipient, whatsappUpdates: e.target.checked })}
-                  className="w-4 h-4 text-[#C19A6B] border-[#C19A6B]/30 rounded focus:ring-[#C19A6B]"
+                  className="w-4 h-4 text-[#da2c38] border-[#da2c38]/30 rounded focus:ring-[#da2c38]"
                 />
-                <Label htmlFor="whatsappUpdates" className="text-[#6B5244] text-sm cursor-pointer">
+                <Label htmlFor="whatsappUpdates" className="text-[#ff595e] text-sm cursor-pointer">
                   Desejo receber atualizações sobre meu pedido via WhatsApp
                 </Label>
               </div>
@@ -285,42 +285,42 @@ export default function Checkout() {
             />
 
             {/* Área de Confirmação - Informações Importantes */}
-            <div className="bg-gradient-to-br from-[#FFF8F0] to-[#FFE8E0] border-2 border-[#C19A6B] rounded-2xl p-6 space-y-4">
-              <h3 className="text-xl font-bold text-[#8B5A3C] mb-4 flex items-center gap-2">
-                <Package className="w-6 h-6 text-[#C19A6B]" />
+            <div className="bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f] border-2 border-[#da2c38] rounded-2xl p-6 space-y-4">
+              <h3 className="text-xl font-bold text-[#Da2c38] mb-4 flex items-center gap-2">
+                <Package className="w-6 h-6 text-[#da2c38]" />
                 Informações Importantes
               </h3>
               
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-[#C19A6B] mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-[#8B5A3C]">Prazo de Entrega</p>
-                    <p className="text-[#6B5244] text-sm">5 dias úteis</p>
+                    <p className="font-semibold text-[#Da2c38]">Prazo de Entrega</p>
+                    <p className="text-[#ff595e] text-sm">5 dias úteis</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <MapPinIcon className="w-5 h-5 text-[#C19A6B] mt-0.5 flex-shrink-0" />
+                  <MapPinIcon className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-[#8B5A3C]">Área de Entrega</p>
-                    <p className="text-[#6B5244] text-sm">São Paulo (capital e região metropolitana)</p>
+                    <p className="font-semibold text-[#Da2c38]">Área de Entrega</p>
+                    <p className="text-[#ff595e] text-sm">São Paulo (capital e região metropolitana)</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <Package className="w-5 h-5 text-[#C19A6B] mt-0.5 flex-shrink-0" />
+                  <Package className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-[#8B5A3C]">Envio</p>
-                    <p className="text-[#6B5244] text-sm">Embalagem especial para preservar o ritual</p>
+                    <p className="font-semibold text-[#Da2c38]">Envio</p>
+                    <p className="text-[#ff595e] text-sm">Embalagem especial para preservar o ritual</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-[#C19A6B] mt-0.5 flex-shrink-0" />
+                  <Mail className="w-5 h-5 text-[#da2c38] mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-[#8B5A3C]">Confirmação</p>
-                    <p className="text-[#6B5244] text-sm">Você receberá um e-mail com o código de rastreamento</p>
+                    <p className="font-semibold text-[#Da2c38]">Confirmação</p>
+                    <p className="text-[#ff595e] text-sm">Você receberá um e-mail com o código de rastreamento</p>
                   </div>
                 </div>
               </div>
