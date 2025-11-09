@@ -1,17 +1,21 @@
 // Normaliza a URL do backend removendo barras duplicadas e finais
 const normalizeUrl = (url) => {
   if (!url) return '';
-  // Remove espaços
+  // Remove espaços e converte para string
   url = String(url).trim();
   
-  // Remove protocolos duplicados (ex: https://https:// ou http://https://)
-  // Mantém apenas o primeiro protocolo encontrado
-  const protocolMatch = url.match(/^(https?:\/\/)/i);
-  if (protocolMatch) {
-    // Remove todos os protocolos e mantém apenas o primeiro
-    url = url.replace(/^(https?:\/\/)+/i, protocolMatch[0]);
-  } else {
-    // Se não começar com http:// ou https://, adiciona https://
+  // Remove TODOS os protocolos duplicados no início (ex: https://https://https://)
+  // Usa replace global para remover todas as ocorrências
+  while (url.match(/^(https?:\/\/)+/i)) {
+    url = url.replace(/^(https?:\/\/)+/i, (match) => {
+      // Pega apenas o primeiro protocolo encontrado
+      const firstProtocol = match.match(/^(https?:\/\/)/i);
+      return firstProtocol ? firstProtocol[0] : 'https://';
+    });
+  }
+  
+  // Se não começar com http:// ou https://, adiciona https://
+  if (!url.match(/^https?:\/\//i)) {
     url = `https://${url}`;
   }
   
@@ -23,6 +27,8 @@ const normalizeUrl = (url) => {
 const getApiBaseUrl = () => {
   // Obtém a URL do backend da variável de ambiente
   const rawBackendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+  
+  // Normaliza a URL do backend (remove protocolos duplicados, etc)
   const BACKEND_URL = normalizeUrl(rawBackendUrl);
   
   // Cria a URL da API garantindo que não há barras duplicadas
@@ -30,9 +36,13 @@ const getApiBaseUrl = () => {
   let apiUrl = `${cleanBackendUrl}/api`.replace(/\/+/g, '/');
   
   // Garante que a URL é absoluta (começa com http:// ou https://)
+  // Mas NÃO adiciona se já tiver (para evitar duplicação)
   if (!apiUrl.match(/^https?:\/\//i)) {
     apiUrl = `https://${apiUrl}`;
   }
+  
+  // Verificação final: remove protocolos duplicados que possam ter sido criados
+  apiUrl = normalizeUrl(apiUrl);
   
   return apiUrl;
 };
