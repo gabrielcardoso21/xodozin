@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, Gift, Leaf, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { API_BASE_URL as API } from '../utils/api';
+import { hybridApi } from '../utils/api-hybrid';
 
 const kitCategories = {
   'autocuidado': { label: 'Autocuidado & Reconexão', icon: Heart, color: 'text-pink-600' },
@@ -24,8 +23,8 @@ export default function Kits() {
 
   const fetchKits = async () => {
     try {
-      const response = await axios.get(`${API}/kits`);
-      setKits(response.data);
+      const kitsData = await hybridApi.getKits();
+      setKits(kitsData);
     } catch (error) {
       console.error('Error fetching kits:', error);
     }

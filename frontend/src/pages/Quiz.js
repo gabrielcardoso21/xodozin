@@ -9,9 +9,8 @@ import {
   Moon, Sun, CheckCircle2, ArrowRight, ArrowLeft,
   Briefcase, Calendar, Gift, Coffee
 } from 'lucide-react';
-import axios from 'axios';
 import { toast } from 'sonner';
-import { API_BASE_URL as API } from '../utils/api';
+import { hybridApi } from '../utils/api-hybrid';
 
 // TELA 1: BEM-VINDO(A)!
 const screen1Questions = [
@@ -180,14 +179,14 @@ export default function Quiz() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`${API}/quiz/suggest`, {
+      const response = await hybridApi.getQuizSuggestion({
         recipient: answers.recipient,
         moment: answers.moment,
         feeling: answers.vibe
       });
       navigate('/custom-ritual', { 
         state: { 
-          ritualData: response.data,
+          ritualData: response,
           personalization: answers
         } 
       });

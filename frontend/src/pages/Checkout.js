@@ -5,12 +5,11 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Heart, Package, Mail, Calendar, MapPin as MapPinIcon } from 'lucide-react';
-import axios from 'axios';
 import { toast } from 'sonner';
 import AddressForm from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
 import { formatPhone, cleanPhone } from '../utils/viaCep';
-import { API_BASE_URL as API } from '../utils/api';
+import { hybridApi } from '../utils/api-hybrid';
 
 export default function Checkout() {
   const location = useLocation();
@@ -122,9 +121,9 @@ export default function Checkout() {
         }
       };
 
-      const response = await axios.post(`${API}/orders`, orderData);
+      const response = await hybridApi.createOrder(orderData);
       toast.success('Pedido realizado com sucesso!');
-      navigate('/confirmation', { state: { order: response.data } });
+      navigate('/confirmation', { state: { order: response } });
     } catch (error) {
       console.error('Error creating order:', error);
       toast.error('Erro ao processar pedido. Tente novamente.');

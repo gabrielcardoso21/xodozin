@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, Heart, Gift, Leaf } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { API_BASE_URL as API } from '../utils/api';
+import { hybridApi } from '../utils/api-hybrid';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,10 +14,10 @@ export default function Home() {
 
   const fetchKits = async () => {
     try {
-      console.log('Fetching kits from:', `${API}/kits`);
-      const response = await axios.get(`${API}/kits`);
-      console.log('Kits response:', response.data);
-      setKits(response.data);
+      console.log('Fetching kits (híbrido: Medusa ou FastAPI)...');
+      const kitsData = await hybridApi.getKits();
+      console.log('Kits response:', kitsData);
+      setKits(kitsData);
     } catch (error) {
       console.error('Error fetching kits:', error);
       console.error('Error details:', error.response?.status, error.response?.data);
