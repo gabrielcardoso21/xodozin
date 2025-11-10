@@ -1,0 +1,168 @@
+/**
+ * Funções helper para adaptar dados do formato Medusa para formato usado no frontend
+ */
+
+/**
+ * Adapta produto do formato Medusa para formato usado no frontend
+ * @param {Object} medusaProduct - Produto do Medusa
+ * @returns {Object} Produto adaptado
+ */
+export function adaptProduct(medusaProduct) {
+  if (!medusaProduct) return null;
+  
+  // Pegar primeira variante e primeiro preço
+  const variant = medusaProduct.variants?.[0];
+  const price = variant?.prices?.[0];
+  
+  return {
+    id: medusaProduct.id,
+    name: medusaProduct.title,
+    description: medusaProduct.description || '',
+    category: medusaProduct.metadata?.category || 'outros',
+    price: price ? price.amount / 100 : 0, // Converter centavos para reais
+    image_url: medusaProduct.images?.[0]?.url || '',
+    variant_id: variant?.id,
+    // Dados extras do Medusa
+    handle: medusaProduct.handle,
+    status: medusaProduct.status
+  };
+}
+
+/**
+ * Adapta collection (kit) do formato Medusa para formato usado no frontend
+ * @param {Object} medusaCollection - Collection do Medusa
+ * @returns {Object} Kit adaptado
+ */
+export function adaptCollection(medusaCollection) {
+  if (!medusaCollection) return null;
+  
+  // Pegar primeira imagem do primeiro produto
+  const firstProduct = medusaCollection.products?.[0];
+  const imageUrl = firstProduct?.images?.[0]?.url || '';
+  
+  // Calcular preço mínimo e máximo dos produtos
+  let priceMin = 0;
+  let priceMax = null;
+  
+  if (medusaCollection.products && medusaCollection.products.length > 0) {
+    const prices = medusaCollection.products
+      .flatMap(p => p.variants || [])
+      .flatMap(v => v.prices || [])
+      .map(p => p.amount / 100);
+    
+    if (prices.length > 0) {
+      priceMin = Math.min(...prices);
+      priceMax = prices.length > 1 ? Math.max(...prices) : null;
+    }
+  }
+  
+  // Usar preços do metadata se disponível
+  if (medusaCollection.metadata?.price_min) {
+    priceMin = medusaCollection.metadata.price_min;
+  }
+  if (medusaCollection.metadata?.price_max) {
+    priceMax = medusaCollection.metadata.price_max;
+  }
+  
+  return {
+    id: medusaCollection.id,
+    name: medusaCollection.title,
+    tier: medusaCollection.metadata?.tier || 'outros',
+    description: medusaCollection.metadata?.description || medusaCollection.title,
+    price_min: priceMin,
+    price_max: priceMax,
+    image_url: imageUrl,
+    items: medusaCollection.products?.map(p => p.id) || []
+  };
+}
+
+/**
+ * Adapta lista de produtos
+ * @param {Array} medusaProducts - Lista de produtos do Medusa
+ * @returns {Array} Lista de produtos adaptados
+ */
+export function adaptProducts(medusaProducts) {
+  if (!Array.isArray(medusaProducts)) return [];
+  return medusaProducts.map(adaptProduct).filter(p => p !== null);
+}
+
+/**
+ * Adapta lista de collections
+ * @param {Array} medusaCollections - Lista de collections do Medusa
+ * @returns {Array} Lista de kits adaptados
+ */
+export function adaptCollections(medusaCollections) {
+  if (!Array.isArray(medusaCollections)) return [];
+  return medusaCollections.map(adaptCollection).filter(k => k !== null);
+}
+
+/**
+ * Adapta resposta de sugestão do quiz
+ * @param {Object} quizResponse - Resposta do endpoint /store/quiz/suggest
+ * @returns {Object} Dados adaptados
+ */
+export function adaptQuizSuggestion(quizResponse) {
+  return {
+    ritual_name: quizResponse.ritual_name || 'Ritual Especial',
+    suggested_products: adaptProducts(quizResponse.suggested_products || []),
+    categories: quizResponse.categories || {
+      sensorial: 0,
+      afetivo: 0,
+      ritualistico: 0
+    }
+  };
+}
+
+/**
+ * Adapta pedido do Medusa para formato usado no frontend
+ * @param {Object} medusaOrder - Pedido do Medusa
+ * @returns {Object} Pedido adaptado
+ */
+export function adaptOrder(medusaOrder) {
+  if (!medusaOrder) return null;
+  
+  return {
+    id: medusaOrder.id,
+    display_id: medusaOrder.display_id,
+    ritual_name: medusaOrder.metadata?.ritual_name || 'Ritual Especial',
+    items: medusaOrder.items?.map(item => ({
+      id: item.id,
+      product_id: item.variant?.product_id,
+      product_name: item.title,
+      price: item.unit_price / 100, // Converter centavos para reais
+      quantity: item.quantity
+    })) || [],
+    total: medusaOrder.total / 100, // Converter centavos para reais
+    dedication: medusaOrder.metadata?.dedication,
+    delivery_address: formatAddress(medusaOrder.shipping_address),
+    recipient: {
+      name: `${medusaOrder.shipping_address?.first_name || ''} ${medusaOrder.shipping_address?.last_name || ''}`.trim(),
+      phone: medusaOrder.shipping_address?.phone || '',
+      email: medusaOrder.email || '',
+      whatsapp_updates: medusaOrder.metadata?.whatsapp_updates || false
+    },
+    created_at: medusaOrder.created_at,
+    status: medusaOrder.status
+  };
+}
+
+/**
+ * Formata endereço do Medusa para string
+ * @param {Object} address - Endereço do Medusa
+ * @returns {string} Endereço formatado
+ */
+function formatAddress(address) {
+  if (!address) return '';
+  
+  const parts = [
+    address.address_1,
+    address.address_2,
+    address.city,
+    address.province,
+    address.postal_code,
+    address.country_code?.toUpperCase()
+  ].filter(Boolean);
+  
+  return parts.join(', ');
+}
+

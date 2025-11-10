@@ -1,0 +1,27 @@
+{
+  "name": "xodozin-medusa-backend",
+  "version": "1.0.0",
+  "description": "Backend e-commerce Xodózin usando Medusa.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "medusa build",
+    "start": "medusa start",
+    "dev": "medusa develop",
+    "migrate": "medusa migrations run",
+    "seed": "medusa seed -f ./data/seed.json"
+  },
+  "dependencies": {
+    "@medusajs/medusa": "^2.0.0",
+    "@medusajs/payment-stripe": "^2.0.0",
+    "pg": "^8.11.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+
