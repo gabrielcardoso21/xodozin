@@ -1,12 +1,11 @@
-// Medusa 2.x usa uma estrutura diferente
-// Por enquanto, vamos usar um servidor simples que será substituído
-// quando o Medusa estiver totalmente configurado
+// Medusa.js 2.x - Usar comando start do Medusa
+// O Medusa gerencia tudo automaticamente via CLI
+// Este arquivo é um fallback caso o CLI não funcione
 
 console.log("🚀 Iniciando Medusa.js...");
-console.log("⚠️  Medusa 2.x requer configuração específica");
-console.log("📝 Usando servidor temporário...");
+console.log("⚠️  Usando servidor temporário enquanto CLI é configurado...");
 
-// Servidor temporário para testar
+// Servidor temporário funcional
 import express from "express";
 
 const app = express();
