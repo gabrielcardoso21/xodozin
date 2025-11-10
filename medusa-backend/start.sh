@@ -26,22 +26,9 @@ fi
 echo "🗄️  Verificando migrações..."
 # Migrações serão executadas automaticamente pelo Medusa na primeira inicialização
 
-# Tentar usar o comando start do Medusa primeiro
+# Usar servidor temporário diretamente (CLI do Medusa tem problemas)
 echo "✅ Iniciando servidor..."
-if command -v medusa >/dev/null 2>&1 || [ -f "node_modules/.bin/medusa" ]; then
-    echo "📝 Tentando usar Medusa CLI..."
-    if [ -f "node_modules/.bin/medusa" ]; then
-        ./node_modules/.bin/medusa start || {
-            echo "⚠️  Medusa CLI falhou, usando servidor temporário..."
-            npx ts-node src/index.ts
-        }
-    else
-        npx medusa start || {
-            echo "⚠️  Medusa CLI falhou, usando servidor temporário..."
-            npx ts-node src/index.ts
-        }
-    fi
-elif [ -f "src/index.ts" ]; then
+if [ -f "src/index.ts" ]; then
     echo "📝 Usando src/index.ts (servidor temporário)..."
     npx ts-node src/index.ts
 elif [ -f "dist/index.js" ]; then
