@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: xodozin-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xodozin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - xodozin-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: xodozin-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - xodozin-network
+
+  # Medusa Backend
+  medusa-backend:
+    build:
+      context: ./medusa-backend
+      dockerfile: Dockerfile
+    container_name: xodozin-medusa-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/xodozin
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret-key}
+      COOKIE_SECRET: ${COOKIE_SECRET:-change-this-cookie-secret-key}
+      PORT: 9000
+      NODE_ENV: development
+      CORS: http://localhost:3000
+      MEDUSA_ADMIN_ONBOARDING_TYPE: default
+      MEDUSA_ADMIN_ONBOARDING_NEXTJS_DIRECTORY: ../admin
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
+      MONGO_URL: ${MONGO_URL:-}
+      DB_NAME: ${DB_NAME:-xodozin}
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./medusa-backend:/app
+      - /app/node_modules
+      - medusa_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - xodozin-network
+    command: npm run dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  medusa_data:
+
+networks:
+  xodozin-network:
+    driver: bridge
+
