@@ -28,18 +28,26 @@ export async function POST(
     // Buscar produtos por categoria usando metadata
     const allProducts = [];
     for (const category of categories) {
-      const products = await productService.list({
-        metadata: {
-          category: category
-        }
-      });
-      allProducts.push(...products);
+      try {
+        const products = await productService.listAndCount({
+          metadata: {
+            category: category
+          }
+        });
+        allProducts.push(...products[0]);
+      } catch (error) {
+        console.warn(`Erro ao buscar produtos da categoria ${category}:`, error);
+      }
     }
     
     // Se não encontrou produtos, buscar todos
     if (allProducts.length === 0) {
-      const all = await productService.list({});
-      allProducts.push(...all);
+      try {
+        const all = await productService.listAndCount({});
+        allProducts.push(...all[0]);
+      } catch (error) {
+        console.error('Erro ao buscar todos os produtos:', error);
+      }
     }
     
     // Limitar a 9 produtos (3 de cada categoria)
@@ -56,15 +64,20 @@ export async function POST(
     const ritualName = getRitualName(recipient);
     
     // Formatar produtos para resposta
-    const formattedProducts = suggestedProducts.map(product => ({
-      id: product.id,
-      name: product.title,
-      description: product.description,
-      category: product.metadata?.category || 'outros',
-      price: product.variants?.[0]?.prices?.[0]?.amount / 100 || 0, // Converter centavos para reais
-      image_url: product.images?.[0]?.url || '',
-      variant_id: product.variants?.[0]?.id
-    }));
+    const formattedProducts = suggestedProducts.map(product => {
+      const variant = product.variants?.[0];
+      const price = variant?.prices?.[0];
+      
+      return {
+        id: product.id,
+        name: product.title,
+        description: product.description || '',
+        category: product.metadata?.category || 'outros',
+        price: price ? price.amount / 100 : 0, // Converter centavos para reais
+        image_url: product.images?.[0]?.url || '',
+        variant_id: variant?.id
+      };
+    });
     
     res.json({
       ritual_name: ritualName,
@@ -116,4 +129,3 @@ function getRitualName(recipient: string): string {
   
   return ritualNames[recipient] || 'Ritual Especial';
 }
-

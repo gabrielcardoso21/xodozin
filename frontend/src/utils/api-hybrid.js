@@ -123,13 +123,78 @@ export const hybridApi = {
 
   /**
    * Criar pedido (checkout)
-   * Por enquanto usa FastAPI, depois migra para Medusa Cart API
+   * Tenta usar Medusa Cart API, se falhar usa FastAPI
    */
   createOrder: async (orderData) => {
-    // Por enquanto sempre usa FastAPI
-    // TODO: Migrar para Medusa Cart API quando estiver pronto
-    const response = await axios.post(`${FASTAPI_URL}/orders`, orderData);
-    return response.data;
+    const useMedusaNow = useMedusa && await testMedusaAvailability();
+    
+    if (useMedusaNow) {
+      try {
+        // Criar carrinho no Medusa
+        const cart = await storeApi.createCart('br'); // Região Brasil
+        
+        // Adicionar itens ao carrinho
+        for (const item of orderData.items) {
+          // Se tiver variant_id, usar; senão buscar primeiro produto
+          if (item.variant_id) {
+            await storeApi.addToCart(cart.cart.id, item.variant_id, 1);
+          } else {
+            // Buscar produto e pegar primeira variante
+            const product = await storeApi.getProduct(item.product_id);
+            if (product.product?.variants?.[0]?.id) {
+              await storeApi.addToCart(cart.cart.id, product.product.variants[0].id, 1);
+            }
+          }
+        }
+        
+        // Atualizar carrinho com dados de entrega e cliente
+        await storeApi.updateCart(cart.cart.id, {
+          email: orderData.recipient.email,
+          shipping_address: {
+            first_name: orderData.recipient.name.split(' ')[0] || orderData.recipient.name,
+            last_name: orderData.recipient.name.split(' ').slice(1).join(' ') || '',
+            address_1: orderData.delivery_address.split(',')[0] || orderData.delivery_address,
+            city: 'São Paulo',
+            country_code: 'br',
+            postal_code: orderData.delivery_address.match(/\d{5}-?\d{3}/)?.[0] || '',
+            phone: orderData.recipient.phone,
+            metadata: {
+              dedication: orderData.dedication,
+              whatsapp_updates: orderData.recipient.whatsapp_updates
+            }
+          }
+        });
+        
+        // Finalizar pedido
+        const order = await storeApi.completeCart(cart.cart.id);
+        
+        // Adaptar resposta para formato esperado pelo frontend
+        return {
+          id: order.order.id,
+          order_id: order.order.display_id || order.order.id,
+          ritual_name: order.order.metadata?.ritual_name || orderData.ritual_name,
+          items: order.order.items?.map(item => ({
+            product_id: item.variant?.product_id,
+            product_name: item.title,
+            price: item.unit_price / 100
+          })) || orderData.items,
+          total: order.order.total / 100,
+          dedication: order.order.metadata?.dedication || orderData.dedication,
+          delivery_address: orderData.delivery_address,
+          recipient: orderData.recipient,
+          created_at: order.order.created_at
+        };
+      } catch (error) {
+        console.warn('Medusa Cart API falhou, usando FastAPI como fallback:', error);
+        // Fallback para FastAPI
+        const response = await axios.post(`${FASTAPI_URL}/orders`, orderData);
+        return response.data;
+      }
+    } else {
+      // Usa FastAPI diretamente
+      const response = await axios.post(`${FASTAPI_URL}/orders`, orderData);
+      return response.data;
+    }
   },
 
   /**
