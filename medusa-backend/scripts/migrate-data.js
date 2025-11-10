@@ -14,9 +14,10 @@ const { MongoClient } = require('mongodb');
 const axios = require('axios');
 require('dotenv').config();
 
-const MEDUSA_API_URL = process.env.MEDUSA_API_URL || 'http://localhost:9000';
+const MEDUSA_API_URL = process.env.MEDUSA_API_URL || process.env.MEDUSA_BACKEND_URL || 'http://localhost:9000';
 const MONGO_URL = process.env.MONGO_URL;
 const DB_NAME = process.env.DB_NAME || 'xodozin';
+const ADMIN_TOKEN = process.env.MEDUSA_ADMIN_TOKEN;
 
 /**
  * Conecta ao MongoDB e busca produtos
@@ -98,11 +99,17 @@ async function createProductInMedusa(product) {
     };
     
     console.log(`Criando produto: ${product.name}`);
-    // Nota: Este endpoint precisa ser criado no Medusa ou usar Admin API
+    
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (ADMIN_TOKEN) {
+      headers['Authorization'] = `Bearer ${ADMIN_TOKEN}`;
+    }
+    
     const response = await axios.post(`${MEDUSA_API_URL}/admin/products`, productData, {
-      headers: {
-        'Authorization': `Bearer ${process.env.MEDUSA_ADMIN_TOKEN}` // Configurar token
-      }
+      headers
     });
     
     return response.data;
@@ -130,21 +137,25 @@ async function createCollectionInMedusa(kit, productIds) {
     };
     
     console.log(`Criando collection: ${kit.name}`);
-    // Nota: Este endpoint precisa ser criado no Medusa ou usar Admin API
+    
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (ADMIN_TOKEN) {
+      headers['Authorization'] = `Bearer ${ADMIN_TOKEN}`;
+    }
+    
     const response = await axios.post(`${MEDUSA_API_URL}/admin/collections`, collectionData, {
-      headers: {
-        'Authorization': `Bearer ${process.env.MEDUSA_ADMIN_TOKEN}`
-      }
+      headers
     });
     
     // Adicionar produtos à collection
     if (productIds.length > 0) {
-      await axios.post(`${MEDUSA_API_URL}/admin/collections/${response.data.id}/products`, {
+      await axios.post(`${MEDUSA_API_URL}/admin/collections/${response.data.collection.id}/products`, {
         product_ids: productIds
       }, {
-        headers: {
-          'Authorization': `Bearer ${process.env.MEDUSA_ADMIN_TOKEN}`
-        }
+        headers
       });
     }
     
@@ -159,7 +170,27 @@ async function createCollectionInMedusa(kit, productIds) {
  * Função principal de migração
  */
 async function migrate() {
-  console.log('🚀 Iniciando migração de dados...\n');
+  console.log('🚀 Iniciando migração de dados do MongoDB para Medusa.js...\n');
+  
+  // Verificar pré-requisitos
+  if (!MONGO_URL) {
+    console.error('❌ MONGO_URL não configurada no .env');
+    console.log('   Configure: MONGO_URL=mongodb+srv://user:password@cluster.mongodb.net/');
+    process.exit(1);
+  }
+  
+  if (!ADMIN_TOKEN) {
+    console.warn('⚠️  MEDUSA_ADMIN_TOKEN não configurado no .env');
+    console.log('   O script tentará usar Admin API sem autenticação (pode falhar)');
+    console.log('   Para obter o token:');
+    console.log('   1. Acesse o Admin do Medusa: http://localhost:7001');
+    console.log('   2. Faça login');
+    console.log('   3. Vá em Settings > API Tokens');
+    console.log('   4. Crie um novo token');
+    console.log('   5. Adicione no .env: MEDUSA_ADMIN_TOKEN=seu-token-aqui');
+    console.log('');
+    console.log('   Continuando sem token (pode falhar)...\n');
+  }
   
   try {
     // 1. Migrar produtos
@@ -172,10 +203,11 @@ async function migrate() {
     for (const product of products) {
       try {
         const medusaProduct = await createProductInMedusa(product);
-        productIdMap[product.id] = medusaProduct.id;
-        console.log(`✅ Produto migrado: ${product.name}`);
+        productIdMap[product.id] = medusaProduct.product?.id || medusaProduct.id;
+        console.log(`✅ Produto migrado: ${product.name} (ID: ${productIdMap[product.id]})`);
       } catch (error) {
-        console.error(`❌ Erro ao migrar produto ${product.name}:`, error.message);
+        console.error(`❌ Erro ao migrar produto ${product.name}:`, error.response?.data || error.message);
+        // Continuar com próximo produto
       }
     }
     
@@ -194,7 +226,8 @@ async function migrate() {
         await createCollectionInMedusa(kit, productIds);
         console.log(`✅ Kit migrado: ${kit.name}`);
       } catch (error) {
-        console.error(`❌ Erro ao migrar kit ${kit.name}:`, error.message);
+        console.error(`❌ Erro ao migrar kit ${kit.name}:`, error.response?.data || error.message);
+        // Continuar com próximo kit
       }
     }
     

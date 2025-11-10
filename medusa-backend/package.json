@@ -8,13 +8,20 @@
     "start": "medusa start",
     "dev": "medusa develop",
     "migrate": "medusa migrations run",
-    "seed": "medusa seed -f ./data/seed.json"
+    "seed": "medusa seed -f ./data/seed.json",
+    "setup": "./scripts/setup.sh",
+    "migrate-data": "node scripts/migrate-data.js",
+    "create-region": "node scripts/create-region.js"
   },
   "dependencies": {
     "@medusajs/medusa": "^2.0.0",
+    "@medusajs/admin": "^2.0.0",
     "@medusajs/payment-stripe": "^2.0.0",
     "pg": "^8.11.0",
-    "dotenv": "^16.3.1"
+    "better-sqlite3": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "mongodb": "^6.0.0",
+    "axios": "^1.6.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
