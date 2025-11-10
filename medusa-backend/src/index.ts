@@ -14,19 +14,19 @@ const port = process.env.PORT || 9000;
 
 app.use(express.json());
 
-app.get("/health", (req, res) => {
+app.get("/health", (_req: any, res: any) => {
   res.json({ status: "ok", message: "Medusa backend is running" });
 });
 
-app.get("/store/products", (req, res) => {
+app.get("/store/products", (_req: any, res: any) => {
   res.json({ products: [], count: 0 });
 });
 
-app.get("/store/collections", (req, res) => {
+app.get("/store/collections", (_req: any, res: any) => {
   res.json({ collections: [], count: 0 });
 });
 
-app.post("/store/quiz/suggest", (req, res) => {
+app.post("/store/quiz/suggest", (_req: any, res: any) => {
   res.json({ 
     ritual_name: "Ritual Especial",
     suggested_products: [],
