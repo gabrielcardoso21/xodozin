@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, Heart, Gift, Leaf } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
-import { hybridApi } from '../utils/api-hybrid';
+import { medusaOnlyApi } from '../utils/medusa-only-api';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -14,13 +14,13 @@ export default function Home() {
 
   const fetchKits = async () => {
     try {
-      console.log('Fetching kits (híbrido: Medusa ou FastAPI)...');
-      const kitsData = await hybridApi.getKits();
+      console.log('Fetching kits do Medusa...');
+      const kitsData = await medusaOnlyApi.getKits();
       console.log('Kits response:', kitsData);
       setKits(kitsData);
     } catch (error) {
       console.error('Error fetching kits:', error);
-      console.error('Error details:', error.response?.status, error.response?.data);
+      console.error('Error details:', error.message);
     }
   };
 

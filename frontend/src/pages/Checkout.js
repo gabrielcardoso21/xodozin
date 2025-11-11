@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import AddressForm from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
 import { formatPhone, cleanPhone } from '../utils/viaCep';
-import { hybridApi } from '../utils/api-hybrid';
+import { medusaOnlyApi } from '../utils/medusa-only-api';
 
 export default function Checkout() {
   const location = useLocation();
@@ -105,7 +105,14 @@ export default function Checkout() {
 
       const orderData = {
         ritual_name: ritualName,
-        items: orderItems,
+        items: orderItems.map(item => ({
+          product_id: item.product_id,
+          product_name: item.product_name,
+          price: item.price,
+          quantity: 1,
+          // Incluir variant_id se disponível nos produtos selecionados
+          variant_id: selectedProducts.find(p => p.id === item.product_id)?.variant_id
+        })),
         dedication: dedication || undefined,
         delivery_address: fullAddress,
         recipient: {
@@ -121,7 +128,7 @@ export default function Checkout() {
         }
       };
 
-      const response = await hybridApi.createOrder(orderData);
+      const response = await medusaOnlyApi.createOrder(orderData);
       toast.success('Pedido realizado com sucesso!');
       navigate('/confirmation', { state: { order: response } });
     } catch (error) {

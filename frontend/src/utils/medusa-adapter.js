@@ -14,13 +14,22 @@ export function adaptProduct(medusaProduct) {
   const variant = medusaProduct.variants?.[0];
   const price = variant?.prices?.[0];
   
+  // Converter preço de centavos para reais
+  const convertPrice = (amount) => {
+    if (typeof amount === 'number') {
+      // Se valor é alto (provavelmente em centavos), dividir por 100
+      return amount > 1000 ? amount / 100 : amount;
+    }
+    return 0;
+  };
+  
   return {
     id: medusaProduct.id,
-    name: medusaProduct.title,
+    name: medusaProduct.title || medusaProduct.name || '',
     description: medusaProduct.description || '',
     category: medusaProduct.metadata?.category || 'outros',
-    price: price ? price.amount / 100 : 0, // Converter centavos para reais
-    image_url: medusaProduct.images?.[0]?.url || '',
+    price: price ? convertPrice(price.amount) : 0,
+    image_url: medusaProduct.images?.[0]?.url || medusaProduct.image_url || '',
     variant_id: variant?.id,
     // Dados extras do Medusa
     handle: medusaProduct.handle,
@@ -121,28 +130,44 @@ export function adaptQuizSuggestion(quizResponse) {
 export function adaptOrder(medusaOrder) {
   if (!medusaOrder) return null;
   
+  // Garantir que preços sejam convertidos corretamente (centavos → reais)
+  const convertPrice = (price) => {
+    if (typeof price === 'number') {
+      // Se já está em centavos (valor alto), dividir por 100
+      // Se já está em reais (valor baixo), usar direto
+      return price > 1000 ? price / 100 : price;
+    }
+    return 0;
+  };
+  
   return {
     id: medusaOrder.id,
+    order_id: medusaOrder.display_id || medusaOrder.id,
     display_id: medusaOrder.display_id,
-    ritual_name: medusaOrder.metadata?.ritual_name || 'Ritual Especial',
-    items: medusaOrder.items?.map(item => ({
+    ritual_name: medusaOrder.metadata?.ritual_name || medusaOrder.ritual_name || 'Ritual Especial',
+    items: (medusaOrder.items || []).map(item => ({
       id: item.id,
-      product_id: item.variant?.product_id,
-      product_name: item.title,
-      price: item.unit_price / 100, // Converter centavos para reais
-      quantity: item.quantity
-    })) || [],
-    total: medusaOrder.total / 100, // Converter centavos para reais
-    dedication: medusaOrder.metadata?.dedication,
-    delivery_address: formatAddress(medusaOrder.shipping_address),
+      product_id: item.variant?.product_id || item.product_id,
+      product_name: item.title || item.product_name || 'Produto',
+      price: convertPrice(item.unit_price || item.price || 0),
+      quantity: item.quantity || 1
+    })),
+    total: convertPrice(medusaOrder.total || 0),
+    subtotal: convertPrice(medusaOrder.subtotal || medusaOrder.total || 0),
+    tax_total: convertPrice(medusaOrder.tax_total || 0),
+    shipping_total: convertPrice(medusaOrder.shipping_total || 0),
+    dedication: medusaOrder.metadata?.dedication || medusaOrder.dedication,
+    delivery_address: formatAddress(medusaOrder.shipping_address) || medusaOrder.delivery_address || '',
     recipient: {
-      name: `${medusaOrder.shipping_address?.first_name || ''} ${medusaOrder.shipping_address?.last_name || ''}`.trim(),
-      phone: medusaOrder.shipping_address?.phone || '',
-      email: medusaOrder.email || '',
-      whatsapp_updates: medusaOrder.metadata?.whatsapp_updates || false
+      name: medusaOrder.recipient?.name || 
+            `${medusaOrder.shipping_address?.first_name || ''} ${medusaOrder.shipping_address?.last_name || ''}`.trim() ||
+            '',
+      phone: medusaOrder.recipient?.phone || medusaOrder.shipping_address?.phone || '',
+      email: medusaOrder.recipient?.email || medusaOrder.email || '',
+      whatsapp_updates: medusaOrder.metadata?.whatsapp_updates || medusaOrder.recipient?.whatsapp_updates || false
     },
-    created_at: medusaOrder.created_at,
-    status: medusaOrder.status
+    created_at: medusaOrder.created_at || new Date().toISOString(),
+    status: medusaOrder.status || 'pending'
   };
 }
 

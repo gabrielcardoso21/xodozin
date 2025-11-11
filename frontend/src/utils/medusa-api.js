@@ -68,13 +68,21 @@ export const storeApi = {
   
   /**
    * Criar carrinho
-   * @param {string} regionId - ID da região (Brasil)
+   * @param {string|number} regionId - ID da região (pode ser string 'br' ou ID numérico)
    * @returns {Promise<Object>} Dados do carrinho criado
    */
-  createCart: async (regionId = 'br') => {
-    const response = await medusaApi.post('/store/carts', {
-      region_id: regionId
-    });
+  createCart: async (regionId = null) => {
+    const payload = regionId ? { region_id: regionId } : {};
+    const response = await medusaApi.post('/store/carts', payload);
+    return response.data;
+  },
+
+  /**
+   * Listar regiões disponíveis
+   * @returns {Promise<Object>} Lista de regiões
+   */
+  getRegions: async () => {
+    const response = await medusaApi.get('/store/regions');
     return response.data;
   },
   
@@ -135,6 +143,28 @@ export const storeApi = {
   getQuizSuggestion: async (answers) => {
     const response = await medusaApi.post('/store/quiz/suggest', answers);
     return response.data;
+  },
+
+  /**
+   * Buscar pedido por ID
+   * NOTA: Medusa geralmente não expõe pedidos via Store API por questões de segurança.
+   * Esta função pode não funcionar se o endpoint não existir ou se não houver autenticação.
+   * Alternativa: Usar os dados retornados no momento da criação do pedido (completeCart).
+   * @param {string} orderId - ID do pedido
+   * @returns {Promise<Object>} Dados do pedido
+   */
+  getOrder: async (orderId) => {
+    // Tentar buscar via Store API (pode não estar disponível)
+    try {
+      const response = await medusaApi.get(`/store/orders/${orderId}`);
+      return response.data;
+    } catch (error) {
+      // Se não existir endpoint público, retornar erro informativo
+      if (error.response?.status === 404 || error.response?.status === 403) {
+        throw new Error('Buscar pedidos não está disponível via Store API do Medusa por questões de segurança. Use os dados retornados no momento da criação do pedido.');
+      }
+      throw error;
+    }
   }
 };
 

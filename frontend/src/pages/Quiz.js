@@ -10,7 +10,7 @@ import {
   Briefcase, Calendar, Gift, Coffee
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { hybridApi } from '../utils/api-hybrid';
+import { medusaOnlyApi } from '../utils/medusa-only-api';
 
 // TELA 1: BEM-VINDO(A)!
 const screen1Questions = [
@@ -179,7 +179,7 @@ export default function Quiz() {
 
   const handleSubmit = async () => {
     try {
-      const response = await hybridApi.getQuizSuggestion({
+      const response = await medusaOnlyApi.getQuizSuggestion({
         recipient: answers.recipient,
         moment: answers.moment,
         feeling: answers.vibe
@@ -192,7 +192,7 @@ export default function Quiz() {
       });
     } catch (error) {
       console.error('Error submitting quiz:', error);
-      toast.error('Erro ao processar suas respostas. Tente novamente.');
+      toast.error(error.message || 'Erro ao processar suas respostas. Tente novamente.');
     }
   };
 
