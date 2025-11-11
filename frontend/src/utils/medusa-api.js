@@ -132,18 +132,6 @@ export const storeApi = {
     return response.data;
   },
   
-  /**
-   * Sugestão de produtos baseado no quiz (endpoint customizado)
-   * @param {Object} answers - Respostas do quiz
-   * @param {string} answers.recipient - Destinatário
-   * @param {string} answers.moment - Momento
-   * @param {string} answers.feeling - Vibe/sentimento
-   * @returns {Promise<Object>} Sugestão de ritual com produtos
-   */
-  getQuizSuggestion: async (answers) => {
-    const response = await medusaApi.post('/store/quiz/suggest', answers);
-    return response.data;
-  },
 
   /**
    * Buscar pedido por ID

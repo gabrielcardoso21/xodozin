@@ -30,6 +30,17 @@ module.exports = {
     cookieSecret: process.env.COOKIE_SECRET,
     database_url: process.env.DATABASE_URL,
     database_type: databaseType,
+    // Medusa 2.x usa database_extra para configurações do Knex
+    ...(databaseType === "postgres" ? {
+      database_extra: {
+        pool: {
+          min: 0,
+          max: 3,
+          idleTimeoutMillis: 10000,
+          acquireTimeoutMillis: 30000,
+        },
+      },
+    } : {}),
     store_cors: process.env.CORS || "http://localhost:3000",
     admin_cors: process.env.ADMIN_CORS || "http://localhost:7001",
     redis_url: process.env.REDIS_URL,

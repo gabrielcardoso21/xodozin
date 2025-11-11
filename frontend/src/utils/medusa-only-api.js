@@ -46,6 +46,7 @@ export const medusaOnlyApi = {
 
   /**
    * Sugestão de produtos baseado no quiz
+   * Lógica movida para o frontend para não precisar de endpoint customizado
    * @param {Object} answers - Respostas do quiz
    * @param {string} answers.recipient - Destinatário
    * @param {string} answers.moment - Momento
@@ -54,10 +55,48 @@ export const medusaOnlyApi = {
    */
   getQuizSuggestion: async (answers) => {
     try {
-      const response = await storeApi.getQuizSuggestion(answers);
-      return adaptQuizSuggestion(response);
+      // Buscar todos os produtos do Medusa
+      const allProductsResponse = await storeApi.getProducts();
+      const allProducts = adaptProducts(allProductsResponse.products || []);
+      
+      // Determinar categorias baseado nas respostas
+      const categories = determineCategories(answers.recipient, answers.moment, answers.feeling);
+      
+      // Filtrar produtos por categoria
+      const suggestedProducts = [];
+      for (const category of categories) {
+        const categoryProducts = allProducts.filter(p => p.category === category);
+        suggestedProducts.push(...categoryProducts.slice(0, 3)); // 3 de cada categoria
+      }
+      
+      // Se não encontrou produtos suficientes, adicionar outros
+      if (suggestedProducts.length < 9) {
+        const remaining = allProducts
+          .filter(p => !suggestedProducts.find(sp => sp.id === p.id))
+          .slice(0, 9 - suggestedProducts.length);
+        suggestedProducts.push(...remaining);
+      }
+      
+      // Limitar a 9 produtos
+      const finalProducts = suggestedProducts.slice(0, 9);
+      
+      // Contar por categoria
+      const categoryCounts = {
+        sensorial: finalProducts.filter(p => p.category === 'sensorial').length,
+        afetivo: finalProducts.filter(p => p.category === 'afetivo').length,
+        ritualistico: finalProducts.filter(p => p.category === 'ritualistico').length
+      };
+      
+      // Nome do ritual baseado no destinatário
+      const ritualName = getRitualName(answers.recipient);
+      
+      return {
+        ritual_name: ritualName,
+        suggested_products: finalProducts,
+        categories: categoryCounts
+      };
     } catch (error) {
-      console.error('Erro ao buscar sugestão do quiz do Medusa:', error);
+      console.error('Erro ao buscar sugestão do quiz:', error);
       throw new Error(`Erro ao conectar com Medusa: ${error.message}. Verifique se o backend está rodando em ${process.env.REACT_APP_MEDUSA_BACKEND_URL || 'http://localhost:9000'}`);
     }
   },
@@ -241,6 +280,42 @@ function extractCEP(address) {
   if (!address) return '';
   const cepMatch = address.match(/\d{5}-?\d{3}/);
   return cepMatch ? cepMatch[0].replace(/\D/g, '') : '';
+}
+
+/**
+ * Helper: Determina categorias baseado nas respostas do quiz
+ */
+function determineCategories(recipient, moment, feeling) {
+  const categories = [];
+  
+  // Sempre incluir pelo menos uma categoria de cada tipo
+  categories.push('sensorial', 'afetivo', 'ritualistico');
+  
+  // Ajustar baseado no feeling
+  if (feeling === 'pausar' || feeling === 'reconectar') {
+    // Priorizar sensorial e ritualistico
+    categories.push('sensorial', 'ritualistico');
+  } else if (feeling === 'fortalecer' || feeling === 'celebrar') {
+    // Priorizar afetivo e ritualistico
+    categories.push('afetivo', 'ritualistico');
+  }
+  
+  return [...new Set(categories)]; // Remover duplicatas
+}
+
+/**
+ * Helper: Retorna nome do ritual baseado no destinatário
+ */
+function getRitualName(recipient) {
+  const ritualNames = {
+    'parceiro': 'Ritual do Amor',
+    'amigo': 'Ritual da Amizade',
+    'familia': 'Ritual do Aconchego',
+    'proprio': 'Ritual do Autocuidado',
+    'colega': 'Ritual da Conexão'
+  };
+  
+  return ritualNames[recipient] || 'Ritual Especial';
 }
 
 /**

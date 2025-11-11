@@ -17,7 +17,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - xodozin-network
 
@@ -33,35 +33,30 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - xodozin-network
 
   # Medusa Backend
-  medusa-backend:
+  medusa:
     build:
       context: ./medusa-backend
       dockerfile: Dockerfile
-    container_name: xodozin-medusa-backend
+    container_name: xodozin-medusa
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/xodozin
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret-key}
-      COOKIE_SECRET: ${COOKIE_SECRET:-change-this-cookie-secret-key}
+      JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret-key-123456789}
+      COOKIE_SECRET: ${COOKIE_SECRET:-change-this-cookie-secret-key-123456789}
       PORT: 9000
       NODE_ENV: development
       CORS: http://localhost:3000
-      MEDUSA_ADMIN_ONBOARDING_TYPE: default
-      MEDUSA_ADMIN_ONBOARDING_NEXTJS_DIRECTORY: ../admin
-      STRIPE_API_KEY: ${STRIPE_API_KEY:-}
-      MONGO_URL: ${MONGO_URL:-}
-      DB_NAME: ${DB_NAME:-xodozin}
+      ADMIN_CORS: http://localhost:3000,http://localhost:7001
     ports:
       - "9000:9000"
     volumes:
       - ./medusa-backend:/app
       - /app/node_modules
-      - medusa_data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,15 +64,19 @@ services:
         condition: service_healthy
     networks:
       - xodozin-network
-    command: npm run dev
+    command: >
+      sh -c "
+        echo '⏳ Aguardando banco estar pronto...' &&
+        sleep 5 &&
+        echo '🚀 Iniciando Medusa...' &&
+        npx medusa develop
+      "
     restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
-  medusa_data:
 
 networks:
   xodozin-network:
     driver: bridge
-
