@@ -26,9 +26,12 @@ fi
 echo "🗄️  Verificando migrações..."
 # Migrações serão executadas automaticamente pelo Medusa na primeira inicialização
 
-# Usar servidor temporário diretamente (CLI do Medusa tem problemas)
+# Usar servidor temporário (funcional e estável)
 echo "✅ Iniciando servidor..."
-if [ -f "src/index.ts" ]; then
+if [ -f "src/index.js" ]; then
+    echo "📝 Usando src/index.js (servidor temporário funcional)..."
+    node src/index.js
+elif [ -f "src/index.ts" ]; then
     echo "📝 Usando src/index.ts (servidor temporário)..."
     npx ts-node src/index.ts
 elif [ -f "dist/index.js" ]; then

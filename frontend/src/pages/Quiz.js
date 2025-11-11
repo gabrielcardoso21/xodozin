@@ -142,7 +142,7 @@ export default function Quiz() {
   const handleNext = () => {
     if (screen === 1) {
       if (currentQuestion < screen1Questions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
+      setCurrentQuestion(currentQuestion + 1);
       } else {
         // Verificar se todas as perguntas foram respondidas
         const allAnswered = screen1Questions.every(q => answers[q.id]);
@@ -199,12 +199,12 @@ export default function Quiz() {
   // TELA 1: Perguntas múltiplas
   if (screen === 1) {
     const currentQ = screen1Questions[currentQuestion];
-    const currentAnswer = answers[currentQ.id];
+  const currentAnswer = answers[currentQ.id];
 
-    return (
+  return (
       <div className="min-h-screen bg-gradient-to-b from-[#F2cc8f] to-[#F2cc8f] pt-20 lg:pt-8 px-4 sm:px-6 lg:px-8 pb-12">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
+      {/* Header */}
           {currentQuestion === 0 && (
             <div className="text-center mb-12">
               <h1 className="text-4xl sm:text-5xl font-bold text-[#Da2c38] mb-4 font-serif">
@@ -213,46 +213,46 @@ export default function Quiz() {
               <p className="text-lg text-[#463f3a]">
                 Responde essas perguntinhas pra gente montar o ritual perfeito.
               </p>
-            </div>
+      </div>
           )}
 
           {/* Progress Bar */}
           <div className="mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
+        <div className="flex items-center justify-center gap-2 mb-4">
               {screen1Questions.map((_, index) => (
-                <div
-                  key={index}
-                  className={`flex-1 h-2 rounded-full transition-all ${
-                    index < currentQuestion
+            <div
+              key={index}
+              className={`flex-1 h-2 rounded-full transition-all ${
+                index < currentQuestion
                       ? 'bg-[#da2c38]'
-                      : index === currentQuestion
+                  : index === currentQuestion
                       ? 'bg-[#da2c38]'
                       : 'bg-[#da2c38]/20'
-                  }`}
-                />
-              ))}
-            </div>
+              }`}
+            />
+          ))}
+        </div>
             <p className="text-center text-[#463f3a] text-sm font-medium">
               Pergunta {currentQuestion + 1} de {screen1Questions.length}
-            </p>
-          </div>
+        </p>
+      </div>
 
-          {/* Question */}
+      {/* Question */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#Da2c38] mb-8 text-center font-serif">
-              {currentQ.question}
-            </h2>
+            {currentQ.question}
+          </h2>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              {currentQ.options.map((option, index) => {
-                const Icon = option.icon;
-                const isSelected = currentAnswer === option.value;
-                return (
-                  <div
-                    key={option.value}
-                    onClick={() => handleAnswer(currentQ.id, option.value)}
+            {currentQ.options.map((option, index) => {
+              const Icon = option.icon;
+              const isSelected = currentAnswer === option.value;
+              return (
+                <div
+                  key={option.value}
+                  onClick={() => handleAnswer(currentQ.id, option.value)}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      isSelected
+                    isSelected 
                         ? 'border-[#da2c38] bg-[#F2cc8f] shadow-md'
                         : 'border-[#da2c38]/30 hover:border-[#da2c38]/50 hover:bg-white/50'
                     }`}
@@ -262,9 +262,9 @@ export default function Quiz() {
                       <p className={`font-medium ${isSelected ? 'text-[#Da2c38]' : 'text-[#463f3a]'}`}>
                         {option.label}
                       </p>
-                      {isSelected && (
+                    {isSelected && (
                         <CheckCircle2 className="h-5 w-5 text-[#da2c38] ml-auto" />
-                      )}
+                    )}
                     </div>
                   </div>
                 );
@@ -434,11 +434,11 @@ export default function Quiz() {
                       }`}
                     >
                       <p className={`text-sm ${isSelected ? 'text-[#Da2c38] font-medium' : 'text-[#463f3a]'}`}>
-                        {option.label}
-                      </p>
-                    </div>
-                  );
-                })}
+                    {option.label}
+                  </p>
+                </div>
+              );
+            })}
               </div>
             </div>
 
