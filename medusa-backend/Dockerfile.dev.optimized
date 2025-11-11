@@ -1,0 +1,48 @@
+# Dockerfile otimizado - Multi-stage build para reduzir tamanho
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Instalar dependências de build
+RUN apk add --no-cache python3 make g++
+
+# Copiar e instalar dependências
+COPY package*.json ./
+RUN npm install --legacy-peer-deps && \
+    npm cache clean --force
+
+# Copiar código fonte
+COPY src/ ./src/
+COPY medusa-config.js ./
+COPY tsconfig.json ./
+
+# Stage final - apenas runtime
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Instalar apenas runtime dependencies
+RUN apk add --no-cache python3
+
+# Copiar node_modules e código do builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/medusa-config.js ./
+COPY --from=builder /app/tsconfig.json ./
+COPY start.sh ./
+RUN chmod +x start.sh
+
+# Limpar arquivos desnecessários para reduzir tamanho
+RUN find node_modules -name "*.md" -delete && \
+    find node_modules -name "*.map" -delete && \
+    find node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find node_modules -name "tests" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find node_modules -name "__tests__" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find node_modules -name "*.test.js" -delete && \
+    find node_modules -name "*.spec.js" -delete && \
+    rm -rf /tmp/* /var/cache/apk/*
+
+EXPOSE 9000
+
+CMD ["sh", "start.sh"]
+

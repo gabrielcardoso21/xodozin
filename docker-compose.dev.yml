@@ -41,7 +41,7 @@ services:
   medusa-backend:
     build:
       context: ./medusa-backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.dev.optimized
     container_name: xodozin-medusa-backend
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/xodozin
