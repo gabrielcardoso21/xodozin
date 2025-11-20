@@ -3,7 +3,6 @@ import type {
   SubscriberConfig,
 } from "@medusajs/framework";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { sendNFeEmail } from "../utils/email";
 
 /**
  * Subscriber que escuta quando NFe é emitida e envia email
@@ -46,7 +45,8 @@ export default async function nfeEmittedHandler({
       return;
     }
 
-    // Enviar email com NFe
+    // Enviar email com NFe (dynamic import para evitar erro de build)
+    const { sendNFeEmail } = await import("../utils/email.js");
     await sendNFeEmail(order);
 
     // Marcar que email foi enviado

@@ -1,6 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { sendPaymentConfirmationEmail } from "../../utils/email";
 
 /**
  * Webhook para receber confirmação de pagamento do gateway

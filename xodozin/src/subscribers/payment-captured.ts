@@ -3,7 +3,6 @@ import type {
   SubscriberConfig,
 } from "@medusajs/framework";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { sendPaymentConfirmationEmail } from "../utils/email";
 
 /**
  * Subscriber que escuta eventos de pagamento confirmado e envia email
@@ -51,7 +50,8 @@ export default async function paymentCapturedHandler({
       return;
     }
 
-    // Enviar email de confirmação
+    // Enviar email de confirmação (dynamic import para evitar erro de build)
+    const { sendPaymentConfirmationEmail } = await import("../utils/email.js");
     await sendPaymentConfirmationEmail(order);
 
     // Marcar que email foi enviado
