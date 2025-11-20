@@ -197,6 +197,53 @@ else
     fi
 fi
 
+# Compilar instrumentation.ts para instrumentation.js na raiz
+echo "🔨 Compilando instrumentation.ts para instrumentation.js..."
+if [ -f "instrumentation.ts" ]; then
+    # Compilar instrumentation.ts especificamente para o diretório raiz
+    # Usar configuração simples que funciona em produção
+    npx tsc instrumentation.ts \
+        --outDir . \
+        --module commonjs \
+        --target ES2021 \
+        --esModuleInterop \
+        --skipLibCheck \
+        --moduleResolution node \
+        --allowSyntheticDefaultImports \
+        2>&1 | tee /tmp/instrumentation-compile.log || {
+        echo "⚠️  Falha ao compilar instrumentation.ts, criando fallback..."
+        # Se falhar, garantir que instrumentation.js existe
+        if [ ! -f "instrumentation.js" ]; then
+            echo "   Criando instrumentation.js básico..."
+            cat > instrumentation.js << 'EOF'
+// Este arquivo é necessário para produção - Node.js não carrega TypeScript diretamente
+// Export empty object to prevent "Cannot find module" error
+module.exports = {};
+EOF
+            echo "✅ instrumentation.js básico criado"
+        fi
+    }
+    if [ -f "instrumentation.js" ]; then
+        echo "✅ instrumentation.js gerado/verificado"
+        ls -lh instrumentation.js
+    else
+        echo "⚠️  AVISO: instrumentation.js não foi gerado, mas continuando..."
+        # Não falhar aqui, pois instrumentation é opcional
+    fi
+else
+    echo "⚠️  instrumentation.ts não encontrado"
+    # Garantir que instrumentation.js existe mesmo se .ts não existir
+    if [ ! -f "instrumentation.js" ]; then
+        echo "   Criando instrumentation.js básico..."
+        cat > instrumentation.js << 'EOF'
+// Este arquivo é necessário para produção - Node.js não carrega TypeScript diretamente
+// Export empty object to prevent "Cannot find module" error
+module.exports = {};
+EOF
+        echo "✅ instrumentation.js básico criado"
+    fi
+fi
+
 # Compilar TypeScript para garantir que arquivos compilados existam
 echo "🔨 Compilando TypeScript (resto do projeto)..."
 if [ -f "tsconfig.json" ]; then

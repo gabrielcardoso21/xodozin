@@ -103,3 +103,24 @@ else
     fi
 fi
 
+# Verificar se instrumentation.js existe (necessário para produção)
+echo ""
+echo "🔍 Verificando se instrumentation.js existe..."
+if [ -f "instrumentation.js" ]; then
+    echo "✅ instrumentation.js encontrado"
+    echo "   Tamanho: $(du -h instrumentation.js | cut -f1)"
+else
+    echo "⚠️  instrumentation.js não encontrado, criando..."
+    cat > instrumentation.js << 'EOF'
+// Este arquivo é necessário para produção - Node.js não carrega TypeScript diretamente
+// Export empty object to prevent "Cannot find module" error
+module.exports = {};
+EOF
+    if [ -f "instrumentation.js" ]; then
+        echo "✅ instrumentation.js criado"
+    else
+        echo "⚠️  AVISO: Falha ao criar instrumentation.js, mas continuando..."
+        # Não falhar aqui, pois instrumentation é opcional
+    fi
+fi
+
