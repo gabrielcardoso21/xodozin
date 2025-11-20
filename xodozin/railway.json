@@ -5,7 +5,7 @@
     "buildCommand": "yarn install && yarn build:skip-if-exists"
   },
   "deploy": {
-    "startCommand": "bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && medusa db:migrate && medusa start",
+    "startCommand": "bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

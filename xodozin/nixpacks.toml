@@ -30,5 +30,5 @@ cmds = [
 ]
 
 [start]
-cmd = "bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && medusa db:migrate && medusa start"
+cmd = "bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build"
 
