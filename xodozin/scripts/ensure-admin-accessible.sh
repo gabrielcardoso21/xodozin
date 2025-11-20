@@ -130,13 +130,33 @@ fi
 if [ -d ".medusa/server/public/admin" ] && [ ! -e ".medusa/admin" ]; then
     echo "   Criando symlink .medusa/admin -> .medusa/server/public/admin..."
     mkdir -p .medusa
-    ln -sf server/public/admin .medusa/admin 2>/dev/null || {
+    if ln -sf server/public/admin .medusa/admin 2>/dev/null; then
+        echo "   ✅ Symlink criado: .medusa/admin -> .medusa/server/public/admin"
+        # Verificar se symlink funciona
+        if [ -f ".medusa/admin/index.html" ]; then
+            echo "   ✅ Symlink funciona! Admin acessível via .medusa/admin/index.html"
+        else
+            echo "   ⚠️  Symlink criado mas não funciona, copiando..."
+            rm -f .medusa/admin
+            cp -r .medusa/server/public/admin .medusa/admin 2>/dev/null || true
+        fi
+    else
         # Se symlink falhar, copiar
         echo "   Symlink falhou, copiando..."
         cp -r .medusa/server/public/admin .medusa/admin 2>/dev/null || true
-    }
-    echo "   ✅ Symlink/cópia criada"
+        echo "   ✅ Cópia criada: .medusa/admin"
+    fi
 fi
+
+# Verificar todos os caminhos possíveis onde Medusa pode procurar
+echo "   Verificando todos os caminhos possíveis..."
+for path in ".medusa/server/public/admin/index.html" ".medusa/admin/index.html" ".medusa/server/public/admin" ".medusa/admin"; do
+    if [ -e "$path" ]; then
+        echo "   ✅ Existe: $path"
+    else
+        echo "   ❌ Não existe: $path"
+    fi
+done
 
 echo "✅ Verificação concluída"
 
