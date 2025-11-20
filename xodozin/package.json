@@ -15,7 +15,7 @@
   "scripts": {
     "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
-    "start": "medusa db:migrate && medusa start",
+    "start": "yarn build && medusa db:migrate && medusa start",
     "start:production": "yarn build && medusa db:migrate && medusa start",
     "dev": "medusa develop",
     "setup:brasil": "medusa exec ./src/scripts/setup-brasil.ts",
