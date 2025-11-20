@@ -12,10 +12,25 @@ echo "   Verificando: .medusa/server/public/admin"
 if [ -d ".medusa/server/public/admin" ]; then
     echo "   ✅ Diretório existe"
     ls -la .medusa/server/public/admin 2>/dev/null | head -5
+    echo "   Verificando index.html:"
+    if [ -f ".medusa/server/public/admin/index.html" ]; then
+        echo "   ✅ index.html existe"
+        ls -lh .medusa/server/public/admin/index.html
+    else
+        echo "   ❌ index.html NÃO existe no diretório!"
+    fi
 else
     echo "   ❌ Diretório não encontrado"
     echo "   Estrutura de .medusa (se existir):"
     find .medusa -type d 2>/dev/null | head -10 || echo "   .medusa não existe"
+    echo "   Verificando se .medusa existe:"
+    if [ -d ".medusa" ]; then
+        echo "   ✅ .medusa existe"
+        echo "   Conteúdo de .medusa:"
+        ls -la .medusa/ | head -10
+    else
+        echo "   ❌ .medusa NÃO existe - arquivos não foram copiados do Git!"
+    fi
 fi
 echo ""
 
