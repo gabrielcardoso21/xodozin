@@ -142,20 +142,35 @@ else
     fi
 fi
 
-# Compilar TypeScript para garantir que medusa-config.js existe
-echo "🔨 Compilando TypeScript (para medusa-config.js)..."
-if [ -f "tsconfig.json" ]; then
-    # Compilar medusa-config.ts especificamente
-    if [ -f "medusa-config.ts" ]; then
-        echo "   Compilando medusa-config.ts..."
-        npx tsc medusa-config.ts --outDir . --module commonjs --esModuleInterop --skipLibCheck 2>&1 || {
-            echo "⚠️  Falha ao compilar medusa-config.ts, mas continuando..."
-        }
-        if [ -f "medusa-config.js" ]; then
-            echo "✅ medusa-config.js gerado"
-        fi
+# Garantir que medusa-config.js existe
+echo "🔨 Garantindo que medusa-config.js existe..."
+if [ ! -f "medusa-config.js" ]; then
+    echo "   medusa-config.js não encontrado, criando wrapper..."
+    # O arquivo medusa-config.js já deve estar commitado, mas se não estiver, criar
+    if [ ! -f "medusa-config.js" ]; then
+        cat > medusa-config.js << 'EOF'
+// Wrapper para medusa-config.ts
+// O Medusa v2 suporta TypeScript diretamente, mas este wrapper garante compatibilidade
+try {
+  require('ts-node/register');
+  module.exports = require('./medusa-config.ts');
+} catch (e) {
+  try {
+    module.exports = require('./.medusa/server/medusa-config.js');
+  } catch (e2) {
+    module.exports = require('./medusa-config.ts');
+  }
+}
+EOF
+        echo "✅ medusa-config.js criado"
     fi
-    # Compilar todo o projeto também
+else
+    echo "✅ medusa-config.js já existe"
+fi
+
+# Compilar TypeScript para garantir que arquivos compilados existam
+echo "🔨 Compilando TypeScript..."
+if [ -f "tsconfig.json" ]; then
     npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
         echo "⚠️  TypeScript compilation had warnings, but continuing..."
     }
