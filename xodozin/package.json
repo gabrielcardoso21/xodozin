@@ -15,7 +15,7 @@
   "scripts": {
     "build": "node --max-old-space-size=2048 node_modules/.bin/medusa build",
     "build:backend-only": "tsc --build",
-    "build:skip-if-exists": "if [ -d '.medusa/server/public/admin' ]; then echo 'Admin build exists, skipping frontend build'; yarn build:backend-only; else echo 'Admin build not found, doing full build'; yarn build; fi",
+    "build:skip-if-exists": "bash scripts/build-skip-if-exists.sh",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "yarn build:skip-if-exists && medusa db:migrate && medusa start",
     "start:skip-build": "medusa db:migrate && medusa start",
