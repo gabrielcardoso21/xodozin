@@ -17,7 +17,8 @@ cmds = [
 
 [phases.install]
 cmds = [
-  "yarn install --frozen-lockfile --cache-folder /tmp/.yarn-cache"
+  # Removido --frozen-lockfile temporariamente para permitir atualização do lockfile
+  "yarn install --cache-folder /tmp/.yarn-cache"
 ]
 
 [phases.build]
