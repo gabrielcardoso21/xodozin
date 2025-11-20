@@ -1,13 +1,14 @@
 #!/bin/bash
 # Script para fazer build apenas se admin não existir
-# Se admin já existe, faz apenas build do backend
+# Se admin já existe, faz apenas build do backend (sem admin)
 
 set -e
 
 if [ -d ".medusa/server/public/admin" ]; then
     echo "✅ Admin build exists, skipping frontend build"
-    echo "🔨 Building backend only..."
-    tsc --build
+    echo "🔨 Building backend only (excluding admin directory)..."
+    # Compilar apenas backend, excluindo src/admin
+    tsc --build --exclude src/admin
     echo "✅ Backend build completed"
 else
     echo "⚠️  Admin build not found, doing full build..."
