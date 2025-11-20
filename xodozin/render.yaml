@@ -2,11 +2,10 @@ services:
   - type: web
     name: medusa-backend
     env: node
-    buildCommand: yarn install && yarn build
-    startCommand: yarn start
+    rootDir: .
+    buildCommand: yarn install && yarn build:skip-if-exists
+    startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: DATABASE_URL
         fromDatabase:
           name: medusa-postgres
@@ -20,21 +19,16 @@ services:
         generateValue: true
       - key: COOKIE_SECRET
         generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=2048"
       - key: STORE_CORS
-        value: https://your-frontend-domain.com
+        value: https://seu-dominio.com
       - key: ADMIN_CORS
-        value: https://your-frontend-domain.com
-      - key: AUTH_CORS
-        value: https://your-frontend-domain.com
+        value: https://seu-dominio.com,https://admin.seu-dominio.com
 
 databases:
   - name: medusa-postgres
     databaseName: medusa
     user: medusa
-    plan: free
-
-  - name: medusa-redis
-    type: redis
-    plan: free
-    maxmemoryPolicy: allkeys-lru
-

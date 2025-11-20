@@ -3,8 +3,8 @@ services:
     name: medusa-backend
     env: node
     rootDir: xodozin
-    buildCommand: yarn install && yarn build
-    startCommand: yarn start
+    buildCommand: yarn install && yarn build:skip-if-exists
+    startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -21,6 +21,8 @@ services:
         generateValue: true
       - key: NODE_ENV
         value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=2048"
       - key: STORE_CORS
         value: https://seu-dominio.com
       - key: ADMIN_CORS
