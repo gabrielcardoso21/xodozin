@@ -57,6 +57,7 @@ if (fs.existsSync(adminPath)) {
         path.join(cwd, 'xodozin/.medusa/server/public/admin/index.html'),
         path.join(cwd, '../.medusa/server/public/admin/index.html'),
         '/app/.medusa/server/public/admin/index.html',
+        path.join(cwd, '.medusa/admin/index.html'), // Medusa pode procurar aqui também
     ];
     
     for (const alt of alternatives) {
@@ -66,9 +67,48 @@ if (fs.existsSync(adminPath)) {
             const targetDir = path.join(cwd, '.medusa/server/public/admin');
             const targetFile = path.join(targetDir, 'index.html');
             fs.mkdirSync(targetDir, { recursive: true });
-            fs.copyFileSync(alt, targetFile);
-            console.log('   ✅ Copiado para:', targetFile);
+            
+            // Copiar todo o diretório admin, não apenas index.html
+            const sourceDir = path.dirname(alt);
+            const targetAdminDir = path.join(cwd, '.medusa/server/public/admin');
+            
+            // Copiar recursivamente
+            function copyRecursiveSync(src, dest) {
+                const exists = fs.existsSync(src);
+                const stats = exists && fs.statSync(src);
+                const isDirectory = exists && stats.isDirectory();
+                if (isDirectory) {
+                    fs.mkdirSync(dest, { recursive: true });
+                    fs.readdirSync(src).forEach(childItemName => {
+                        copyRecursiveSync(
+                            path.join(src, childItemName),
+                            path.join(dest, childItemName)
+                        );
+                    });
+                } else {
+                    fs.copyFileSync(src, dest);
+                }
+            }
+            
+            copyRecursiveSync(sourceDir, targetAdminDir);
+            console.log('   ✅ Copiado para:', targetAdminDir);
             process.exit(0);
+        }
+    }
+    
+    // Se não encontrou, criar symlink de .medusa/admin para .medusa/server/public/admin
+    // (caso Medusa procure em .medusa/admin)
+    const adminAltPath = path.join(cwd, '.medusa/admin');
+    const adminTargetPath = path.join(cwd, '.medusa/server/public/admin');
+    if (fs.existsSync(adminTargetPath) && !fs.existsSync(adminAltPath)) {
+        console.log('   Tentando criar symlink de .medusa/admin para .medusa/server/public/admin...');
+        try {
+            fs.mkdirSync(path.join(cwd, '.medusa'), { recursive: true });
+            fs.symlinkSync(adminTargetPath, adminAltPath, 'dir');
+            console.log('   ✅ Symlink criado:', adminAltPath, '->', adminTargetPath);
+            process.exit(0);
+        } catch (err) {
+            console.log('   ⚠️  Não foi possível criar symlink:', err.message);
         }
     }
     
@@ -85,5 +125,19 @@ else
     # Não falhar aqui, apenas avisar
 fi
 
+# Criar symlink adicional: .medusa/admin -> .medusa/server/public/admin
+# (caso Medusa procure em .medusa/admin)
+if [ -d ".medusa/server/public/admin" ] && [ ! -e ".medusa/admin" ]; then
+    echo "   Criando symlink .medusa/admin -> .medusa/server/public/admin..."
+    mkdir -p .medusa
+    ln -sf server/public/admin .medusa/admin 2>/dev/null || {
+        # Se symlink falhar, copiar
+        echo "   Symlink falhou, copiando..."
+        cp -r .medusa/server/public/admin .medusa/admin 2>/dev/null || true
+    }
+    echo "   ✅ Symlink/cópia criada"
+fi
+
 echo "✅ Verificação concluída"
+
 
