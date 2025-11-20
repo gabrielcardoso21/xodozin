@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: medusa-backend
+    env: node
+    buildCommand: yarn install && yarn build
+    startCommand: yarn start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medusa-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: medusa-redis
+          type: redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: STORE_CORS
+        value: https://your-frontend-domain.com
+      - key: ADMIN_CORS
+        value: https://your-frontend-domain.com
+      - key: AUTH_CORS
+        value: https://your-frontend-domain.com
+
+databases:
+  - name: medusa-postgres
+    databaseName: medusa
+    user: medusa
+    plan: free
+
+  - name: medusa-redis
+    type: redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
