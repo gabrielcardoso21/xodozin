@@ -5,7 +5,7 @@ services:
     rootDir: .
     plan: free
     buildCommand: yarn install && yarn build:skip-if-exists
-    startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build
+    startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && PORT=${PORT:-9000} yarn start:skip-build
     autoDeploy: true
     healthCheckPath: /health
     envVars:
