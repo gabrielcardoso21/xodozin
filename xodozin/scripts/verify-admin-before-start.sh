@@ -65,9 +65,24 @@ EOF
         echo "   ✅ Node.js consegue acessar o admin (Medusa deve conseguir também)"
         rm -f /tmp/test-medusa-access.js
     else
-        echo "   ⚠️  Node.js NÃO consegue acessar o admin - pode haver problema de caminho!"
+        echo "   ⚠️  Node.js NÃO consegue acessar o admin - tentando restaurar do backup..."
         rm -f /tmp/test-medusa-access.js
-        # Não falhar aqui, apenas avisar - o Medusa pode usar caminho diferente
+        
+        # Tentar restaurar do backup se existir
+        if [ -d "/tmp/admin-backup/admin" ]; then
+            echo "   Restaurando admin do backup..."
+            mkdir -p .medusa/server/public
+            cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || true
+            if [ -f ".medusa/server/public/admin/index.html" ]; then
+                echo "   ✅ Admin restaurado do backup"
+            else
+                echo "   ❌ Falha ao restaurar admin do backup"
+                exit 1
+            fi
+        else
+            echo "   ❌ Backup não encontrado e Node.js não consegue acessar admin"
+            exit 1
+        fi
     fi
 else
     echo "❌ ERRO: Admin build NÃO encontrado em $ADMIN_PATH"

@@ -30,5 +30,5 @@ cmds = [
 ]
 
 [start]
-cmd = "medusa db:migrate && medusa start"
+cmd = "bash scripts/verify-admin-before-start.sh && medusa db:migrate && medusa start"
 
