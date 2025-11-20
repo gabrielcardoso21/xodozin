@@ -4,6 +4,12 @@
 
 set -e
 
+echo "🔍 DEBUG: Verificando se admin build existe..."
+echo "   Diretório atual: $(pwd)"
+echo "   Verificando: .medusa/server/public/admin"
+ls -la .medusa/server/public/admin 2>/dev/null | head -5 || echo "   Diretório não encontrado"
+echo ""
+
 if [ -d ".medusa/server/public/admin" ]; then
     echo "✅ Admin build exists, skipping frontend build"
     echo "📦 Preserving admin build..."
@@ -29,9 +35,26 @@ if [ -d ".medusa/server/public/admin" ]; then
         echo "⚠️  Warning: Admin backup not found in /tmp/admin-backup/admin"
     fi
     echo "✅ Backend build completed"
+    echo "🔍 DEBUG: Verificando admin após build..."
+    if [ -f ".medusa/server/public/admin/index.html" ]; then
+        echo "✅ Admin existe após build: .medusa/server/public/admin/index.html"
+        ls -lh .medusa/server/public/admin/index.html
+    else
+        echo "❌ ERRO: Admin NÃO existe após build!"
+        echo "   Estrutura de .medusa:"
+        find .medusa -type d 2>/dev/null | head -10 || echo "   .medusa não existe"
+    fi
 else
     echo "⚠️  Admin build not found, doing full build..."
+    echo "🔍 DEBUG: Listando arquivos .medusa antes do build:"
+    find .medusa -type f -name "*.html" 2>/dev/null | head -5 || echo "   Nenhum arquivo HTML encontrado"
     node --max-old-space-size=2048 node_modules/.bin/medusa build
     echo "✅ Full build completed"
+    echo "🔍 DEBUG: Verificando admin após build completo..."
+    if [ -f ".medusa/server/public/admin/index.html" ]; then
+        echo "✅ Admin gerado: .medusa/server/public/admin/index.html"
+    else
+        echo "❌ ERRO: Admin NÃO foi gerado!"
+    fi
 fi
 
