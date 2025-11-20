@@ -1,23 +1,26 @@
 # Configuração Nixpacks para Railway
-# Força detecção como Node.js
+# Força detecção como Node.js e ignora pasta backend/
 
 providers = ["node"]
 
 [variables]
 NODE_VERSION = "20"
 
+[phases.setup]
+cmds = [
+  "echo 'Building Node.js project in xodozin/'"
+]
+
 [phases.install]
 cmds = [
-  "cd xodozin",
-  "yarn install"
+  "yarn install --frozen-lockfile"
 ]
 
 [phases.build]
 cmds = [
-  "cd xodozin",
   "yarn build"
 ]
 
 [start]
-cmd = "cd xodozin && yarn start"
+cmd = "yarn start"
 
