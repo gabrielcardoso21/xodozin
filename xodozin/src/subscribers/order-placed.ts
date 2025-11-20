@@ -159,8 +159,8 @@ export default async function orderPlacedHandler({
 
     // Enviar email com NFe após emissão bem-sucedida
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { sendNFeEmail } = require("../utils/email");
+      // @ts-ignore - arquivo .js será gerado durante o build
+      const { sendNFeEmail } = await import("../utils/email.js");
       await sendNFeEmail({
         ...order,
         metadata: {
