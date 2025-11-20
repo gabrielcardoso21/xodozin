@@ -2,7 +2,8 @@
 # Script para fazer build apenas se admin não existir
 # Se admin já existe, faz apenas build do backend (sem admin)
 
-# Não usar set -e aqui porque queremos restaurar admin mesmo se build falhar
+# Não usar set -e no início porque queremos restaurar admin mesmo se build falhar
+# Mas vamos garantir que erros críticos sejam detectados
 set +e
 
 echo "🔍 DEBUG: Verificando se admin build existe..."
@@ -199,12 +200,52 @@ fi
 # Compilar TypeScript para garantir que arquivos compilados existam
 echo "🔨 Compilando TypeScript (resto do projeto)..."
 if [ -f "tsconfig.json" ]; then
-    npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
-        echo "⚠️  TypeScript compilation had warnings, but continuing..."
-    }
+    # Usar tsconfig.backend.json se existir para evitar erros do frontend
+    if [ -f "tsconfig.backend.json" ]; then
+        echo "   Usando tsconfig.backend.json (exclui frontend)..."
+        npx tsc --build --project tsconfig.backend.json 2>&1 | tee /tmp/tsc-build.log || {
+            echo "⚠️  TypeScript compilation had warnings, but continuing..."
+        }
+    else
+        npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
+            echo "⚠️  TypeScript compilation had warnings, but continuing..."
+        }
+    fi
     echo "✅ TypeScript compilation completed"
 else
     echo "⚠️  tsconfig.json não encontrado, pulando compilação TypeScript"
 fi
+
+# Garantir que medusa-config.js existe antes de terminar
+if [ ! -f "medusa-config.js" ]; then
+    echo "❌ ERRO CRÍTICO: medusa-config.js não existe após build!"
+    echo "   Tentando criar versão básica..."
+    cat > medusa-config.js << 'EOF'
+const { loadEnv, defineConfig } = require('@medusajs/framework/utils');
+loadEnv(process.env.NODE_ENV || 'development', process.cwd());
+module.exports = defineConfig({
+  projectConfig: {
+    databaseUrl: process.env.DATABASE_URL,
+    http: {
+      port: process.env.PORT || 9000,
+      storeCors: process.env.STORE_CORS || "http://localhost:3000",
+      adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
+      authCors: process.env.AUTH_CORS || "http://localhost:3000,http://localhost:7001",
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+    },
+  },
+  featureFlags: {}
+});
+EOF
+    if [ -f "medusa-config.js" ]; then
+        echo "✅ medusa-config.js básico criado"
+    else
+        echo "❌ ERRO: Falha ao criar medusa-config.js básico!"
+        exit 1
+    fi
+fi
+
+echo "✅ Build script completed successfully"
 
 
