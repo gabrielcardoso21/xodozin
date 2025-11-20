@@ -142,34 +142,62 @@ else
     fi
 fi
 
-# Garantir que medusa-config.js existe
-echo "🔨 Garantindo que medusa-config.js existe..."
-if [ ! -f "medusa-config.js" ]; then
-    echo "   medusa-config.js não encontrado, criando wrapper..."
-    # O arquivo medusa-config.js já deve estar commitado, mas se não estiver, criar
-    if [ ! -f "medusa-config.js" ]; then
-        cat > medusa-config.js << 'EOF'
-// Wrapper para medusa-config.ts
-// O Medusa v2 suporta TypeScript diretamente, mas este wrapper garante compatibilidade
-try {
-  require('ts-node/register');
-  module.exports = require('./medusa-config.ts');
-} catch (e) {
-  try {
-    module.exports = require('./.medusa/server/medusa-config.js');
-  } catch (e2) {
-    module.exports = require('./medusa-config.ts');
-  }
-}
+# Compilar medusa-config.ts para medusa-config.js
+echo "🔨 Compilando medusa-config.ts para medusa-config.js..."
+if [ -f "medusa-config.ts" ]; then
+    # Compilar medusa-config.ts especificamente para o diretório raiz
+    # Usar configuração simples que funciona em produção
+    npx tsc medusa-config.ts \
+        --outDir . \
+        --module commonjs \
+        --target ES2021 \
+        --esModuleInterop \
+        --skipLibCheck \
+        --moduleResolution node \
+        --resolveJsonModule \
+        --allowSyntheticDefaultImports \
+        2>&1 | tee /tmp/medusa-config-compile.log || {
+        echo "⚠️  Falha ao compilar medusa-config.ts, tentando método alternativo..."
+        # Se falhar, criar um medusa-config.js básico que funciona
+        if [ ! -f "medusa-config.js" ]; then
+            echo "   Criando medusa-config.js básico..."
+            cat > medusa-config.js << 'EOF'
+const { loadEnv, defineConfig } = require('@medusajs/framework/utils');
+loadEnv(process.env.NODE_ENV || 'development', process.cwd());
+module.exports = defineConfig({
+  projectConfig: {
+    databaseUrl: process.env.DATABASE_URL,
+    http: {
+      storeCors: process.env.STORE_CORS || "http://localhost:3000",
+      adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
+      authCors: process.env.AUTH_CORS || "http://localhost:3000,http://localhost:7001",
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+    },
+  },
+  featureFlags: {}
+});
 EOF
-        echo "✅ medusa-config.js criado"
+            echo "✅ medusa-config.js básico criado"
+        fi
+    }
+    if [ -f "medusa-config.js" ]; then
+        echo "✅ medusa-config.js gerado/verificado"
+        ls -lh medusa-config.js
+    else
+        echo "❌ ERRO: medusa-config.js não foi gerado!"
+        exit 1
     fi
 else
-    echo "✅ medusa-config.js já existe"
+    echo "⚠️  medusa-config.ts não encontrado"
+    if [ ! -f "medusa-config.js" ]; then
+        echo "❌ ERRO: Nem medusa-config.ts nem medusa-config.js encontrados!"
+        exit 1
+    fi
 fi
 
 # Compilar TypeScript para garantir que arquivos compilados existam
-echo "🔨 Compilando TypeScript..."
+echo "🔨 Compilando TypeScript (resto do projeto)..."
 if [ -f "tsconfig.json" ]; then
     npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
         echo "⚠️  TypeScript compilation had warnings, but continuing..."

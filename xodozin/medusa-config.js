@@ -1,23 +1,23 @@
 // Este arquivo é gerado automaticamente durante o build
-// Se não existir, o Medusa tentará usar medusa-config.ts diretamente
-// Mas para garantir compatibilidade, criamos este wrapper
+// Compilado de medusa-config.ts
+// Se este arquivo não existir, o build deve compilar medusa-config.ts para gerá-lo
 
-// Tentar carregar o TypeScript usando ts-node se disponível
-try {
-  require('ts-node/register');
-  module.exports = require('./medusa-config.ts');
-} catch (e) {
-  // Se ts-node não estiver disponível, tentar carregar o arquivo compilado
-  try {
-    module.exports = require('./.medusa/server/medusa-config.js');
-  } catch (e2) {
-    // Se nada funcionar, tentar o arquivo TypeScript diretamente (pode funcionar em alguns ambientes)
-    try {
-      module.exports = require('./medusa-config.ts');
-    } catch (e3) {
-      console.error('Erro ao carregar medusa-config:', e3.message);
-      throw e3;
-    }
+const { loadEnv, defineConfig } = require('@medusajs/framework/utils');
+
+loadEnv(process.env.NODE_ENV || 'development', process.cwd());
+
+module.exports = defineConfig({
+  projectConfig: {
+    databaseUrl: process.env.DATABASE_URL,
+    http: {
+      storeCors: process.env.STORE_CORS || "http://localhost:3000",
+      adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
+      authCors: process.env.AUTH_CORS || "http://localhost:3000,http://localhost:7001",
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+    },
+  },
+  featureFlags: {
   }
-}
+});
 
