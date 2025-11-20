@@ -41,9 +41,21 @@ if [ -d ".medusa/server/public/admin" ] && [ -f ".medusa/server/public/admin/ind
     mkdir -p /tmp/admin-backup
     cp -r .medusa/server/public/admin /tmp/admin-backup/ 2>/dev/null || true
     echo "   Admin backed up to /tmp/admin-backup/admin"
-    echo "🔨 Building backend only (excluding admin directory)..."
+    echo "🔨 Building backend only (tsc only, no medusa build to avoid OOM)..."
     # Compilar apenas backend usando tsconfig específico que exclui src/admin
-    tsc --project tsconfig.backend.json
+    # Isso evita OOM porque não faz build do frontend
+    tsc --project tsconfig.backend.json || {
+        echo "⚠️  tsc failed, trying medusa build with admin preservation..."
+        # Se tsc falhar, tentar medusa build mas restaurar admin imediatamente após
+        node --max-old-space-size=2048 node_modules/.bin/medusa build || {
+            echo "❌ Build failed, restoring admin from backup..."
+            mkdir -p .medusa/server/public
+            if [ -d "/tmp/admin-backup/admin" ]; then
+                cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || true
+            fi
+            exit 1
+        }
+    }
     # Garantir que estrutura existe e restaurar admin após build
     mkdir -p .medusa/server/public
     if [ -d "/tmp/admin-backup/admin" ]; then
