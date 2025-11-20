@@ -18,7 +18,7 @@
     "build:skip-if-exists": "bash scripts/build-skip-if-exists.sh",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "yarn build:skip-if-exists && medusa db:migrate && medusa start",
-    "start:skip-build": "bash scripts/verify-admin-before-start.sh && bash scripts/ensure-admin-accessible.sh && medusa db:migrate && medusa start",
+    "start:skip-build": "medusa build && medusa db:migrate && medusa start",
     "start:production": "yarn build:skip-if-exists && medusa db:migrate && medusa start",
     "dev": "medusa develop",
     "setup:brasil": "medusa exec ./src/scripts/setup-brasil.ts",
