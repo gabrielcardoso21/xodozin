@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
+import { sendPaymentConfirmationEmail } from "../../utils/email";
 
 /**
  * Webhook para receber confirmação de pagamento do gateway
@@ -111,8 +112,6 @@ export async function POST(
     // Se pagamento foi confirmado, enviar email de confirmação
     if (paymentStatus === "captured") {
       try {
-        const { sendPaymentConfirmationEmail } = await import("../../utils/email.js");
-        
         // Verificar se email já foi enviado (evitar duplicatas)
         if (!order.metadata?.payment_confirmation_email_sent) {
           await sendPaymentConfirmationEmail({
