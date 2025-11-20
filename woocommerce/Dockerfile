@@ -8,7 +8,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 # Instalar dependências para WP-CLI
 RUN apt-get update && apt-get install -y \
     less \
-    mysql-client \
+    default-mysql-client \
     git \
     curl \
     unzip \
