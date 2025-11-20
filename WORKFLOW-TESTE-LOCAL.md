@@ -30,7 +30,7 @@ bash scripts/test-build-local.sh
 **O que o script verifica:**
 - ✅ Dependências instaladas
 - ✅ Build executa sem erros
-- ✅ Admin panel é gerado (`.medusa/admin/index.html`)
+- ✅ Admin panel é gerado (`.medusa/server/public/admin/index.html` - Medusa v2)
 
 ### 3. Se Build Passar: Fazer Deploy
 

@@ -93,7 +93,8 @@ fi
 echo "🔍 Verificando se admin panel foi gerado..."
 echo ""
 
-ADMIN_INDEX=".medusa/admin/index.html"
+# Medusa v2 gera admin em .medusa/server/public/admin/index.html
+ADMIN_INDEX=".medusa/server/public/admin/index.html"
 if [ -f "$ADMIN_INDEX" ]; then
     echo -e "${GREEN}✅ Admin panel gerado: $ADMIN_INDEX${NC}"
     echo "   Tamanho: $(du -h "$ADMIN_INDEX" | cut -f1)"
@@ -102,17 +103,17 @@ else
     echo -e "${RED}❌ ERRO: Admin panel NÃO foi gerado!${NC}"
     echo "   Arquivo esperado: $ADMIN_INDEX"
     echo ""
-    echo "📂 Conteúdo de .medusa/admin (se existir):"
-    ls -la .medusa/admin/ 2>/dev/null || echo "   Diretório não existe"
+    echo "📂 Estrutura de .medusa (se existir):"
+    find .medusa -type f -name "*.html" 2>/dev/null | head -10 || echo "   Nenhum arquivo HTML encontrado"
     exit 1
 fi
 
 # 5. Verificar estrutura do build
 echo "📂 Estrutura do build gerado:"
 echo ""
-if [ -d ".medusa/admin" ]; then
-    echo "   .medusa/admin/"
-    ls -lh .medusa/admin/ | head -10 | sed 's/^/     /'
+if [ -d ".medusa/server/public/admin" ]; then
+    echo "   .medusa/server/public/admin/"
+    ls -lh .medusa/server/public/admin/ | head -10 | sed 's/^/     /'
     echo ""
 fi
 

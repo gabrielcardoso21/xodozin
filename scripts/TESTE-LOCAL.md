@@ -19,7 +19,7 @@ O script irá:
 - ✅ Verificar dependências
 - ✅ Instalar dependências se necessário
 - ✅ Executar build em modo produção
-- ✅ Verificar se admin panel foi gerado (`.medusa/admin/index.html`)
+- ✅ Verificar se admin panel foi gerado (`.medusa/server/public/admin/index.html` - Medusa v2)
 
 ### 2. Testar Start Local (Opcional)
 
