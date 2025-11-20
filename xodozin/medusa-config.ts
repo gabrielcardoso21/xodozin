@@ -15,11 +15,7 @@ module.exports = defineConfig({
     },
     // Configuração de locale padrão para Brasil
     // O Medusa v2 usa a configuração do store para determinar locale e formatação
-    // Esta configuração será aplicada quando o store for criado/atualizado
-    store: {
-      // Locale padrão será configurado via script setup-brasil.ts
-      // A moeda BRL e região Brasil já são configuradas automaticamente
-    }
+    // Esta configuração será aplicada quando o store for criado/atualizado via script setup-brasil.ts
   },
   // Configuração de Payment Providers
   // Variáveis de ambiente necessárias:

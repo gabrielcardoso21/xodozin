@@ -3,7 +3,7 @@ import {
   ContainerRegistrationKeys,
   Modules,
 } from "@medusajs/framework/utils";
-import * as bcrypt from "bcryptjs";
+// import * as bcrypt from "bcryptjs"; // Não usado mais, workflow cria auth automaticamente
 
 export default async function createUsersFinal({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -14,20 +14,26 @@ export default async function createUsersFinal({ container }: ExecArgs) {
   // Verificar se usuários já existem
   const existingUsers = await userModuleService.listUsers({});
   
-  const gabrielExists = existingUsers.some(u => u.email === "gabriel@xodozin.com.br");
-  const anneExists = existingUsers.some(u => u.email === "anne@xodozin.com.br");
+  const gabrielExists = existingUsers.some((u: any) => u.email === "gabriel@xodozin.com.br");
+  const anneExists = existingUsers.some((u: any) => u.email === "anne@xodozin.com.br");
 
   // Criar Gabriel com password_hash
   if (!gabrielExists) {
     logger.info("Criando usuário Gabriel...");
     try {
-      const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
-      const gabriel = await userModuleService.createUsers({
-        email: "gabriel@xodozin.com.br",
-        password_hash: hashedPassword,
-        first_name: "Gabriel",
-        last_name: "Admin",
+      // Usar workflow para criar usuário com autenticação
+      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
+      const { result } = await createUsersWorkflow(container).run({
+        input: {
+          users: [{
+            email: "gabriel@xodozin.com.br",
+            password: "Gabriel123!",
+            first_name: "Gabriel",
+            last_name: "Admin",
+          }],
+        },
       });
+      const gabriel = result[0];
       logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
       logger.info("   Email: gabriel@xodozin.com.br");
       logger.info("   Senha: Gabriel123!");
@@ -38,14 +44,14 @@ export default async function createUsersFinal({ container }: ExecArgs) {
   } else {
     logger.info("✅ Usuário Gabriel já existe");
     // Atualizar senha se não tiver hash
-    const gabriel = existingUsers.find(u => u.email === "gabriel@xodozin.com.br");
-    if (gabriel && !gabriel.password_hash) {
+    const gabriel = existingUsers.find((u: any) => u.email === "gabriel@xodozin.com.br");
+    if (gabriel && !(gabriel as any).password_hash) {
       logger.info("Atualizando senha do Gabriel (não tinha hash)...");
       const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
-      await userModuleService.updateUsers({
-        selector: { id: gabriel.id },
-        update: { password_hash: hashedPassword },
-      });
+      await userModuleService.updateUsers([{
+        id: gabriel.id,
+        password_hash: hashedPassword,
+      }]);
       logger.info("✅ Senha do Gabriel atualizada");
     }
   }
@@ -54,13 +60,19 @@ export default async function createUsersFinal({ container }: ExecArgs) {
   if (!anneExists) {
     logger.info("Criando usuário Anne...");
     try {
-      const hashedPassword = await bcrypt.hash("Anne123!", 10);
-      const anne = await userModuleService.createUsers({
-        email: "anne@xodozin.com.br",
-        password_hash: hashedPassword,
-        first_name: "Anne",
-        last_name: "User",
+      // Usar workflow para criar usuário com autenticação
+      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
+      const { result } = await createUsersWorkflow(container).run({
+        input: {
+          users: [{
+            email: "anne@xodozin.com.br",
+            password: "Anne123!",
+            first_name: "Anne",
+            last_name: "User",
+          }],
+        },
       });
+      const anne = result[0];
       logger.info(`✅ Usuário Anne criado: ${anne.id}`);
       logger.info("   Email: anne@xodozin.com.br");
       logger.info("   Senha: Anne123!");
@@ -71,14 +83,14 @@ export default async function createUsersFinal({ container }: ExecArgs) {
   } else {
     logger.info("✅ Usuário Anne já existe");
     // Atualizar senha se não tiver hash
-    const anne = existingUsers.find(u => u.email === "anne@xodozin.com.br");
-    if (anne && !anne.password_hash) {
+    const anne = existingUsers.find((u: any) => u.email === "anne@xodozin.com.br");
+    if (anne && !(anne as any).password_hash) {
       logger.info("Atualizando senha da Anne (não tinha hash)...");
       const hashedPassword = await bcrypt.hash("Anne123!", 10);
-      await userModuleService.updateUsers({
-        selector: { id: anne.id },
-        update: { password_hash: hashedPassword },
-      });
+      await userModuleService.updateUsers([{
+        id: anne.id,
+        password_hash: hashedPassword,
+      }]);
       logger.info("✅ Senha da Anne atualizada");
     }
   }

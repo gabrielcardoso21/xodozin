@@ -37,7 +37,7 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
     return;
   }
 
-  const brazilRegion = regions[0];
+  const brazilRegion = regions[0] as any;
   logger.info(`✅ Região Brasil encontrada: ${brazilRegion.id}`);
 
   // Verificar payment providers disponíveis
@@ -48,7 +48,7 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
   try {
     existingProviders = (await paymentProviderModule.listPaymentProviders()) as any[];
   } catch (error) {
-    logger.warn("Não foi possível listar payment providers:", error);
+    logger.warn("Não foi possível listar payment providers");
   }
 
   logger.info(`Payment providers encontrados: ${existingProviders.length}`);
@@ -60,7 +60,7 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
     
     // Verificar se Stripe provider já existe
     const stripeProvider = existingProviders.find(
-      (p) => p.id === "pp_stripe" || p.id?.includes("stripe")
+      (p: any) => p.id === "pp_stripe" || p.id?.includes("stripe")
     );
 
     if (stripeProvider) {
@@ -72,7 +72,7 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
 
     // Atualizar região para incluir Stripe nos payment providers
     try {
-      const currentProviders = brazilRegion.payment_providers || [];
+      const currentProviders = (brazilRegion.payment_providers || []) as string[];
       if (!currentProviders.includes("pp_stripe") && !currentProviders.some((p: string) => p.includes("stripe"))) {
         logger.info("Adicionando Stripe à região Brasil...");
         // Nota: Atualizar região requer workflow específico
@@ -81,7 +81,7 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
         logger.info("   Settings → Regions → Brasil → Payment Providers");
       }
     } catch (error) {
-      logger.warn("Erro ao atualizar payment providers da região:", error);
+      logger.warn("Erro ao atualizar payment providers da região");
     }
   } else {
     logger.info("ℹ️ STRIPE_SECRET_KEY não configurado. Pulando configuração do Stripe.");

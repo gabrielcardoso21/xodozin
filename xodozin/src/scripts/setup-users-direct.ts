@@ -3,7 +3,7 @@ import {
   ContainerRegistrationKeys,
   Modules,
 } from "@medusajs/framework/utils";
-import * as bcrypt from "bcryptjs";
+// import * as bcrypt from "bcryptjs"; // Não usado mais, workflow cria auth automaticamente
 
 export default async function setupUsersDirect({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -28,14 +28,19 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
   if (!gabrielExists) {
     logger.info("Criando usuário Gabriel (Admin)...");
     try {
-      const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
-      
-      const gabriel = await userModuleService.createUsers({
-        email: "gabriel@xodozin.com.br",
-        password_hash: hashedPassword,
-        first_name: "Gabriel",
-        last_name: "Admin",
+      // Usar workflow para criar usuário com autenticação
+      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
+      const { result } = await createUsersWorkflow(container).run({
+        input: {
+          users: [{
+            email: "gabriel@xodozin.com.br",
+            password: "Gabriel123!",
+            first_name: "Gabriel",
+            last_name: "Admin",
+          }],
+        },
       });
+      const gabriel = result[0];
 
       logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
       logger.info("   Email: gabriel@xodozin.com.br");
@@ -53,14 +58,19 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
   if (!anneExists) {
     logger.info("Criando usuário Anne (Permissões limitadas)...");
     try {
-      const hashedPassword = await bcrypt.hash("Anne123!", 10);
-      
-      const anne = await userModuleService.createUsers({
-        email: "anne@xodozin.com.br",
-        password_hash: hashedPassword,
-        first_name: "Anne",
-        last_name: "User",
+      // Usar workflow para criar usuário com autenticação
+      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
+      const { result } = await createUsersWorkflow(container).run({
+        input: {
+          users: [{
+            email: "anne@xodozin.com.br",
+            password: "Anne123!",
+            first_name: "Anne",
+            last_name: "User",
+          }],
+        },
       });
+      const anne = result[0];
 
       logger.info(`✅ Usuário Anne criado: ${anne.id}`);
       logger.info("   Email: anne@xodozin.com.br");

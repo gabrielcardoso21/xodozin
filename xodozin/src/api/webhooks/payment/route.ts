@@ -20,16 +20,13 @@ export async function POST(
   const paymentModule = req.scope.resolve(Modules.PAYMENT);
 
   try {
-    const webhookData = req.body;
+    const webhookData = req.body as any;
     const headers = req.headers;
 
-    logger.info("Webhook de pagamento recebido:", {
-      provider: headers["x-provider"] || "unknown",
-      event: webhookData.type || webhookData.event || "unknown"
-    });
+    logger.info("Webhook de pagamento recebido");
 
     // Identificar provider baseado nos headers ou dados
-    const provider = headers["x-provider"] || 
+    const provider = (headers["x-provider"] as string) || 
                     webhookData.provider || 
                     (webhookData.type?.startsWith("stripe") ? "stripe" : null) ||
                     (webhookData.type?.startsWith("mercadopago") ? "mercadopago" : null) ||
@@ -42,25 +39,25 @@ export async function POST(
     if (provider === "stripe" || webhookData.type?.startsWith("payment_intent")) {
       // Webhook do Stripe
       const paymentIntent = webhookData.data?.object || webhookData.object;
-      orderId = paymentIntent.metadata?.order_id || paymentIntent.metadata?.medusa_order_id;
+      orderId = paymentIntent?.metadata?.order_id || paymentIntent?.metadata?.medusa_order_id;
       
-      if (paymentIntent.status === "succeeded") {
+      if (paymentIntent?.status === "succeeded") {
         paymentStatus = "captured";
-      } else if (paymentIntent.status === "processing") {
+      } else if (paymentIntent?.status === "processing") {
         paymentStatus = "pending";
-      } else if (paymentIntent.status === "requires_payment_method") {
+      } else if (paymentIntent?.status === "requires_payment_method") {
         paymentStatus = "requires_action";
       }
     } else if (provider === "mercadopago" || webhookData.type === "payment") {
       // Webhook do Mercado Pago
       const payment = webhookData.data || webhookData;
-      orderId = payment.external_reference || payment.metadata?.order_id;
+      orderId = payment?.external_reference || payment?.metadata?.order_id;
       
-      if (payment.status === "approved") {
+      if (payment?.status === "approved") {
         paymentStatus = "captured";
-      } else if (payment.status === "pending") {
+      } else if (payment?.status === "pending") {
         paymentStatus = "pending";
-      } else if (payment.status === "rejected") {
+      } else if (payment?.status === "rejected") {
         paymentStatus = "canceled";
       }
     } else {
@@ -79,7 +76,7 @@ export async function POST(
     }
 
     if (!orderId) {
-      logger.warn("Webhook de pagamento recebido mas order_id não encontrado:", webhookData);
+      logger.warn("Webhook de pagamento recebido mas order_id não encontrado");
       return res.status(400).json({
         error: "order_id não encontrado no webhook"
       });
@@ -95,19 +92,19 @@ export async function POST(
       });
     }
 
-    const order = orders[0];
+    const order = orders[0] as any;
 
     // Atualizar status do pagamento no pedido
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       payment_status: paymentStatus,
       metadata: {
-        ...order.metadata,
+        ...(order.metadata || {}),
         payment_webhook_received_at: new Date().toISOString(),
         payment_provider: provider,
         payment_webhook_data: webhookData
       }
-    });
+    }]);
 
     logger.info(`Status de pagamento atualizado para pedido ${orderId}: ${paymentStatus}`);
 
@@ -124,10 +121,10 @@ export async function POST(
           });
           
           // Marcar que email foi enviado
-          await orderModule.updateOrders({
+          await orderModule.updateOrders([{
             id: orderId,
             metadata: {
-              ...order.metadata,
+              ...(order.metadata || {}),
               payment_status: paymentStatus,
               payment_webhook_received_at: new Date().toISOString(),
               payment_provider: provider,
@@ -135,7 +132,7 @@ export async function POST(
               payment_confirmation_email_sent: true,
               payment_confirmation_email_sent_at: new Date().toISOString(),
             },
-          });
+          }]);
           
           logger.info(`✅ Email de confirmação de pagamento enviado para pedido ${orderId}`);
         }
