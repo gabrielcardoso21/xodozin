@@ -35,51 +35,53 @@ fi
 echo ""
 
 if [ -d ".medusa/server/public/admin" ] && [ -f ".medusa/server/public/admin/index.html" ]; then
-    echo "✅ Admin build exists, skipping frontend build"
-    echo "📦 Preserving admin build..."
-    # Fazer backup do admin antes de qualquer operação
+    echo "✅ Admin build exists, will preserve it during medusa build"
+    echo "📦 Making backup of admin build..."
+    # Fazer backup completo do admin antes de qualquer operação
     mkdir -p /tmp/admin-backup
+    rm -rf /tmp/admin-backup/admin
     cp -r .medusa/server/public/admin /tmp/admin-backup/ 2>/dev/null || true
     echo "   Admin backed up to /tmp/admin-backup/admin"
-    echo "🔨 Building backend only (tsc only, no medusa build to avoid OOM)..."
-    # Compilar apenas backend usando tsconfig específico que exclui src/admin
-    # Isso evita OOM porque não faz build do frontend
-    tsc --project tsconfig.backend.json || {
-        echo "⚠️  tsc failed, trying medusa build with admin preservation..."
-        # Se tsc falhar, tentar medusa build mas restaurar admin imediatamente após
-        node --max-old-space-size=2048 node_modules/.bin/medusa build || {
-            echo "❌ Build failed, restoring admin from backup..."
-            mkdir -p .medusa/server/public
-            if [ -d "/tmp/admin-backup/admin" ]; then
-                cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || true
-            fi
-            exit 1
-        }
-    }
+    echo "   Backup size: $(du -sh /tmp/admin-backup/admin 2>/dev/null | cut -f1)"
+    
+    echo "🔨 Running medusa build (will restore admin after)..."
+    echo "   Note: This may take a while but admin will be preserved"
+    
+    # Executar medusa build - ele vai remover .medusa/server mas vamos restaurar o admin depois
+    # Usar timeout e monitorar memória
+    if timeout 600 node --max-old-space-size=2048 node_modules/.bin/medusa build 2>&1 | tee /tmp/medusa-build.log; then
+        echo "✅ Medusa build completed"
+    else
+        BUILD_EXIT_CODE=$?
+        echo "⚠️  Medusa build exited with code: $BUILD_EXIT_CODE"
+        if [ $BUILD_EXIT_CODE -eq 137 ] || [ $BUILD_EXIT_CODE -eq 124 ]; then
+            echo "❌ Build was killed (OOM or timeout)"
+        fi
+        # Continuar para restaurar admin mesmo se build falhou parcialmente
+    fi
+    
     # Garantir que estrutura existe e restaurar admin após build
+    echo "📦 Restoring admin build..."
     mkdir -p .medusa/server/public
     if [ -d "/tmp/admin-backup/admin" ]; then
+        rm -rf .medusa/server/public/admin 2>/dev/null || true
         cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || true
         echo "✅ Admin build restored to .medusa/server/public/admin"
         # Verificar se foi restaurado corretamente
         if [ -f ".medusa/server/public/admin/index.html" ]; then
-            echo "✅ Verified: index.html exists"
+            echo "✅ Verified: index.html exists after restore"
+            ls -lh .medusa/server/public/admin/index.html
         else
-            echo "⚠️  Warning: index.html not found after restore"
+            echo "❌ ERROR: index.html not found after restore!"
+            echo "   Checking backup..."
+            ls -la /tmp/admin-backup/admin/ 2>/dev/null || echo "   Backup directory not found"
+            exit 1
         fi
     else
-        echo "⚠️  Warning: Admin backup not found in /tmp/admin-backup/admin"
+        echo "❌ ERROR: Admin backup not found in /tmp/admin-backup/admin"
+        exit 1
     fi
-    echo "✅ Backend build completed"
-    echo "🔍 DEBUG: Verificando admin após build..."
-    if [ -f ".medusa/server/public/admin/index.html" ]; then
-        echo "✅ Admin existe após build: .medusa/server/public/admin/index.html"
-        ls -lh .medusa/server/public/admin/index.html
-    else
-        echo "❌ ERRO: Admin NÃO existe após build!"
-        echo "   Estrutura de .medusa:"
-        find .medusa -type d 2>/dev/null | head -10 || echo "   .medusa não existe"
-    fi
+    echo "✅ Build completed with admin preserved"
 else
     echo "⚠️  Admin build not found, doing full build..."
     echo "🔍 DEBUG: Listando arquivos .medusa antes do build:"
@@ -93,4 +95,5 @@ else
         echo "❌ ERRO: Admin NÃO foi gerado!"
     fi
 fi
+
 
