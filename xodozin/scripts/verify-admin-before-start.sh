@@ -45,6 +45,30 @@ if [ -f "$ADMIN_PATH" ]; then
         echo "   ❌ Diretório ou arquivo não são acessíveis!"
         exit 1
     fi
+    
+    # Garantir que o Medusa encontre o admin usando Node.js para simular
+    echo "   Testando acesso via Node.js (como Medusa faz)..."
+    cat > /tmp/test-medusa-access.js << 'EOF'
+const fs = require('fs');
+const path = require('path');
+const adminPath = path.join(process.cwd(), '.medusa/server/public/admin/index.html');
+if (fs.existsSync(adminPath)) {
+    console.log('✅ Node.js (Medusa) consegue encontrar admin em:', adminPath);
+    process.exit(0);
+} else {
+    console.log('❌ Node.js (Medusa) NÃO consegue encontrar admin em:', adminPath);
+    console.log('   process.cwd():', process.cwd());
+    process.exit(1);
+}
+EOF
+    if node /tmp/test-medusa-access.js; then
+        echo "   ✅ Node.js consegue acessar o admin (Medusa deve conseguir também)"
+        rm -f /tmp/test-medusa-access.js
+    else
+        echo "   ⚠️  Node.js NÃO consegue acessar o admin - pode haver problema de caminho!"
+        rm -f /tmp/test-medusa-access.js
+        # Não falhar aqui, apenas avisar - o Medusa pode usar caminho diferente
+    fi
 else
     echo "❌ ERRO: Admin build NÃO encontrado em $ADMIN_PATH"
     echo "   Estrutura de .medusa:"
