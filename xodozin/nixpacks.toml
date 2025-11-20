@@ -9,7 +9,8 @@ NODE_VERSION = "20"
 # Cache de dependências para builds mais rápidos
 YARN_CACHE_FOLDER = "/tmp/.yarn-cache"
 # Aumentar limite de memória do Node.js para build do frontend
-NODE_OPTIONS = "--max-old-space-size=4096"
+# Reduzido para 2GB para evitar OOM Killer no Railway
+NODE_OPTIONS = "--max-old-space-size=2048"
 
 [phases.setup]
 cmds = [
