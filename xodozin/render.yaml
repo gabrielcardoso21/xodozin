@@ -19,6 +19,8 @@ services:
         value: production
       - key: NODE_OPTIONS
         value: "--max-old-space-size=2048"
+      - key: PORT
+        value: "9000"
       - key: STORE_CORS
         value: https://seu-dominio.com
       - key: ADMIN_CORS
