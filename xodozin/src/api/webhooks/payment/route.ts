@@ -94,12 +94,12 @@ export async function POST(
 
     const order = orders[0] as any;
 
-    // Atualizar status do pagamento no pedido
+    // Atualizar status do pagamento no pedido (via metadata, payment_status não é editável diretamente)
     await orderModule.updateOrders([{
       id: orderId,
-      payment_status: paymentStatus,
       metadata: {
         ...(order.metadata || {}),
+        payment_status: paymentStatus,
         payment_webhook_received_at: new Date().toISOString(),
         payment_provider: provider,
         payment_webhook_data: webhookData
@@ -111,7 +111,7 @@ export async function POST(
     // Se pagamento foi confirmado, enviar email de confirmação
     if (paymentStatus === "captured") {
       try {
-        const { sendPaymentConfirmationEmail } = await import("../../utils/email");
+        const { sendPaymentConfirmationEmail } = await import("../../utils/email.js");
         
         // Verificar se email já foi enviado (evitar duplicatas)
         if (!order.metadata?.payment_confirmation_email_sent) {

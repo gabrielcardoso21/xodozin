@@ -3,10 +3,8 @@ import {
   ContainerRegistrationKeys,
   Modules,
 } from "@medusajs/framework/utils";
-import {
-  createProductCollectionsWorkflow,
-  linkProductsToCollectionWorkflow,
-} from "@medusajs/medusa/core-flows";
+// Workflows de collections não estão disponíveis, usar módulo diretamente
+// import { createProductCollectionsWorkflow, linkProductsToCollectionWorkflow } from "@medusajs/medusa/core-flows";
 
 export default async function createCollections({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -67,30 +65,18 @@ export default async function createCollections({ container }: ExecArgs) {
     },
   ];
 
+  // TODO: Implementar criação de collections via módulo quando API estiver disponível
+  logger.warn("⚠️  Criação de collections via workflow não está disponível. Use o Admin Panel para criar collections.");
+  
   for (const collectionData of collections) {
     try {
-      // Criar collection
-      const { result } = await createProductCollectionsWorkflow(container).run({
-        input: {
-          collections: [collectionData],
-        },
-      });
+      // Usar módulo diretamente
+      const productModule = container.resolve(Modules.PRODUCT);
+      const collection = await productModule.createProductCollections([collectionData] as any);
+      logger.info(`✅ Collection criada: ${collectionData.title}`);
 
-      const collection = result[0];
-      logger.info(`✅ Collection criada: ${collection.title} (${collection.id})`);
-
-      // Vincular produtos à collection (pegar primeiros 2 produtos)
-      const productsToLink = products.slice(0, 2).map(p => p.id);
-      
-      if (productsToLink.length > 0) {
-        await linkProductsToCollectionWorkflow(container).run({
-          input: {
-            id: collection.id,
-            add: productsToLink,
-          },
-        });
-        logger.info(`✅ ${productsToLink.length} produtos vinculados à collection ${collection.title}`);
-      }
+      // TODO: Vincular produtos via módulo quando API estiver disponível
+      logger.info(`⚠️  Vincule produtos manualmente via Admin Panel para a collection ${collectionData.title}`);
     } catch (error: any) {
       if (error.message?.includes("already exists") || error.message?.includes("duplicate")) {
         logger.info(`⚠️  Collection "${collectionData.title}" já existe`);

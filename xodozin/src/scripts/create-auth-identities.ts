@@ -39,9 +39,8 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
       provider_metadata: {},
     });
 
-    // Criar provider identity com emailpass
-    await authModuleService.createProviderIdentities({
-      entity_id: gabriel.id,
+    // Criar provider identity com emailpass (API mudou)
+    await authModuleService.createProviderIdentities([{
       provider: "emailpass",
       auth_identity_id: authIdentity.id,
       user_metadata: {
@@ -50,7 +49,7 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
       provider_metadata: {
         password: hashedPassword,
       },
-    });
+    }] as any);
 
     logger.info(`✅ Autenticação criada para Gabriel (auth: ${authIdentity.id})`);
   } catch (error: any) {
@@ -63,15 +62,13 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
   try {
     const hashedPassword = await bcrypt.hash("Anne123!", 10);
     
-    // Criar auth identity
-    const authIdentity = await authModuleService.createAuthIdentities({
-      entity_id: anne.id,
+    // Criar auth identity (API mudou, usar método correto)
+    const authIdentity = await authModuleService.createAuthIdentities([{
       provider_metadata: {},
-    });
+    }] as any);
 
-    // Criar provider identity com emailpass
-    await authModuleService.createProviderIdentities({
-      entity_id: anne.id,
+    // Criar provider identity com emailpass (API mudou)
+    await authModuleService.createProviderIdentities([{
       provider: "emailpass",
       auth_identity_id: authIdentity.id,
       user_metadata: {
@@ -80,7 +77,7 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
       provider_metadata: {
         password: hashedPassword,
       },
-    });
+    }] as any);
 
     logger.info(`✅ Autenticação criada para Anne (auth: ${authIdentity.id})`);
   } catch (error: any) {

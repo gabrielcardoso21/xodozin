@@ -82,7 +82,7 @@ export default async function createCollectionsViaModule({ container }: ExecArgs
         logger.info(`✅ Collection criada: ${collection.title} (${collection.id})`);
       }
 
-      createdCollections.push(collection);
+      createdCollections.push(collection as any);
 
       // Vincular produtos à collection usando workflow
       const productsToLink = products.slice(0, 2).map(p => p.id);

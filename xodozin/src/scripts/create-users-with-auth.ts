@@ -3,9 +3,7 @@ import {
   ContainerRegistrationKeys,
   Modules,
 } from "@medusajs/framework/utils";
-import {
-  createUsersWorkflow,
-} from "@medusajs/medusa/core-flows";
+// import { createUsersWorkflow } from "@medusajs/medusa/core-flows"; // Não usado mais
 
 export default async function createUsersWithAuth({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -24,31 +22,26 @@ export default async function createUsersWithAuth({ container }: ExecArgs) {
   if (gabrielExists) {
     const gabriel = existingUsers.find(u => u.email === "gabriel@xodozin.com.br");
     logger.info(`Deletando usuário Gabriel existente (${gabriel?.id})...`);
-    await userModuleService.deleteUsers(gabriel!.id);
+    await userModuleService.deleteUsers([gabriel!.id]);
   }
   
   if (anneExists) {
     const anne = existingUsers.find(u => u.email === "anne@xodozin.com.br");
     logger.info(`Deletando usuário Anne existente (${anne?.id})...`);
-    await userModuleService.deleteUsers(anne!.id);
+    await userModuleService.deleteUsers([anne!.id]);
   }
 
   // Criar Gabriel usando workflow (que cria auth automaticamente)
   logger.info("Criando usuário Gabriel com autenticação...");
   try {
-    const { result } = await createUsersWorkflow(container).run({
-      input: {
-        users: [
-          {
-            email: "gabriel@xodozin.com.br",
-            password: "Gabriel123!",
-            first_name: "Gabriel",
-            last_name: "Admin",
-          },
-        ],
-      },
-    });
-    logger.info(`✅ Usuário Gabriel criado: ${result[0].id}`);
+    // Criar usuário (senha será configurada via CLI)
+    const gabriel = await userModuleService.createUsers([{
+      email: "gabriel@xodozin.com.br",
+      first_name: "Gabriel",
+      last_name: "Admin",
+    }]);
+    logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
+    logger.info("⚠️  Configure a senha via CLI: npx medusa user -e gabriel@xodozin.com.br -p Gabriel123!");
   } catch (error: any) {
     logger.error(`Erro ao criar Gabriel: ${error.message}`);
     logger.error(error.stack);
@@ -57,19 +50,14 @@ export default async function createUsersWithAuth({ container }: ExecArgs) {
   // Criar Anne usando workflow
   logger.info("Criando usuário Anne com autenticação...");
   try {
-    const { result } = await createUsersWorkflow(container).run({
-      input: {
-        users: [
-          {
-            email: "anne@xodozin.com.br",
-            password: "Anne123!",
-            first_name: "Anne",
-            last_name: "User",
-          },
-        ],
-      },
-    });
-    logger.info(`✅ Usuário Anne criado: ${result[0].id}`);
+    // Criar usuário (senha será configurada via CLI)
+    const anne = await userModuleService.createUsers([{
+      email: "anne@xodozin.com.br",
+      first_name: "Anne",
+      last_name: "User",
+    }]);
+    logger.info(`✅ Usuário Anne criado: ${anne.id}`);
+    logger.info("⚠️  Configure a senha via CLI: npx medusa user -e anne@xodozin.com.br -p Anne123!");
   } catch (error: any) {
     logger.error(`Erro ao criar Anne: ${error.message}`);
     logger.error(error.stack);

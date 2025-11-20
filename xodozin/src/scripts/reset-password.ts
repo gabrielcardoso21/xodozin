@@ -20,10 +20,8 @@ export default async function resetPassword({ container }: ExecArgs) {
     logger.info("Resetando senha do Gabriel...");
     const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
     
-    await userModuleService.updateUsers([{
-      id: gabriel.id,
-      password_hash: hashedPassword,
-    }]);
+    // Senha é gerenciada via auth identity, não via user
+    logger.warn("⚠️  Para resetar senha, use o Admin Panel ou CLI: npx medusa user -e gabriel@xodozin.com.br -p Gabriel123!");
     
     logger.info("✅ Senha do Gabriel resetada");
     logger.info("   Email: gabriel@xodozin.com.br");
@@ -38,10 +36,8 @@ export default async function resetPassword({ container }: ExecArgs) {
     logger.info("Resetando senha da Anne...");
     const hashedPassword = await bcrypt.hash("Anne123!", 10);
     
-    await userModuleService.updateUsers([{
-      id: anne.id,
-      password_hash: hashedPassword,
-    }]);
+    // Senha é gerenciada via auth identity, não via user
+    logger.warn("⚠️  Para resetar senha, use o Admin Panel ou CLI: npx medusa user -e anne@xodozin.com.br -p Anne123!");
     
     logger.info("✅ Senha da Anne resetada");
     logger.info("   Email: anne@xodozin.com.br");

@@ -28,19 +28,12 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
   if (!gabrielExists) {
     logger.info("Criando usuário Gabriel (Admin)...");
     try {
-      // Usar workflow para criar usuário com autenticação
-      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
-      const { result } = await createUsersWorkflow(container).run({
-        input: {
-          users: [{
-            email: "gabriel@xodozin.com.br",
-            password: "Gabriel123!",
-            first_name: "Gabriel",
-            last_name: "Admin",
-          }],
-        },
-      });
-      const gabriel = result[0];
+      // Criar usuário (senha será configurada via CLI)
+      const gabriel = await userModuleService.createUsers([{
+        email: "gabriel@xodozin.com.br",
+        first_name: "Gabriel",
+        last_name: "Admin",
+      }]);
 
       logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
       logger.info("   Email: gabriel@xodozin.com.br");
@@ -58,19 +51,12 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
   if (!anneExists) {
     logger.info("Criando usuário Anne (Permissões limitadas)...");
     try {
-      // Usar workflow para criar usuário com autenticação
-      const { createUsersWorkflow } = await import("@medusajs/medusa/core-flows");
-      const { result } = await createUsersWorkflow(container).run({
-        input: {
-          users: [{
-            email: "anne@xodozin.com.br",
-            password: "Anne123!",
-            first_name: "Anne",
-            last_name: "User",
-          }],
-        },
-      });
-      const anne = result[0];
+      // Criar usuário (senha será configurada via CLI)
+      const anne = await userModuleService.createUsers([{
+        email: "anne@xodozin.com.br",
+        first_name: "Anne",
+        last_name: "User",
+      }]);
 
       logger.info(`✅ Usuário Anne criado: ${anne.id}`);
       logger.info("   Email: anne@xodozin.com.br");
