@@ -3,7 +3,7 @@ import type {
   SubscriberConfig,
 } from "@medusajs/framework";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { sendPaymentConfirmationEmail } from "../utils/email.js";
+import { sendPaymentConfirmationEmail } from "../utils/email";
 
 /**
  * Subscriber que escuta eventos de pagamento confirmado e envia email

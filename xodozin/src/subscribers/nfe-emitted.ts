@@ -3,7 +3,7 @@ import type {
   SubscriberConfig,
 } from "@medusajs/framework";
 import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { sendNFeEmail } from "../utils/email.js";
+import { sendNFeEmail } from "../utils/email";
 
 /**
  * Subscriber que escuta quando NFe é emitida e envia email
