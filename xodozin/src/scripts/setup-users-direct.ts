@@ -29,11 +29,12 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
     logger.info("Criando usuário Gabriel (Admin)...");
     try {
       // Criar usuário (senha será configurada via CLI)
-      const gabriel = await userModuleService.createUsers([{
+      const gabrielArray = await userModuleService.createUsers([{
         email: "gabriel@xodozin.com.br",
         first_name: "Gabriel",
         last_name: "Admin",
       }]);
+      const gabriel = gabrielArray[0];
 
       logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
       logger.info("   Email: gabriel@xodozin.com.br");
@@ -52,11 +53,12 @@ export default async function setupUsersDirect({ container }: ExecArgs) {
     logger.info("Criando usuário Anne (Permissões limitadas)...");
     try {
       // Criar usuário (senha será configurada via CLI)
-      const anne = await userModuleService.createUsers([{
+      const anneArray = await userModuleService.createUsers([{
         email: "anne@xodozin.com.br",
         first_name: "Anne",
         last_name: "User",
       }]);
+      const anne = anneArray[0];
 
       logger.info(`✅ Usuário Anne criado: ${anne.id}`);
       logger.info("   Email: anne@xodozin.com.br");

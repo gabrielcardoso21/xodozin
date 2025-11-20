@@ -111,7 +111,7 @@ export async function POST(
     // Se pagamento foi confirmado, enviar email de confirmação
     if (paymentStatus === "captured") {
       try {
-        const { sendPaymentConfirmationEmail } = await import("../../utils/email.js");
+        const { sendPaymentConfirmationEmail } = await import("../../utils/email");
         
         // Verificar se email já foi enviado (evitar duplicatas)
         if (!order.metadata?.payment_confirmation_email_sent) {

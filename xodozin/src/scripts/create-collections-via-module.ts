@@ -58,7 +58,7 @@ export default async function createCollectionsViaModule({ container }: ExecArgs
     },
   ];
 
-  const createdCollections = [];
+  const createdCollections: any[] = [];
 
   for (const collectionData of collections) {
     try {

@@ -22,11 +22,12 @@ export default async function createUsersFinal({ container }: ExecArgs) {
     logger.info("Criando usuário Gabriel...");
     try {
       // Criar usuário sem senha (senha será configurada via CLI ou Admin Panel)
-      const gabriel = await userModuleService.createUsers([{
+      const gabrielArray = await userModuleService.createUsers([{
         email: "gabriel@xodozin.com.br",
         first_name: "Gabriel",
         last_name: "Admin",
       }]);
+      const gabriel = gabrielArray[0];
       logger.info(`✅ Usuário Gabriel criado: ${gabriel.id}`);
       logger.info("   Email: gabriel@xodozin.com.br");
       logger.info("   Senha: Gabriel123!");
@@ -45,11 +46,12 @@ export default async function createUsersFinal({ container }: ExecArgs) {
     logger.info("Criando usuário Anne...");
     try {
       // Criar usuário sem senha (senha será configurada via CLI ou Admin Panel)
-      const anne = await userModuleService.createUsers([{
+      const anneArray = await userModuleService.createUsers([{
         email: "anne@xodozin.com.br",
         first_name: "Anne",
         last_name: "User",
       }]);
+      const anne = anneArray[0];
       logger.info(`✅ Usuário Anne criado: ${anne.id}`);
       logger.info("   Email: anne@xodozin.com.br");
       logger.info("   Senha: Anne123!");

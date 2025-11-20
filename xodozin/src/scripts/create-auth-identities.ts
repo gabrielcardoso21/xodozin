@@ -34,10 +34,11 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
     const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
     
     // Criar auth identity
-    const authIdentity = await authModuleService.createAuthIdentities({
+    const authIdentityArray = await authModuleService.createAuthIdentities([{
       entity_id: gabriel.id,
       provider_metadata: {},
-    });
+    }] as any);
+    const authIdentity = authIdentityArray[0];
 
     // Criar provider identity com emailpass (API mudou)
     await authModuleService.createProviderIdentities([{
@@ -63,9 +64,11 @@ export default async function createAuthIdentities({ container }: ExecArgs) {
     const hashedPassword = await bcrypt.hash("Anne123!", 10);
     
     // Criar auth identity (API mudou, usar método correto)
-    const authIdentity = await authModuleService.createAuthIdentities([{
+    const authIdentityArray = await authModuleService.createAuthIdentities([{
+      entity_id: anne.id,
       provider_metadata: {},
     }] as any);
+    const authIdentity = authIdentityArray[0];
 
     // Criar provider identity com emailpass (API mudou)
     await authModuleService.createProviderIdentities([{
