@@ -193,15 +193,15 @@ if [ -f "medusa-config.ts" ]; then
     if [ ! -f "medusa-config.js" ]; then
         echo "⚠️  Falha ao compilar medusa-config.ts, tentando método alternativo..."
         # Se falhar, criar um medusa-config.js básico que funciona
-        if [ ! -f "medusa-config.js" ]; then
-            echo "   Criando medusa-config.js básico..."
-            cat > medusa-config.js << 'EOF'
+        echo "   Criando medusa-config.js básico..."
+        cat > medusa-config.js << 'EOF'
 const { loadEnv, defineConfig } = require('@medusajs/framework/utils');
 loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     http: {
+      port: process.env.PORT ? parseInt(process.env.PORT, 10) : 9000,
       storeCors: process.env.STORE_CORS || "http://localhost:3000",
       adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
       authCors: process.env.AUTH_CORS || "http://localhost:3000,http://localhost:7001",
@@ -212,9 +212,8 @@ module.exports = defineConfig({
   featureFlags: {}
 });
 EOF
-            echo "✅ medusa-config.js básico criado"
-        fi
-    }
+        echo "✅ medusa-config.js básico criado"
+    fi
     if [ -f "medusa-config.js" ]; then
         echo "✅ medusa-config.js gerado/verificado"
         ls -lh medusa-config.js
@@ -276,17 +275,14 @@ if [ -f "instrumentation.ts" ]; then
     # Se ainda não existe, criar fallback
     if [ ! -f "instrumentation.js" ]; then
         echo "⚠️  Falha ao compilar instrumentation.ts, criando fallback..."
-        # Se falhar, garantir que instrumentation.js existe
-        if [ ! -f "instrumentation.js" ]; then
-            echo "   Criando instrumentation.js básico..."
-            cat > instrumentation.js << 'EOF'
+        echo "   Criando instrumentation.js básico..."
+        cat > instrumentation.js << 'EOF'
 // Este arquivo é necessário para produção - Node.js não carrega TypeScript diretamente
 // Export empty object to prevent "Cannot find module" error
 module.exports = {};
 EOF
-            echo "✅ instrumentation.js básico criado"
-        fi
-    }
+        echo "✅ instrumentation.js básico criado"
+    fi
     if [ -f "instrumentation.js" ]; then
         echo "✅ instrumentation.js gerado/verificado"
         ls -lh instrumentation.js
@@ -340,8 +336,9 @@ if [ -f "tsconfig.json" ]; then
             }
         else
             node_modules/.bin/tsc --build 2>&1 | tee /tmp/tsc-build.log || {
-            echo "⚠️  TypeScript compilation had warnings, but continuing..."
-        }
+                echo "⚠️  TypeScript compilation had warnings, but continuing..."
+            }
+        fi
     fi
     echo "✅ TypeScript compilation completed"
 else
