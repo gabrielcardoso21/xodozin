@@ -8,10 +8,10 @@
   },
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd xodozin && yarn install && yarn build"
+    "buildCommand": "yarn install && yarn build"
   },
   "deploy": {
-    "startCommand": "cd xodozin && yarn start",
+    "startCommand": "yarn start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
