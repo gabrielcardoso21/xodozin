@@ -1,7 +1,17 @@
-# Ignorar pasta backend Python para Railway não detectar como Python
+# Arquivos e pastas ignorados pelo Railway durante o build
+# Isso evita que o Railway detecte Python ao encontrar backend/
+
 backend/
 *.py
 requirements.txt
-venv/
 __pycache__/
+*.pyc
+.python-version
 
+# Outros arquivos que não são necessários para o build
+node_modules/
+.git/
+.env
+.env.local
+*.log
+.DS_Store

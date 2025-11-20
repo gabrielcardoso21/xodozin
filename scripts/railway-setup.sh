@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# Script de setup para produção após deploy
-# Execute via: railway run bash xodozin/scripts/setup-production.sh
-# OU se já estiver no diretório xodozin: railway run bash scripts/setup-production.sh
+# Script para executar setup completo no Railway
+# Execute: railway run bash scripts/railway-setup.sh
 
 set -e
 
-echo "🚀 Iniciando setup de produção..."
+echo "🚀 Iniciando setup de produção no Railway..."
 
-# Navegar para o diretório correto (se necessário)
+# Verificar se estamos no diretório correto
 if [ -d "xodozin" ]; then
   cd xodozin
   echo "📁 Entrando no diretório xodozin..."
@@ -21,7 +20,7 @@ if [ -z "$DATABASE_URL" ]; then
 fi
 
 echo "📦 Executando migrations..."
-yarn medusa db:migrate || echo "⚠️ Migrations já executadas ou erro (pode ser normal)"
+yarn medusa migrations run || echo "⚠️ Migrations já executadas ou erro (pode ser normal)"
 
 echo "🇧🇷 Configurando região Brasil..."
 yarn medusa exec ./src/scripts/setup-brasil.ts || echo "⚠️ Brasil já configurado ou erro"
