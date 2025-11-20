@@ -1,16 +1,29 @@
 # Configuração Nixpacks para Railway
 # Este arquivo deve estar no diretório xodozin/
+# Se Root Directory estiver configurado como 'xodozin', este arquivo será usado
 
 providers = ["node"]
 
 [variables]
 NODE_VERSION = "20"
+# Cache de dependências para builds mais rápidos
+YARN_CACHE_FOLDER = "/tmp/.yarn-cache"
+
+[phases.setup]
+cmds = [
+  "echo 'Building Medusa project'",
+  "mkdir -p /tmp/.yarn-cache"
+]
 
 [phases.install]
-cmds = ["yarn install"]
+cmds = [
+  "yarn install --frozen-lockfile --cache-folder /tmp/.yarn-cache"
+]
 
 [phases.build]
-cmds = ["yarn build"]
+cmds = [
+  "yarn build"
+]
 
 [start]
 cmd = "yarn start"
