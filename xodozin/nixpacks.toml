@@ -26,9 +26,9 @@ cmds = [
 
 [phases.build]
 cmds = [
-  "yarn build"
+  "yarn build:skip-if-exists"
 ]
 
 [start]
-cmd = "yarn build && yarn start"
+cmd = "yarn start:skip-build"
 

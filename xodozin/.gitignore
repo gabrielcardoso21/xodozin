@@ -24,3 +24,5 @@ build
 !.yarn/versions
 
 .medusa
+# Exceção: commitar build do admin panel para evitar build no Railway
+!.medusa/server/public/admin/
