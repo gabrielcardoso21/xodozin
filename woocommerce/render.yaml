@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: woocommerce-store
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /wp-admin/install.php
+    envVars:
+      - key: WORDPRESS_DB_HOST
+        fromDatabase:
+          name: woocommerce-db
+          property: host
+      - key: WORDPRESS_DB_USER
+        fromDatabase:
+          name: woocommerce-db
+          property: user
+      - key: WORDPRESS_DB_PASSWORD
+        fromDatabase:
+          name: woocommerce-db
+          property: password
+      - key: WORDPRESS_DB_NAME
+        fromDatabase:
+          name: woocommerce-db
+          property: database
+      - key: WORDPRESS_TABLE_PREFIX
+        value: wp_
+      - key: WORDPRESS_DEBUG
+        value: "0"
+      - key: WP_ADMIN_USER
+        value: admin
+      - key: WP_ADMIN_EMAIL
+        value: admin@xodozin.com
+      - key: WP_TITLE
+        value: Xodózin Store
+
+databases:
+  - name: woocommerce-db
+    databaseName: wordpress
+    user: wordpress
+    plan: free
