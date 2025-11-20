@@ -1,6 +1,10 @@
 // Uncomment this file to enable instrumentation and observability using OpenTelemetry
 // Refer to the docs for installation instructions: https://docs.medusajs.com/learn/debugging-and-testing/instrumentation
 
+// Export empty object to prevent "Cannot find module" error
+// This file is optional - Medusa will work without instrumentation
+export default {};
+
 // import { registerOtel } from "@medusajs/medusa"
 // // If using an exporter other than Zipkin, require it here.
 // import { ZipkinExporter } from "@opentelemetry/exporter-zipkin"
