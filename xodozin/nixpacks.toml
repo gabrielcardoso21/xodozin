@@ -27,5 +27,5 @@ cmds = [
 ]
 
 [start]
-cmd = "yarn start"
+cmd = "yarn build && yarn start"
 

@@ -5,7 +5,7 @@
     "buildCommand": "yarn install && yarn build"
   },
   "deploy": {
-    "startCommand": "yarn start",
+    "startCommand": "yarn build && yarn start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
