@@ -2,10 +2,10 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "yarn install && NODE_OPTIONS=--max-old-space-size=4096 yarn build"
+    "buildCommand": "yarn install && yarn build"
   },
   "deploy": {
-    "startCommand": "NODE_OPTIONS=--max-old-space-size=4096 yarn build && yarn start",
+    "startCommand": "yarn build && yarn start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

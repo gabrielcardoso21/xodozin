@@ -8,6 +8,8 @@ providers = ["node"]
 NODE_VERSION = "20"
 # Cache de dependências para builds mais rápidos
 YARN_CACHE_FOLDER = "/tmp/.yarn-cache"
+# Aumentar limite de memória do Node.js para build do frontend
+NODE_OPTIONS = "--max-old-space-size=4096"
 
 [phases.setup]
 cmds = [
@@ -23,9 +25,9 @@ cmds = [
 
 [phases.build]
 cmds = [
-  "NODE_OPTIONS=--max-old-space-size=4096 yarn build"
+  "yarn build"
 ]
 
 [start]
-cmd = "NODE_OPTIONS=--max-old-space-size=4096 yarn build && yarn start"
+cmd = "yarn build && yarn start"
 
