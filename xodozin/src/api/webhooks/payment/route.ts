@@ -112,6 +112,7 @@ export async function POST(
     if (paymentStatus === "captured") {
       try {
         // Dynamic import para evitar erro de build com moduleResolution node16
+        // @ts-ignore - arquivo .js será gerado durante o build
         const { sendPaymentConfirmationEmail } = await import("../../utils/email.js");
         
         // Verificar se email já foi enviado (evitar duplicatas)

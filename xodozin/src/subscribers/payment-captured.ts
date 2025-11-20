@@ -51,6 +51,7 @@ export default async function paymentCapturedHandler({
     }
 
     // Enviar email de confirmação (dynamic import para evitar erro de build)
+    // @ts-ignore - arquivo .js será gerado durante o build
     const { sendPaymentConfirmationEmail } = await import("../utils/email.js");
     await sendPaymentConfirmationEmail(order);
 

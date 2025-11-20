@@ -46,6 +46,7 @@ export default async function nfeEmittedHandler({
     }
 
     // Enviar email com NFe (dynamic import para evitar erro de build)
+    // @ts-ignore - arquivo .js será gerado durante o build
     const { sendNFeEmail } = await import("../utils/email.js");
     await sendNFeEmail(order);
 
