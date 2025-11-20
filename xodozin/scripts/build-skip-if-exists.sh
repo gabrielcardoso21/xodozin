@@ -46,18 +46,34 @@ if [ -d ".medusa/server/public/admin" ] && [ -f ".medusa/server/public/admin/ind
     
     echo "🔨 Running medusa build (will restore admin after)..."
     echo "   Note: This may take a while but admin will be preserved"
+    echo "   Current directory: $(pwd)"
+    echo "   Admin backup location: /tmp/admin-backup/admin"
+    echo "   Verifying backup exists:"
+    ls -la /tmp/admin-backup/admin/ 2>/dev/null | head -5 || echo "   ⚠️  Backup not found yet"
     
     # Executar medusa build - ele vai remover .medusa/server mas vamos restaurar o admin depois
     # Usar timeout e monitorar memória
-    if timeout 600 node --max-old-space-size=2048 node_modules/.bin/medusa build 2>&1 | tee /tmp/medusa-build.log; then
-        echo "✅ Medusa build completed"
+    # Se der OOM, pelo menos restaurar o admin
+    set +e  # Não falhar se build der erro
+    timeout 600 node --max-old-space-size=2048 node_modules/.bin/medusa build 2>&1 | tee /tmp/medusa-build.log
+    BUILD_EXIT_CODE=${PIPESTATUS[0]}
+    set -e  # Voltar a falhar em erros
+    
+    if [ $BUILD_EXIT_CODE -eq 0 ]; then
+        echo "✅ Medusa build completed successfully"
     else
-        BUILD_EXIT_CODE=$?
         echo "⚠️  Medusa build exited with code: $BUILD_EXIT_CODE"
-        if [ $BUILD_EXIT_CODE -eq 137 ] || [ $BUILD_EXIT_CODE -eq 124 ]; then
-            echo "❌ Build was killed (OOM or timeout)"
+        if [ $BUILD_EXIT_CODE -eq 137 ]; then
+            echo "❌ Build was killed by OOM Killer (out of memory)"
+            echo "   Will restore admin from backup and continue..."
+        elif [ $BUILD_EXIT_CODE -eq 124 ]; then
+            echo "❌ Build timed out"
+            echo "   Will restore admin from backup and continue..."
+        else
+            echo "⚠️  Build failed with exit code $BUILD_EXIT_CODE"
+            echo "   Will restore admin from backup and continue..."
         fi
-        # Continuar para restaurar admin mesmo se build falhou parcialmente
+        # Continuar para restaurar admin mesmo se build falhou
     fi
     
     # Garantir que estrutura existe e restaurar admin após build
