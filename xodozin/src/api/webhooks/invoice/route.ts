@@ -16,12 +16,10 @@ export async function POST(
   const orderModule = req.scope.resolve(Modules.ORDER);
 
   try {
-    const webhookData = req.body;
+    const webhookData = req.body as any;
     const headers = req.headers;
 
-    logger.info("Webhook de NFe recebido:", {
-      event: webhookData.event || webhookData.status || "unknown"
-    });
+    logger.info("Webhook de NFe recebido");
 
     // Extrair referência do pedido (order_id)
     const orderId = webhookData.ref || 
@@ -30,7 +28,7 @@ export async function POST(
                     webhookData.metadata?.order_id;
 
     if (!orderId) {
-      logger.warn("Webhook de NFe recebido mas order_id não encontrado:", webhookData);
+      logger.warn("Webhook de NFe recebido mas order_id não encontrado");
       return res.status(400).json({
         error: "order_id não encontrado no webhook"
       });
@@ -46,7 +44,7 @@ export async function POST(
       });
     }
 
-    const order = orders[0];
+    const order = orders[0] as any;
 
     // Processar status da NFe
     const nfeStatus = webhookData.status || webhookData.situacao || "unknown";
@@ -55,8 +53,8 @@ export async function POST(
     const nfeUrl = webhookData.url || webhookData.url_nfe || order.metadata?.nfe_url;
 
     // Atualizar metadata do pedido com informações da NFe
-    const updatedMetadata = {
-      ...order.metadata,
+    const updatedMetadata: any = {
+      ...(order.metadata || {}),
       nfe_status: nfeStatus,
       nfe_webhook_received_at: new Date().toISOString(),
       nfe_webhook_data: webhookData
@@ -79,10 +77,10 @@ export async function POST(
     }
 
     // Atualizar pedido
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       metadata: updatedMetadata
-    });
+    }]);
 
     logger.info(`Status de NFe atualizado para pedido ${orderId}: ${nfeStatus}`);
 

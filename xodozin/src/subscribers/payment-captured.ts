@@ -16,9 +16,9 @@ import { sendPaymentConfirmationEmail } from "../utils/email";
 export default async function paymentCapturedHandler({
   event: { data },
   container,
-}: SubscriberArgs<{ id: string }>) {
+}: SubscriberArgs<{ id: string; order_id?: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const orderId = data.id || data.order_id;
+  const orderId = (data as any).id || (data as any).order_id;
 
   if (!orderId) {
     logger.warn("paymentCapturedHandler: order_id não encontrado no evento");
@@ -37,7 +37,7 @@ export default async function paymentCapturedHandler({
       return;
     }
 
-    const order = orders[0];
+    const order = orders[0] as any;
 
     // Verificar se pagamento foi realmente confirmado
     if (order.payment_status !== "captured" && order.payment_status !== "authorized") {
@@ -55,14 +55,14 @@ export default async function paymentCapturedHandler({
     await sendPaymentConfirmationEmail(order);
 
     // Marcar que email foi enviado
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       metadata: {
         ...order.metadata,
         payment_confirmation_email_sent: true,
         payment_confirmation_email_sent_at: new Date().toISOString(),
       },
-    });
+    }]);
 
     logger.info(`✅ Email de confirmação de pagamento enviado para pedido ${orderId}`);
 

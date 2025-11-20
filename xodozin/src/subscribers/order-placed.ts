@@ -14,7 +14,7 @@ export default async function orderPlacedHandler({
   container,
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const orderId = data.id;
+  const orderId = (data as any).id;
 
   try {
     logger.info(`Pedido criado: ${orderId}. Verificando se deve emitir NFe...`);
@@ -28,7 +28,7 @@ export default async function orderPlacedHandler({
       return;
     }
 
-    const order = orders[0];
+    const order = orders[0] as any;
 
     // Verificar se NFe já foi emitida
     if (order.metadata?.nfe_key) {
@@ -53,9 +53,9 @@ export default async function orderPlacedHandler({
     // Verificar se pedido está pago (status = "completed" ou payment_status = "captured")
     // Nota: Em alguns casos, pode querer emitir NFe apenas quando pagamento for confirmado
     // Por enquanto, emitimos assim que o pedido é criado
-    const shouldEmitNFe = order.status === "completed" || 
-                         order.payment_status === "captured" ||
-                         order.payment_status === "authorized";
+    const shouldEmitNFe = (order.status === "completed" || 
+                         (order as any).payment_status === "captured" ||
+                         (order as any).payment_status === "authorized");
 
     if (!shouldEmitNFe) {
       logger.info(`Pedido ${orderId} ainda não está pago. NFe será emitida quando pagamento for confirmado.`);
@@ -84,7 +84,7 @@ export default async function orderPlacedHandler({
       finalidade_emissao: "1", // 1 = Normal
       consumidor_final: "1", // 1 = Sim
       presenca_comprador: "1", // 1 = Operação presencial
-      items: order.items?.map((item: any, index: number) => ({
+      items: ((order as any).items || []).map((item: any, index: number) => ({
         numero_item: index + 1,
         codigo_produto: item.variant?.sku || item.id || `ITEM-${index + 1}`,
         descricao: item.title || item.variant?.title || "Produto",
@@ -93,19 +93,19 @@ export default async function orderPlacedHandler({
         quantidade_comercial: item.quantity || 1,
         valor_unitario_comercial: (item.unit_price || 0) / 100, // Converter de centavos para reais
         valor_total: ((item.unit_price || 0) * (item.quantity || 1)) / 100
-      })) || [],
+      })),
       cliente: {
-        nome: (order.shipping_address?.first_name || "") + " " + (order.shipping_address?.last_name || "") || "Cliente",
-        cpf: order.shipping_address?.cpf || "",
-        email: order.email || "",
-        telefone: order.shipping_address?.phone || "",
+        nome: (((order as any).shipping_address?.first_name || "") + " " + ((order as any).shipping_address?.last_name || "")).trim() || "Cliente",
+        cpf: (order as any).shipping_address?.cpf || "",
+        email: (order as any).email || "",
+        telefone: (order as any).shipping_address?.phone || "",
         endereco: {
-          logradouro: order.shipping_address?.address_1 || "",
-          numero: order.shipping_address?.address_2 || "",
-          bairro: order.shipping_address?.city || "",
-          municipio: order.shipping_address?.city || "São Paulo",
-          uf: order.shipping_address?.province || "SP",
-          cep: order.shipping_address?.postal_code?.replace(/\D/g, "") || "",
+          logradouro: (order as any).shipping_address?.address_1 || "",
+          numero: (order as any).shipping_address?.address_2 || "",
+          bairro: (order as any).shipping_address?.city || "",
+          municipio: (order as any).shipping_address?.city || "São Paulo",
+          uf: (order as any).shipping_address?.province || "SP",
+          cep: ((order as any).shipping_address?.postal_code || "").replace(/\D/g, ""),
           pais: "BRA"
         }
       },
@@ -144,22 +144,22 @@ export default async function orderPlacedHandler({
     const nfeUrl = nfeResponse.data.url;
 
     // Atualizar pedido com dados da NFe
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       metadata: {
-        ...order.metadata,
+        ...(order.metadata || {}),
         nfe_key: nfeKey,
         nfe_number: nfeNumber,
         nfe_url: nfeUrl,
         nfe_emitted_at: new Date().toISOString()
       }
-    });
+    }]);
 
     logger.info(`✅ NFe emitida automaticamente para pedido ${orderId}. Chave: ${nfeKey}`);
 
     // Enviar email com NFe após emissão bem-sucedida
     try {
-      const { sendNFeEmail } = await import("../utils/email");
+      const { sendNFeEmail } = await import("../utils/email.js");
       await sendNFeEmail({
         ...order,
         metadata: {
@@ -172,10 +172,10 @@ export default async function orderPlacedHandler({
       });
       
       // Marcar que email foi enviado
-      await orderModule.updateOrders({
+      await orderModule.updateOrders([{
         id: orderId,
         metadata: {
-          ...order.metadata,
+          ...(order.metadata || {}),
           nfe_key: nfeKey,
           nfe_number: nfeNumber,
           nfe_url: nfeUrl,
@@ -183,7 +183,7 @@ export default async function orderPlacedHandler({
           nfe_email_sent: true,
           nfe_email_sent_at: new Date().toISOString(),
         },
-      });
+      }]);
       
       logger.info(`✅ Email de NFe enviado para pedido ${orderId}`);
     } catch (emailError: any) {

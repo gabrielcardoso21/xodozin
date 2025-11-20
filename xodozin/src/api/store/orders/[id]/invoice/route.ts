@@ -95,10 +95,10 @@ export async function GET(
         valor_total: ((item.unit_price || 0) * (item.quantity || 1)) / 100
       })) || [],
       cliente: {
-        nome: order.shipping_address?.first_name + " " + (order.shipping_address?.last_name || "") || "Cliente",
-        cpf: order.shipping_address?.cpf || "",
-        email: order.email || "",
-        telefone: order.shipping_address?.phone || "",
+        nome: ((order.shipping_address as any)?.first_name || "") + " " + ((order.shipping_address as any)?.last_name || "") || "Cliente",
+        cpf: (order.shipping_address as any)?.cpf || "",
+        email: (order as any).email || "",
+        telefone: (order.shipping_address as any)?.phone || "",
         endereco: {
           logradouro: order.shipping_address?.address_1 || "",
           numero: order.shipping_address?.address_2 || "",
@@ -144,16 +144,16 @@ export async function GET(
     const nfeUrl = nfeResponse.data.url;
 
     // Atualizar pedido com dados da NFe
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       metadata: {
-        ...order.metadata,
+        ...(order.metadata || {}),
         nfe_key: nfeKey,
         nfe_number: nfeNumber,
         nfe_url: nfeUrl,
         nfe_emitted_at: new Date().toISOString()
       }
-    });
+    }]);
 
     logger.info(`NFe emitida com sucesso para pedido ${orderId}. Chave: ${nfeKey}`);
 

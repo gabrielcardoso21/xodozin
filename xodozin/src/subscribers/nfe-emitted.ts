@@ -18,7 +18,7 @@ export default async function nfeEmittedHandler({
   container,
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const orderId = data.id;
+  const orderId = (data as any).id;
 
   try {
     logger.info(`Verificando se NFe foi emitida para pedido ${orderId}...`);
@@ -32,7 +32,7 @@ export default async function nfeEmittedHandler({
       return;
     }
 
-    const order = orders[0];
+    const order = orders[0] as any;
 
     // Verificar se NFe foi emitida
     if (!order.metadata?.nfe_key) {
@@ -50,14 +50,14 @@ export default async function nfeEmittedHandler({
     await sendNFeEmail(order);
 
     // Marcar que email foi enviado
-    await orderModule.updateOrders({
+    await orderModule.updateOrders([{
       id: orderId,
       metadata: {
         ...order.metadata,
         nfe_email_sent: true,
         nfe_email_sent_at: new Date().toISOString(),
       },
-    });
+    }]);
 
     logger.info(`✅ Email de NFe enviado para pedido ${orderId}`);
 

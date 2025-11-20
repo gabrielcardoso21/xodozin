@@ -1,131 +1,237 @@
-# 🚀 Deploy Rápido - Passo a Passo
+# ⚡ Deploy Rápido - Passo a Passo
 
-## ✅ Status: PRONTO PARA DEPLOY!
-
-Todos os arquivos de configuração estão prontos. Siga os passos abaixo:
+## 🎯 Objetivo: Colocar o site no ar para cadastrar produtos
 
 ---
 
-## 📋 Passo 1: MongoDB Atlas (5 minutos)
+## 📦 PARTE 1: Backend (Railway) - 15 minutos
 
-1. Acesse: https://www.mongodb.com/cloud/atlas
-2. Crie uma conta gratuita
-3. Crie um novo cluster (escolha a região mais próxima do Brasil)
-4. Configure usuário do banco:
-   - Vá em "Database Access" > "Add New Database User"
-   - Crie usuário e senha (ANOTE ESSAS CREDENCIAIS!)
-5. Configure Network Access:
-   - Vá em "Network Access" > "Add IP Address"
-   - Adicione `0.0.0.0/0` (permite de qualquer IP)
-6. Obtenha a connection string:
-   - Vá em "Database" > "Connect" > "Connect your application"
-   - Copie a string (exemplo: `mongodb+srv://usuario:senha@cluster.mongodb.net/`)
-   - **IMPORTANTE:** Substitua `<password>` pela senha real que você criou
-   - **ANOTE ESSA STRING COMPLETA!**
+### 1. Criar Conta e Projeto
+
+1. Acesse: https://railway.app
+2. Login com GitHub
+3. "New Project" → "Deploy from GitHub repo"
+4. Selecione repositório `xodozin`
+
+### 2. Adicionar PostgreSQL
+
+1. No projeto, clique "+ New"
+2. "Database" → "Add PostgreSQL"
+3. ✅ Pronto! Railway cria automaticamente
+
+### 3. Configurar Variáveis de Ambiente
+
+No serviço do Medusa → "Variables" → Adicione:
+
+```env
+# Database (Railway preenche automaticamente - não precisa adicionar)
+# DATABASE_URL=${{Postgres.DATABASE_URL}}
+
+# Secrets (GERE NO TERMINAL!)
+JWT_SECRET=$(openssl rand -base64 32)
+COOKIE_SECRET=$(openssl rand -base64 32)
+
+# Environment
+NODE_ENV=production
+PORT=9000
+
+# CORS (ajuste depois com URL do frontend)
+STORE_CORS=*
+ADMIN_CORS=*
+AUTH_CORS=*
+
+# Opcional (pode deixar vazio)
+REDIS_URL=
+```
+
+**⚠️ IMPORTANTE:** Gere os secrets no terminal:
+```bash
+openssl rand -base64 32  # Copie e cole como JWT_SECRET
+openssl rand -base64 32  # Copie e cole como COOKIE_SECRET
+```
+
+### 4. Configurar Root Directory (CRÍTICO! ⚠️)
+
+**🚨 AÇÃO OBRIGATÓRIA:** O Railway está analisando a raiz e não detecta Node.js.
+
+**Solução IMEDIATA:**
+
+1. No Railway Dashboard → Seu serviço Medusa
+2. Clique em **"Settings"** (⚙️)
+3. Role até **"Root Directory"**
+4. **Digite:** `xodozin` (exatamente isso, sem barra no final)
+5. **Salve**
+
+**Isso faz o Railway:**
+- ✅ Analisar apenas o diretório `xodozin/`
+- ✅ Encontrar o `package.json` do Medusa
+- ✅ Detectar como Node.js automaticamente
+
+**⚠️ SEM ISSO, O DEPLOY NÃO VAI FUNCIONAR!**
+
+**Se não encontrar "Root Directory":**
+- Procure em "Settings" → "Build & Deploy"
+- Ou em "Settings" → "General"
+- Pode estar em diferentes lugares dependendo da versão do Railway
+
+### 5. Deploy Automático
+
+Railway fará deploy automaticamente! Aguarde ~5 minutos.
+
+**Se der erro de Python:**
+- Verifique se os arquivos `nixpacks.toml` e `railway.json` estão na raiz
+- Force redeploy: "Deployments" → "Redeploy"
+
+### 6. Anotar URL
+
+Após deploy, anote a URL:
+- Exemplo: `xodozin-production.up.railway.app`
+- Admin Panel: `https://xodozin-production.up.railway.app/app`
+
+### 7. Setup Pós-Deploy (CRÍTICO!)
+
+Após o primeiro deploy, execute o setup:
+
+#### Opção A: Railway CLI (Recomendado)
+
+```bash
+# Instalar Railway CLI
+npm i -g @railway/cli
+
+# Login
+railway login
+
+# Link ao projeto (selecione o projeto)
+railway link
+
+# Executar setup
+railway run bash xodozin/scripts/setup-production.sh
+```
+
+#### Opção B: Via Dashboard (One-Off Service)
+
+1. No Railway, "+ New" → "Empty Service"
+2. Configure:
+   - Root Directory: `xodozin`
+   - Command: `bash scripts/setup-production.sh`
+3. Execute e depois delete o serviço
+
+#### Opção C: Manual (via Railway CLI)
+
+```bash
+railway run cd xodozin && yarn medusa migrations run
+railway run cd xodozin && yarn medusa exec ./src/scripts/setup-brasil.ts
+railway run cd xodozin && yarn medusa exec ./src/scripts/create-users-final.ts
+railway run cd xodozin && yarn medusa exec ./src/scripts/create-publishable-key.ts
+```
+
+### 8. Verificar
+
+1. Acesse: `https://seu-app.railway.app/health`
+2. Deve retornar: `{ status: "ok" }`
+3. Acesse Admin: `https://seu-app.railway.app/app`
+4. Login com: `gabriel@xodozin.com.br` / `Gabriel123!`
 
 ---
 
-## 🔧 Passo 2: Render - Backend (10 minutos)
+## 🎨 PARTE 2: Frontend (Vercel) - 10 minutos
 
-1. Acesse: https://render.com
-2. Faça login com GitHub
-3. Clique em "New" > "Web Service"
-4. Conecte seu repositório GitHub (selecione o repositório do Xodózin)
-5. O Render vai detectar automaticamente o `render.yaml` ✅
-6. Configure as variáveis de ambiente:
-   - Clique em "Environment Variables"
-   - Adicione:
-     ```
-     MONGO_URL = mongodb+srv://usuario:senha@cluster.mongodb.net/
-     DB_NAME = xodozin
-     CORS_ORIGINS = https://seu-app.vercel.app
-     ```
-   - **IMPORTANTE:** 
-     - Cole a connection string COMPLETA do MongoDB (com senha substituída)
-     - Deixe `CORS_ORIGINS` vazio por enquanto (vamos atualizar depois)
-7. Clique em "Create Web Service"
-8. Aguarde o deploy (pode demorar 5-10 minutos)
-9. **ANOTE A URL DO BACKEND** (exemplo: `https://xodozin-backend.onrender.com`)
-
----
-
-## 🎨 Passo 3: Vercel - Frontend (5 minutos)
+### 1. Criar Conta
 
 1. Acesse: https://vercel.com
-2. Faça login com GitHub
-3. Clique em "Add New..." > "Project"
-4. Importe seu repositório GitHub (selecione o repositório do Xodózin)
-5. O Vercel vai detectar automaticamente o `vercel.json` ✅
-6. Configure:
-   - **Root Directory:** `frontend` (se não detectar automaticamente)
-   - **Framework Preset:** Other (ou deixe automático)
-7. Configure variável de ambiente:
-   - Clique em "Environment Variables"
-   - Adicione:
-     ```
-     REACT_APP_BACKEND_URL = https://xodozin-backend.onrender.com
-     ```
-   - **IMPORTANTE:** Use a URL completa do backend que você obteve no passo anterior (com `https://`)
-8. Clique em "Deploy"
-9. Aguarde o deploy (pode demorar 3-5 minutos)
-10. **ANOTE A URL DO FRONTEND** (exemplo: `https://xodozin.vercel.app`)
+2. Login com GitHub
+
+### 2. Importar Projeto
+
+1. "Add New" → "Project"
+2. Importe repositório `xodozin`
+3. Configure:
+   - **Framework Preset:** Create React App
+   - **Root Directory:** `frontend`
+   - **Build Command:** `yarn build` (ou `npm run build`)
+   - **Output Directory:** `build`
+   - **Install Command:** `yarn install` (ou `npm install`)
+
+### 3. Variáveis de Ambiente
+
+"Settings" → "Environment Variables":
+
+```env
+REACT_APP_MEDUSA_BACKEND_URL=https://seu-app.railway.app
+REACT_APP_MEDUSA_PUBLISHABLE_KEY=pk_...  # Obter do Admin Panel
+```
+
+**⚠️ IMPORTANTE:** 
+- Substitua `seu-app.railway.app` pela URL real do Railway
+- Para obter `PUBLISHABLE_KEY`: Acesse Admin Panel → Settings → API Keys → Copie a chave
+
+### 4. Deploy
+
+Vercel faz deploy automaticamente! Aguarde ~3 minutos.
+
+### 5. Atualizar CORS no Backend
+
+Volte no Railway e atualize:
+
+```env
+STORE_CORS=https://seu-app.vercel.app
+ADMIN_CORS=https://seu-app.vercel.app
+AUTH_CORS=https://seu-app.vercel.app
+```
+
+Railway fará redeploy automaticamente.
 
 ---
 
-## 🔄 Passo 4: Atualizar CORS (2 minutos)
+## ✅ Checklist Final
 
-1. Volte ao Render (dashboard do backend)
-2. Vá em "Environment" > "Environment Variables"
-3. Atualize `CORS_ORIGINS` com a URL do frontend:
-   ```
-   CORS_ORIGINS = https://seu-app.vercel.app
-   ```
-4. Salve (o Render vai reiniciar automaticamente)
-
----
-
-## ✅ Passo 5: Testar!
-
-1. Acesse a URL do frontend no Vercel
-2. Teste:
-   - ✅ Navegação na Home
-   - ✅ Quiz funcionando
-   - ✅ Seleção de produtos
-   - ✅ Checkout (CEP de SP)
+- [ ] Backend deployado no Railway
+- [ ] PostgreSQL criado
+- [ ] Variáveis de ambiente configuradas
+- [ ] Setup executado (migrations, Brasil, usuários)
+- [ ] Admin Panel acessível e login funciona
+- [ ] Frontend deployado no Vercel
+- [ ] Variáveis de ambiente do frontend configuradas
+- [ ] CORS atualizado no backend
+- [ ] Frontend conecta ao backend
 
 ---
 
 ## 🎉 Pronto!
 
-Seu app está no ar! 🚀
+Sua amiga pode acessar:
+- **Admin Panel:** `https://seu-app.railway.app/app`
+- **Site (Frontend):** `https://seu-app.vercel.app`
 
----
-
-## ⚠️ Observações Importantes
-
-1. **Render Free Tier:** O serviço hiberna após 15 min de inatividade. A primeira requisição após hibernar pode demorar ~30 segundos (isso é normal).
-
-2. **MongoDB Atlas:** O free tier oferece 512MB, suficiente para começar.
-
-3. **URLs:** Sempre use `https://` nas URLs (não `http://`).
-
-4. **Variáveis de Ambiente:** Certifique-se de não ter espaços extras nas variáveis.
+E começar a cadastrar produtos e kits! 🚀
 
 ---
 
 ## 🆘 Problemas Comuns
 
-### Backend não conecta ao MongoDB
-- Verifique se o IP `0.0.0.0/0` está na lista de Network Access
-- Verifique se a connection string está correta (com senha substituída)
-- Veja os logs no Render para mais detalhes
+### Backend não inicia
+- Verificar logs no Railway
+- Verificar se `DATABASE_URL` está configurado
+- Verificar se `JWT_SECRET` e `COOKIE_SECRET` estão definidos
 
-### CORS Error
-- Verifique se `CORS_ORIGINS` tem a URL exata do frontend (com `https://`)
-- Certifique-se de que não há espaços extras
+### Migrations não executam
+```bash
+railway run cd xodozin && yarn medusa migrations run
+```
 
-### Frontend não encontra Backend
-- Verifique se `REACT_APP_BACKEND_URL` está configurado corretamente
-- Certifique-se de que a URL está completa (com `https://`)
-- Aguarde alguns segundos se o backend estiver hibernado
+### Admin Panel não carrega
+- Verificar CORS
+- Verificar se usuário foi criado
+- Verificar logs
+
+### Frontend não conecta
+- Verificar `REACT_APP_MEDUSA_BACKEND_URL` está correto
+- Verificar `REACT_APP_MEDUSA_PUBLISHABLE_KEY` está configurado
+- Verificar CORS no backend
+
+---
+
+## 📞 Precisa de Ajuda?
+
+Se algo der errado, me avise e eu ajudo a resolver!
 

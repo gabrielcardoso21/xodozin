@@ -15,17 +15,15 @@ export default async function resetPassword({ container }: ExecArgs) {
   const users = await userModuleService.listUsers({});
   
   // Resetar senha do Gabriel
-  const gabriel = users.find(u => u.email === "gabriel@xodozin.com.br");
+  const gabriel = users.find((u: any) => u.email === "gabriel@xodozin.com.br");
   if (gabriel) {
     logger.info("Resetando senha do Gabriel...");
     const hashedPassword = await bcrypt.hash("Gabriel123!", 10);
     
-    await userModuleService.updateUsers({
-      selector: { id: gabriel.id },
-      update: {
-        password_hash: hashedPassword,
-      },
-    });
+    await userModuleService.updateUsers([{
+      id: gabriel.id,
+      password_hash: hashedPassword,
+    }]);
     
     logger.info("✅ Senha do Gabriel resetada");
     logger.info("   Email: gabriel@xodozin.com.br");
@@ -35,17 +33,15 @@ export default async function resetPassword({ container }: ExecArgs) {
   }
 
   // Resetar senha da Anne
-  const anne = users.find(u => u.email === "anne@xodozin.com.br");
+  const anne = users.find((u: any) => u.email === "anne@xodozin.com.br");
   if (anne) {
     logger.info("Resetando senha da Anne...");
     const hashedPassword = await bcrypt.hash("Anne123!", 10);
     
-    await userModuleService.updateUsers({
-      selector: { id: anne.id },
-      update: {
-        password_hash: hashedPassword,
-      },
-    });
+    await userModuleService.updateUsers([{
+      id: anne.id,
+      password_hash: hashedPassword,
+    }]);
     
     logger.info("✅ Senha da Anne resetada");
     logger.info("   Email: anne@xodozin.com.br");

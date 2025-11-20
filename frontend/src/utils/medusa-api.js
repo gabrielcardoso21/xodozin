@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 const MEDUSA_BACKEND_URL = process.env.REACT_APP_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+const PUBLISHABLE_API_KEY = process.env.REACT_APP_MEDUSA_PUBLISHABLE_KEY || '';
 
 const medusaApi = axios.create({
   baseURL: `${MEDUSA_BACKEND_URL}`,
   headers: {
     'Content-Type': 'application/json',
+    ...(PUBLISHABLE_API_KEY && { 'x-publishable-api-key': PUBLISHABLE_API_KEY }),
   },
 });
 
@@ -112,6 +114,40 @@ export const storeApi = {
     return response.data;
   },
   
+  /**
+   * Criar payment session para um carrinho
+   * @param {string} cartId - ID do carrinho
+   * @param {string} providerId - ID do payment provider (ex: "pp_stripe", "pp_system_default")
+   * @returns {Promise<Object>} Payment session criada
+   */
+  createPaymentSession: async (cartId, providerId) => {
+    const response = await medusaApi.post(`/store/carts/${cartId}/payment-sessions`, {
+      provider_id: providerId
+    });
+    return response.data;
+  },
+
+  /**
+   * Autorizar pagamento (completar payment session)
+   * @param {string} cartId - ID do carrinho
+   * @param {string} sessionId - ID da payment session
+   * @returns {Promise<Object>} Payment session autorizada
+   */
+  authorizePayment: async (cartId, sessionId) => {
+    const response = await medusaApi.post(`/store/carts/${cartId}/payment-sessions/${sessionId}`, {});
+    return response.data;
+  },
+
+  /**
+   * Listar payment sessions disponíveis para um carrinho
+   * @param {string} cartId - ID do carrinho
+   * @returns {Promise<Object>} Lista de payment sessions
+   */
+  listPaymentSessions: async (cartId) => {
+    const response = await medusaApi.get(`/store/carts/${cartId}/payment-sessions`);
+    return response.data;
+  },
+
   /**
    * Finalizar pedido (completar carrinho)
    * @param {string} cartId - ID do carrinho

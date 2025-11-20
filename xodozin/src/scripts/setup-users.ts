@@ -35,7 +35,6 @@ export default async function setupUsers({ container }: ExecArgs) {
           invites: [
             {
               email: "gabriel@xodozin.com.br",
-              role: "admin",
               metadata: {
                 first_name: "Gabriel",
                 last_name: "Admin",
@@ -75,7 +74,6 @@ export default async function setupUsers({ container }: ExecArgs) {
           invites: [
             {
               email: "anne@xodozin.com.br",
-              role: "admin", // Por padrão, mas pode ser limitado manualmente
               metadata: {
                 first_name: "Anne",
                 last_name: "User",

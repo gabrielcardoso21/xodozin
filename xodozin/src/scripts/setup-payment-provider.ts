@@ -22,11 +22,11 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
   logger.info("💳 Configurando payment providers...");
 
   // Buscar região Brasil
-  let regions = [];
+  let regions: any[] = [];
   try {
-    regions = await regionModule.listRegions({
+    regions = (await regionModule.listRegions({
       currency_code: "brl",
-    });
+    })) as any[];
   } catch (error) {
     logger.error("Erro ao buscar regiões:", error);
     throw error;
@@ -44,9 +44,9 @@ export default async function setupPaymentProvider({ container }: ExecArgs) {
   const paymentProviderModule = container.resolve(Modules.PAYMENT);
   
   // Listar payment providers existentes
-  let existingProviders = [];
+  let existingProviders: any[] = [];
   try {
-    existingProviders = await paymentProviderModule.listPaymentProviders();
+    existingProviders = (await paymentProviderModule.listPaymentProviders()) as any[];
   } catch (error) {
     logger.warn("Não foi possível listar payment providers:", error);
   }

@@ -13,11 +13,13 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    command: postgres -c max_connections=100 -c ssl=off
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d xodozin"]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 10
+      start_period: 30s
     networks:
       - xodozin-network
 
@@ -37,41 +39,9 @@ services:
     networks:
       - xodozin-network
 
-  # Medusa Backend
-  medusa:
-    build:
-      context: ./medusa-backend
-      dockerfile: Dockerfile
-    container_name: xodozin-medusa
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/xodozin
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret-key-123456789}
-      COOKIE_SECRET: ${COOKIE_SECRET:-change-this-cookie-secret-key-123456789}
-      PORT: 9000
-      NODE_ENV: development
-      CORS: http://localhost:3000
-      ADMIN_CORS: http://localhost:3000,http://localhost:7001
-    ports:
-      - "9000:9000"
-    volumes:
-      - ./medusa-backend:/app
-      - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - xodozin-network
-    command: >
-      sh -c "
-        echo '⏳ Aguardando banco estar pronto...' &&
-        sleep 5 &&
-        echo '🚀 Iniciando Medusa...' &&
-        npx medusa develop
-      "
-    restart: unless-stopped
+  # Medusa Backend - Rodando localmente (fora do Docker)
+  # Para iniciar o Medusa localmente, execute:
+  # cd xodozin && yarn dev
 
 volumes:
   postgres_data:

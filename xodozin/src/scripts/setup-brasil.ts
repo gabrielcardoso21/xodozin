@@ -58,11 +58,11 @@ export default async function setupBrasil({ container }: ExecArgs) {
   // Verificar se região já existe
   logger.info("Verificando se região Brasil já existe...");
   const regionModule = container.resolve(Modules.REGION);
-  let existingRegions = [];
+  let existingRegions: any[] = [];
   try {
     existingRegions = await regionModule.listRegions({
       currency_code: "brl",
-    });
+    }) as any[];
   } catch (error) {
     // Se não conseguir listar, tentar criar
   }

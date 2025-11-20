@@ -207,7 +207,52 @@ export const medusaOnlyApi = {
         }
       });
 
-      // 5. Finalizar pedido
+      // 5. Criar payment session se método de pagamento foi especificado
+      let paymentSessionId = null;
+      if (orderData.payment?.method) {
+        try {
+          // Determinar provider ID baseado no método de pagamento
+          // Por padrão, usar pp_system_default se não houver provider específico
+          let providerId = 'pp_system_default';
+          
+          // Se tiver provider_id no payment data, usar ele
+          if (orderData.payment.provider_id) {
+            providerId = orderData.payment.provider_id;
+          } else {
+            // Mapear método para provider (pode ser customizado)
+            const methodToProvider = {
+              'credit_card': 'pp_stripe', // ou outro provider de cartão
+              'pix': 'pp_system_default', // ou provider de PIX
+              'boleto': 'pp_system_default' // ou provider de boleto
+            };
+            providerId = methodToProvider[orderData.payment.method] || 'pp_system_default';
+          }
+
+          console.log(`Criando payment session com provider: ${providerId}`);
+          const paymentSessionResponse = await storeApi.createPaymentSession(cartId, providerId);
+          
+          if (paymentSessionResponse?.payment_session?.id) {
+            paymentSessionId = paymentSessionResponse.payment_session.id;
+            console.log(`Payment session criada: ${paymentSessionId}`);
+            
+            // 6. Autorizar pagamento (se necessário)
+            // Nota: Alguns providers podem requerer redirecionamento ou tokenização
+            // Por enquanto, apenas autorizamos a session
+            try {
+              await storeApi.authorizePayment(cartId, paymentSessionId);
+              console.log('Payment session autorizada');
+            } catch (authError) {
+              console.warn('Erro ao autorizar payment session (pode ser normal para alguns providers):', authError);
+              // Continuar mesmo se autorização falhar (alguns providers fazem isso no completeCart)
+            }
+          }
+        } catch (paymentError) {
+          console.warn('Erro ao criar payment session (continuando sem payment session):', paymentError);
+          // Continuar sem payment session - alguns fluxos podem funcionar sem ela
+        }
+      }
+
+      // 7. Finalizar pedido
       const orderResponse = await storeApi.completeCart(cartId);
       
       if (!orderResponse?.order) {

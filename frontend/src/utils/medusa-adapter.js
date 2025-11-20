@@ -45,9 +45,9 @@ export function adaptProduct(medusaProduct) {
 export function adaptCollection(medusaCollection) {
   if (!medusaCollection) return null;
   
-  // Pegar primeira imagem do primeiro produto
+  // Pegar primeira imagem do primeiro produto (se disponível)
   const firstProduct = medusaCollection.products?.[0];
-  const imageUrl = firstProduct?.images?.[0]?.url || '';
+  const imageUrl = firstProduct?.images?.[0]?.url || medusaCollection.thumbnail || '';
   
   // Calcular preço mínimo e máximo dos produtos
   let priceMin = 0;
@@ -57,7 +57,11 @@ export function adaptCollection(medusaCollection) {
     const prices = medusaCollection.products
       .flatMap(p => p.variants || [])
       .flatMap(v => v.prices || [])
-      .map(p => p.amount / 100);
+      .map(p => {
+        // Converter de centavos para reais se necessário
+        const amount = p.amount || 0;
+        return amount > 1000 ? amount / 100 : amount;
+      });
     
     if (prices.length > 0) {
       priceMin = Math.min(...prices);
@@ -65,19 +69,43 @@ export function adaptCollection(medusaCollection) {
     }
   }
   
-  // Usar preços do metadata se disponível
-  if (medusaCollection.metadata?.price_min) {
+  // Usar preços do metadata se disponível (prioridade)
+  if (medusaCollection.metadata?.price_min !== undefined) {
     priceMin = medusaCollection.metadata.price_min;
   }
-  if (medusaCollection.metadata?.price_max) {
+  if (medusaCollection.metadata?.price_max !== undefined) {
     priceMax = medusaCollection.metadata.price_max;
   }
   
+  // Se não tem preço, usar valores padrão do metadata ou 0
+  if (priceMin === 0 && !medusaCollection.metadata?.price_min) {
+    priceMin = 50; // Valor padrão
+  }
+  
+  // Mapear handle para tier se metadata não estiver disponível
+  let tier = medusaCollection.metadata?.tier || 'outros';
+  if (tier === 'outros' && medusaCollection.handle) {
+    if (medusaCollection.handle.includes('xodo')) tier = 'xodo';
+    else if (medusaCollection.handle.includes('encanto')) tier = 'encanto';
+    else if (medusaCollection.handle.includes('completo')) tier = 'completo';
+  }
+
+  // Mapear handle para descrição se metadata não estiver disponível
+  let description = medusaCollection.metadata?.description || medusaCollection.description || '';
+  if (!description && medusaCollection.handle) {
+    const descriptions = {
+      'kit-xodo': 'Kit completo de autocuidado e reconexão',
+      'kit-encanto': 'Kit para conexão romântica',
+      'kit-completo': 'Kit completo para amizade e conexão',
+    };
+    description = descriptions[medusaCollection.handle] || medusaCollection.title || '';
+  }
+
   return {
     id: medusaCollection.id,
-    name: medusaCollection.title,
-    tier: medusaCollection.metadata?.tier || 'outros',
-    description: medusaCollection.metadata?.description || medusaCollection.title,
+    name: medusaCollection.title || medusaCollection.name || 'Kit',
+    tier: tier,
+    description: description || medusaCollection.title || '',
     price_min: priceMin,
     price_max: priceMax,
     image_url: imageUrl,

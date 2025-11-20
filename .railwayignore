@@ -1,0 +1,7 @@
+# Ignorar pasta backend Python para Railway não detectar como Python
+backend/
+*.py
+requirements.txt
+venv/
+__pycache__/
+

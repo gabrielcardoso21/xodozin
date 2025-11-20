@@ -5,19 +5,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
-    databaseExtra: {
-      driverOptions: {
-        connection: {
-          ssl: false,
-        },
-      },
-      pool: {
-        min: 0,
-        max: 10,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 60000,
-      },
-    },
+    // databaseExtra removido - não suportado no Medusa v2
     http: {
       storeCors: process.env.STORE_CORS || "http://localhost:3000",
       adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
