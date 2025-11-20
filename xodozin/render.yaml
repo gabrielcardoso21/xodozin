@@ -6,6 +6,7 @@ services:
     plan: free
     buildCommand: yarn install && yarn build:skip-if-exists
     startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build
+    autoDeploy: true
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
