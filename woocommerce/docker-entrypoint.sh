@@ -1,21 +1,14 @@
 #!/bin/bash
-set -e
+# Não usar set -e para não parar no primeiro erro
+set +e
 
-# Executar inicialização do WooCommerce em background
-# Isso garante que o WooCommerce seja instalado assim que o WordPress estiver pronto
+# Executar inicialização do WooCommerce em background (não bloqueia o servidor)
 (
-    sleep 10  # Aguardar WordPress iniciar
-    echo "Aguardando WordPress estar disponível para instalar WooCommerce..."
-    for i in {1..120}; do
-        if wp core is-installed --allow-root 2>/dev/null; then
-            echo "WordPress está pronto! Inicializando WooCommerce..."
-            /usr/local/bin/init-woocommerce.sh || echo "⚠️ Aviso: Erro ao inicializar WooCommerce"
-            break
-        fi
-        sleep 2
-    done
+    sleep 15  # Aguardar WordPress e Apache iniciarem
+    echo "Iniciando instalação do WooCommerce em background..."
+    /usr/local/bin/init-woocommerce.sh 2>&1 | tee /tmp/woocommerce-init.log || echo "⚠️ WooCommerce será instalado depois"
 ) &
 
 # Executar entrypoint padrão do WordPress (isso inicia o Apache)
-# O entrypoint padrão está em /usr/local/bin/docker-entrypoint.sh
+# IMPORTANTE: Isso deve ser executado e não pode falhar
 exec /usr/local/bin/docker-entrypoint.sh "$@"
