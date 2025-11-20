@@ -1,32 +1,29 @@
-# Configuração Nixpacks para Railway - OTIMIZADA
-# Força detecção como Node.js e ignora pasta backend/
-# NOTA: Se Root Directory estiver configurado como 'xodozin', use o nixpacks.toml dentro de xodozin/
+# Configuração Nixpacks para Railway - FALLBACK
+# Este arquivo é usado APENAS se Root Directory NÃO estiver configurado
+# Se Root Directory = 'xodozin', o Railway usa xodozin/nixpacks.toml automaticamente
+# 
+# IMPORTANTE: Configure Root Directory como 'xodozin' no Railway Dashboard
+# para usar a configuração otimizada em xodozin/nixpacks.toml
 
 providers = ["node"]
 
 [variables]
 NODE_VERSION = "20"
-# Cache de dependências para builds mais rápidos
 YARN_CACHE_FOLDER = "/tmp/.yarn-cache"
 
 [phases.setup]
 cmds = [
-  "echo 'Building Node.js project - checking directory structure'",
-  "mkdir -p /tmp/.yarn-cache",
-  "pwd",
-  "ls -la"
+  "echo 'Building Node.js project (fallback - Root Directory não configurado)'",
+  "mkdir -p /tmp/.yarn-cache"
 ]
 
 [phases.install]
 cmds = [
-  # Se Root Directory não estiver configurado, entrar em xodozin
-  # Removido --frozen-lockfile temporariamente para permitir atualização do lockfile
   "cd xodozin && yarn install --cache-folder /tmp/.yarn-cache"
 ]
 
 [phases.build]
 cmds = [
-  # Build do Medusa (inclui admin panel)
   "cd xodozin && yarn build"
 ]
 
