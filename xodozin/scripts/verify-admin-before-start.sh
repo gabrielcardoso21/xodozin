@@ -11,8 +11,28 @@ ADMIN_PATH=".medusa/server/public/admin/index.html"
 if [ -f "$ADMIN_PATH" ]; then
     echo "✅ Admin build encontrado: $ADMIN_PATH"
     echo "   Tamanho: $(du -h "$ADMIN_PATH" | cut -f1)"
+    echo "   Caminho absoluto: $(realpath "$ADMIN_PATH" 2>/dev/null || echo "$(pwd)/$ADMIN_PATH")"
     echo "   Estrutura:"
     ls -lh .medusa/server/public/admin/ | head -5 | sed 's/^/     /'
+    echo ""
+    echo "🔍 Verificando permissões e conteúdo..."
+    if [ -r "$ADMIN_PATH" ]; then
+        echo "   ✅ Arquivo é legível"
+        # Verificar se arquivo não está vazio
+        if [ -s "$ADMIN_PATH" ]; then
+            echo "   ✅ Arquivo não está vazio"
+            # Verificar se contém HTML
+            if grep -q -i "html\|<!DOCTYPE" "$ADMIN_PATH" 2>/dev/null; then
+                echo "   ✅ Arquivo contém HTML válido"
+            else
+                echo "   ⚠️  Arquivo pode não ser HTML válido"
+            fi
+        else
+            echo "   ⚠️  Arquivo está vazio!"
+        fi
+    else
+        echo "   ❌ Arquivo não é legível!"
+    fi
     echo ""
 else
     echo "❌ ERRO: Admin build NÃO encontrado em $ADMIN_PATH"
