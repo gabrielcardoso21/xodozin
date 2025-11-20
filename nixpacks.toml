@@ -22,5 +22,5 @@ cmds = [
 ]
 
 [start]
-cmd = "yarn start"
+cmd = "bash scripts/start-with-migrations.sh"
 
