@@ -5,7 +5,6 @@ services:
     dockerfilePath: ./woocommerce/Dockerfile
     dockerContext: ./woocommerce
     plan: free
-    healthCheckPath: /
     envVars:
       - key: WORDPRESS_DB_HOST
         fromDatabase:
