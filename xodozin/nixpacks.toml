@@ -30,5 +30,5 @@ cmds = [
 ]
 
 [start]
-cmd = "yarn start:skip-build"
+cmd = "medusa db:migrate && medusa start"
 
