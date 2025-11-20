@@ -34,6 +34,17 @@ if [ -f "$ADMIN_PATH" ]; then
         echo "   ❌ Arquivo não é legível!"
     fi
     echo ""
+    # Garantir que o caminho seja absoluto para o Medusa
+    ABSOLUTE_PATH=$(realpath "$ADMIN_PATH" 2>/dev/null || echo "$(pwd)/$ADMIN_PATH")
+    echo "   Caminho absoluto do admin: $ABSOLUTE_PATH"
+    echo "   Verificando se Medusa pode acessar..."
+    # Verificar se o diretório .medusa/server/public/admin existe e é acessível
+    if [ -d ".medusa/server/public/admin" ] && [ -r ".medusa/server/public/admin/index.html" ]; then
+        echo "   ✅ Diretório e arquivo são acessíveis"
+    else
+        echo "   ❌ Diretório ou arquivo não são acessíveis!"
+        exit 1
+    fi
 else
     echo "❌ ERRO: Admin build NÃO encontrado em $ADMIN_PATH"
     echo "   Estrutura de .medusa:"
