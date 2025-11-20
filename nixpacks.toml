@@ -1,26 +1,32 @@
-# Configuração Nixpacks para Railway
+# Configuração Nixpacks para Railway - OTIMIZADA
 # Força detecção como Node.js e ignora pasta backend/
 
 providers = ["node"]
 
 [variables]
 NODE_VERSION = "20"
+# Cache de dependências para builds mais rápidos
+YARN_CACHE_FOLDER = "/tmp/.yarn-cache"
 
 [phases.setup]
 cmds = [
-  "echo 'Building Node.js project in xodozin/'"
+  "echo 'Building Node.js project in xodozin/'",
+  # Criar diretório de cache
+  "mkdir -p /tmp/.yarn-cache"
 ]
 
 [phases.install]
 cmds = [
-  "yarn install --frozen-lockfile"
+  # Usar cache do yarn para instalação mais rápida
+  "yarn install --frozen-lockfile --cache-folder /tmp/.yarn-cache"
 ]
 
 [phases.build]
 cmds = [
+  # Build apenas uma vez (postinstall foi removido)
   "yarn build"
 ]
 
 [start]
-cmd = "bash scripts/start-with-migrations.sh"
+cmd = "yarn start"
 
