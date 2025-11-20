@@ -2,7 +2,8 @@
 # Script para fazer build apenas se admin não existir
 # Se admin já existe, faz apenas build do backend (sem admin)
 
-set -e
+# Não usar set -e aqui porque queremos restaurar admin mesmo se build falhar
+set +e
 
 echo "🔍 DEBUG: Verificando se admin build existe..."
 echo "   Diretório atual: $(pwd)"
@@ -79,25 +80,54 @@ if [ -d ".medusa/server/public/admin" ] && [ -f ".medusa/server/public/admin/ind
     # Garantir que estrutura existe e restaurar admin após build
     echo "📦 Restoring admin build..."
     mkdir -p .medusa/server/public
+    
+    # Sempre restaurar admin, mesmo se build falhou
     if [ -d "/tmp/admin-backup/admin" ]; then
+        echo "   Removing any existing admin directory..."
         rm -rf .medusa/server/public/admin 2>/dev/null || true
-        cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || true
+        echo "   Copying admin from backup..."
+        cp -r /tmp/admin-backup/admin .medusa/server/public/ 2>/dev/null || {
+            echo "❌ ERROR: Failed to copy admin from backup!"
+            echo "   Backup location: /tmp/admin-backup/admin"
+            ls -la /tmp/admin-backup/ 2>/dev/null || echo "   /tmp/admin-backup does not exist"
+            exit 1
+        }
         echo "✅ Admin build restored to .medusa/server/public/admin"
+        
         # Verificar se foi restaurado corretamente
         if [ -f ".medusa/server/public/admin/index.html" ]; then
             echo "✅ Verified: index.html exists after restore"
             ls -lh .medusa/server/public/admin/index.html
+            echo "   Admin directory contents:"
+            ls -la .medusa/server/public/admin/ | head -5
         else
             echo "❌ ERROR: index.html not found after restore!"
+            echo "   Checking .medusa/server/public/admin..."
+            ls -la .medusa/server/public/admin/ 2>/dev/null || echo "   Directory does not exist"
             echo "   Checking backup..."
             ls -la /tmp/admin-backup/admin/ 2>/dev/null || echo "   Backup directory not found"
             exit 1
         fi
     else
         echo "❌ ERROR: Admin backup not found in /tmp/admin-backup/admin"
+        echo "   Checking /tmp/admin-backup..."
+        ls -la /tmp/admin-backup/ 2>/dev/null || echo "   /tmp/admin-backup does not exist"
         exit 1
     fi
+    
+    # Verificar se estrutura completa existe
+    echo "🔍 Verifying complete structure..."
+    if [ ! -d ".medusa/server" ]; then
+        echo "⚠️  Warning: .medusa/server does not exist, creating..."
+        mkdir -p .medusa/server
+    fi
+    if [ ! -d ".medusa/server/public" ]; then
+        echo "⚠️  Warning: .medusa/server/public does not exist, creating..."
+        mkdir -p .medusa/server/public
+    fi
+    
     echo "✅ Build completed with admin preserved"
+    set -e  # Voltar a falhar em erros
 else
     echo "⚠️  Admin build not found, doing full build..."
     echo "🔍 DEBUG: Listando arquivos .medusa antes do build:"
