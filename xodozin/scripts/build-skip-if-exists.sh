@@ -6,11 +6,20 @@ set -e
 
 echo "🔍 DEBUG: Verificando se admin build existe..."
 echo "   Diretório atual: $(pwd)"
+echo "   Listando arquivos .medusa (se existir):"
+find .medusa -type f -name "index.html" 2>/dev/null | head -5 || echo "   Nenhum index.html encontrado"
 echo "   Verificando: .medusa/server/public/admin"
-ls -la .medusa/server/public/admin 2>/dev/null | head -5 || echo "   Diretório não encontrado"
+if [ -d ".medusa/server/public/admin" ]; then
+    echo "   ✅ Diretório existe"
+    ls -la .medusa/server/public/admin 2>/dev/null | head -5
+else
+    echo "   ❌ Diretório não encontrado"
+    echo "   Estrutura de .medusa (se existir):"
+    find .medusa -type d 2>/dev/null | head -10 || echo "   .medusa não existe"
+fi
 echo ""
 
-if [ -d ".medusa/server/public/admin" ]; then
+if [ -d ".medusa/server/public/admin" ] && [ -f ".medusa/server/public/admin/index.html" ]; then
     echo "✅ Admin build exists, skipping frontend build"
     echo "📦 Preserving admin build..."
     # Fazer backup do admin antes de qualquer operação
