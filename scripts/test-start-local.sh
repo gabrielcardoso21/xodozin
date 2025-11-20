@@ -20,8 +20,8 @@ cd "$(dirname "$0")/../xodozin" || exit 1
 echo "📁 Diretório: $(pwd)"
 echo ""
 
-# Verificar se build foi executado
-if [ ! -f ".medusa/admin/index.html" ]; then
+# Verificar se build foi executado (Medusa v2 usa .medusa/server/public/admin/index.html)
+if [ ! -f ".medusa/server/public/admin/index.html" ]; then
     echo -e "${RED}❌ Build não encontrado!${NC}"
     echo "   Execute primeiro: bash scripts/test-build-local.sh"
     exit 1
