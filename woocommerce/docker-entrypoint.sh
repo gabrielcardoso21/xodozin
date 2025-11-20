@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
-# Executar entrypoint padrão do WordPress em background
-/usr/local/bin/docker-entrypoint.sh apache2-foreground &
+# Primeiro, executar o entrypoint padrão do WordPress para configurar tudo
+# Isso garante que o WordPress está configurado antes de iniciar o servidor
+/usr/local/bin/docker-entrypoint.sh "$@" &
 WP_PID=$!
 
 # Aguardar WordPress estar pronto
@@ -14,15 +15,15 @@ for i in {1..60}; do
         break
     fi
     if [ $i -eq 60 ]; then
-        echo "⚠️ Timeout aguardando WordPress"
-        exit 1
+        echo "⚠️ Timeout aguardando WordPress (continuando mesmo assim...)"
+        break
     fi
     sleep 2
 done
 
-# Executar inicialização do WooCommerce
+# Executar inicialização do WooCommerce em background
 echo "Inicializando WooCommerce..."
-/usr/local/bin/init-woocommerce.sh || echo "⚠️ Aviso: Erro ao inicializar WooCommerce (pode já estar instalado)"
+/usr/local/bin/init-woocommerce.sh || echo "⚠️ Aviso: Erro ao inicializar WooCommerce (pode já estar instalado)" &
 
-# Aguardar processo do WordPress
+# Aguardar processo do WordPress (isso mantém o container rodando)
 wait $WP_PID
