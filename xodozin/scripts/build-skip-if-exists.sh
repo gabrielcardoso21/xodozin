@@ -148,16 +148,49 @@ echo "🔨 Compilando medusa-config.ts para medusa-config.js..."
 if [ -f "medusa-config.ts" ]; then
     # Compilar medusa-config.ts especificamente para o diretório raiz
     # Usar configuração simples que funciona em produção
-    npx tsc medusa-config.ts \
-        --outDir . \
-        --module commonjs \
-        --target ES2021 \
-        --esModuleInterop \
-        --skipLibCheck \
-        --moduleResolution node \
-        --resolveJsonModule \
-        --allowSyntheticDefaultImports \
-        2>&1 | tee /tmp/medusa-config-compile.log || {
+    # Usar yarn tsc ou node_modules/.bin/tsc diretamente
+    if command -v yarn &> /dev/null; then
+        yarn tsc medusa-config.ts \
+            --outDir . \
+            --module commonjs \
+            --target ES2021 \
+            --esModuleInterop \
+            --skipLibCheck \
+            --moduleResolution node \
+            --resolveJsonModule \
+            --allowSyntheticDefaultImports \
+            2>&1 | tee /tmp/medusa-config-compile.log || {
+            echo "⚠️  yarn tsc falhou, tentando node_modules/.bin/tsc..."
+            node_modules/.bin/tsc medusa-config.ts \
+                --outDir . \
+                --module commonjs \
+                --target ES2021 \
+                --esModuleInterop \
+                --skipLibCheck \
+                --moduleResolution node \
+                --resolveJsonModule \
+                --allowSyntheticDefaultImports \
+                2>&1 | tee /tmp/medusa-config-compile.log || {
+                echo "⚠️  Compilação falhou, usando fallback..."
+            }
+        }
+    else
+        node_modules/.bin/tsc medusa-config.ts \
+            --outDir . \
+            --module commonjs \
+            --target ES2021 \
+            --esModuleInterop \
+            --skipLibCheck \
+            --moduleResolution node \
+            --resolveJsonModule \
+            --allowSyntheticDefaultImports \
+            2>&1 | tee /tmp/medusa-config-compile.log || {
+            echo "⚠️  Compilação falhou, usando fallback..."
+        }
+    fi
+    
+    # Se ainda não existe, criar fallback
+    if [ ! -f "medusa-config.js" ]; then
         echo "⚠️  Falha ao compilar medusa-config.ts, tentando método alternativo..."
         # Se falhar, criar um medusa-config.js básico que funciona
         if [ ! -f "medusa-config.js" ]; then
@@ -202,15 +235,46 @@ echo "🔨 Compilando instrumentation.ts para instrumentation.js..."
 if [ -f "instrumentation.ts" ]; then
     # Compilar instrumentation.ts especificamente para o diretório raiz
     # Usar configuração simples que funciona em produção
-    npx tsc instrumentation.ts \
-        --outDir . \
-        --module commonjs \
-        --target ES2021 \
-        --esModuleInterop \
-        --skipLibCheck \
-        --moduleResolution node \
-        --allowSyntheticDefaultImports \
-        2>&1 | tee /tmp/instrumentation-compile.log || {
+    # Usar yarn tsc ou node_modules/.bin/tsc diretamente
+    if command -v yarn &> /dev/null; then
+        yarn tsc instrumentation.ts \
+            --outDir . \
+            --module commonjs \
+            --target ES2021 \
+            --esModuleInterop \
+            --skipLibCheck \
+            --moduleResolution node \
+            --allowSyntheticDefaultImports \
+            2>&1 | tee /tmp/instrumentation-compile.log || {
+            echo "⚠️  yarn tsc falhou, tentando node_modules/.bin/tsc..."
+            node_modules/.bin/tsc instrumentation.ts \
+                --outDir . \
+                --module commonjs \
+                --target ES2021 \
+                --esModuleInterop \
+                --skipLibCheck \
+                --moduleResolution node \
+                --allowSyntheticDefaultImports \
+                2>&1 | tee /tmp/instrumentation-compile.log || {
+                echo "⚠️  Compilação falhou, usando fallback..."
+            }
+        }
+    else
+        node_modules/.bin/tsc instrumentation.ts \
+            --outDir . \
+            --module commonjs \
+            --target ES2021 \
+            --esModuleInterop \
+            --skipLibCheck \
+            --moduleResolution node \
+            --allowSyntheticDefaultImports \
+            2>&1 | tee /tmp/instrumentation-compile.log || {
+            echo "⚠️  Compilação falhou, usando fallback..."
+        }
+    fi
+    
+    # Se ainda não existe, criar fallback
+    if [ ! -f "instrumentation.js" ]; then
         echo "⚠️  Falha ao compilar instrumentation.ts, criando fallback..."
         # Se falhar, garantir que instrumentation.js existe
         if [ ! -f "instrumentation.js" ]; then
@@ -250,11 +314,32 @@ if [ -f "tsconfig.json" ]; then
     # Usar tsconfig.backend.json se existir para evitar erros do frontend
     if [ -f "tsconfig.backend.json" ]; then
         echo "   Usando tsconfig.backend.json (exclui frontend)..."
-        npx tsc --build --project tsconfig.backend.json 2>&1 | tee /tmp/tsc-build.log || {
-            echo "⚠️  TypeScript compilation had warnings, but continuing..."
-        }
+        # Usar yarn tsc ou node_modules/.bin/tsc
+        if command -v yarn &> /dev/null; then
+            # tsc --build não aceita --project, usar apenas o arquivo de config
+            yarn tsc --build -p tsconfig.backend.json 2>&1 | tee /tmp/tsc-build.log || {
+                echo "⚠️  yarn tsc falhou, tentando node_modules/.bin/tsc..."
+                node_modules/.bin/tsc --build -p tsconfig.backend.json 2>&1 | tee /tmp/tsc-build.log || {
+                    echo "⚠️  TypeScript compilation had warnings, but continuing..."
+                }
+            }
+        else
+            # tsc --build não aceita --project, usar apenas o arquivo de config
+            node_modules/.bin/tsc --build -p tsconfig.backend.json 2>&1 | tee /tmp/tsc-build.log || {
+                echo "⚠️  TypeScript compilation had warnings, but continuing..."
+            }
+        fi
     else
-        npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
+        # Usar yarn tsc ou node_modules/.bin/tsc
+        if command -v yarn &> /dev/null; then
+            yarn tsc --build 2>&1 | tee /tmp/tsc-build.log || {
+                echo "⚠️  yarn tsc falhou, tentando node_modules/.bin/tsc..."
+                node_modules/.bin/tsc --build 2>&1 | tee /tmp/tsc-build.log || {
+                    echo "⚠️  TypeScript compilation had warnings, but continuing..."
+                }
+            }
+        else
+            node_modules/.bin/tsc --build 2>&1 | tee /tmp/tsc-build.log || {
             echo "⚠️  TypeScript compilation had warnings, but continuing..."
         }
     fi

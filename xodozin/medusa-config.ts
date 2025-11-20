@@ -8,7 +8,8 @@ module.exports = defineConfig({
     // databaseExtra removido - não suportado no Medusa v2
     http: {
       // Render requer que a porta seja um número, não string
-      port: parseInt(process.env.PORT || "9000", 10),
+      // Garantir que PORT está definida e é um número
+      port: process.env.PORT ? parseInt(process.env.PORT, 10) : 9000,
       storeCors: process.env.STORE_CORS || "http://localhost:3000",
       adminCors: process.env.ADMIN_CORS || "http://localhost:3000,http://localhost:7001",
       authCors: process.env.AUTH_CORS || "http://localhost:3000,http://localhost:7001",
