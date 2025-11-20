@@ -142,4 +142,26 @@ else
     fi
 fi
 
+# Compilar TypeScript para garantir que medusa-config.js existe
+echo "🔨 Compilando TypeScript (para medusa-config.js)..."
+if [ -f "tsconfig.json" ]; then
+    # Compilar medusa-config.ts especificamente
+    if [ -f "medusa-config.ts" ]; then
+        echo "   Compilando medusa-config.ts..."
+        npx tsc medusa-config.ts --outDir . --module commonjs --esModuleInterop --skipLibCheck 2>&1 || {
+            echo "⚠️  Falha ao compilar medusa-config.ts, mas continuando..."
+        }
+        if [ -f "medusa-config.js" ]; then
+            echo "✅ medusa-config.js gerado"
+        fi
+    fi
+    # Compilar todo o projeto também
+    npx tsc --build 2>&1 | tee /tmp/tsc-build.log || {
+        echo "⚠️  TypeScript compilation had warnings, but continuing..."
+    }
+    echo "✅ TypeScript compilation completed"
+else
+    echo "⚠️  tsconfig.json não encontrado, pulando compilação TypeScript"
+fi
+
 

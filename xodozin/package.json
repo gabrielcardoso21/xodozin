@@ -16,6 +16,7 @@
     "build": "node --max-old-space-size=2048 node_modules/.bin/medusa build",
     "build:backend-only": "tsc --build",
     "build:skip-if-exists": "bash scripts/build-skip-if-exists.sh",
+    "build:compile": "tsc --build",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "medusa db:migrate && medusa start",
     "start:skip-build": "medusa db:migrate && medusa start",
