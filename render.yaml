@@ -1,35 +1,41 @@
 services:
   - type: web
-    name: medusa-backend
-    env: node
-    rootDir: xodozin
+    name: woocommerce-store
+    env: docker
+    dockerfilePath: ./woocommerce/Dockerfile
+    dockerContext: ./woocommerce
     plan: free
-    buildCommand: yarn install && yarn build:skip-if-exists
-    startCommand: bash scripts/ensure-admin-accessible.sh && bash scripts/verify-admin-before-start.sh && yarn start:skip-build
-    healthCheckPath: /health
+    healthCheckPath: /wp-admin/install.php
     envVars:
-      - key: DATABASE_URL
+      - key: WORDPRESS_DB_HOST
         fromDatabase:
-          name: medusa-postgres
-          property: connectionString
-      - key: JWT_SECRET
-        generateValue: true
-      - key: COOKIE_SECRET
-        generateValue: true
-      - key: NODE_ENV
-        value: production
-      - key: NODE_OPTIONS
-        value: "--max-old-space-size=2048"
-      - key: STORE_CORS
-        value: https://seu-dominio.com
-      - key: ADMIN_CORS
-        value: https://seu-dominio.com,https://admin.seu-dominio.com
-    # Redis é opcional - Medusa funciona sem ele (usa in-memory)
-    # Se quiser Redis, crie manualmente depois no dashboard
+          name: woocommerce-db
+          property: host
+      - key: WORDPRESS_DB_USER
+        fromDatabase:
+          name: woocommerce-db
+          property: user
+      - key: WORDPRESS_DB_PASSWORD
+        fromDatabase:
+          name: woocommerce-db
+          property: password
+      - key: WORDPRESS_DB_NAME
+        fromDatabase:
+          name: woocommerce-db
+          property: database
+      - key: WORDPRESS_TABLE_PREFIX
+        value: wp_
+      - key: WORDPRESS_DEBUG
+        value: "0"
+      - key: WP_ADMIN_USER
+        value: admin
+      - key: WP_ADMIN_EMAIL
+        value: admin@xodozin.com
+      - key: WP_TITLE
+        value: Xodózin Store
 
 databases:
-  - name: medusa-postgres
-    databaseName: medusa
-    user: medusa
+  - name: woocommerce-db
+    databaseName: wordpress
+    user: wordpress
     plan: free
-
