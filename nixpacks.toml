@@ -1,5 +1,5 @@
 # Configuração Nixpacks para Railway
-# Este arquivo deve estar no diretório xodozin/
+# Força detecção como Node.js
 
 providers = ["node"]
 
@@ -10,11 +10,17 @@ NODE_VERSION = "20"
 nixPkgs = ["nodejs-20_x", "yarn"]
 
 [phases.install]
-cmds = ["yarn install"]
+cmds = [
+  "cd xodozin",
+  "yarn install"
+]
 
 [phases.build]
-cmds = ["yarn build"]
+cmds = [
+  "cd xodozin",
+  "yarn build"
+]
 
 [start]
-cmd = "yarn start"
+cmd = "cd xodozin && yarn start"
 
