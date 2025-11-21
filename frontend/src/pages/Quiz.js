@@ -10,7 +10,7 @@ import {
   Briefcase, Calendar, Gift, Coffee
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { medusaOnlyApi } from '../utils/medusa-only-api';
+import hybridApi from '../utils/api-hybrid';
 
 // TELA 1: BEM-VINDO(A)!
 const screen1Questions = [
@@ -179,7 +179,7 @@ export default function Quiz() {
 
   const handleSubmit = async () => {
     try {
-      const response = await medusaOnlyApi.getQuizSuggestion({
+      const response = await hybridApi.getQuizSuggestion({
         recipient: answers.recipient,
         moment: answers.moment,
         feeling: answers.vibe

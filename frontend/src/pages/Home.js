@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, Heart, Gift, Leaf } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
-import { medusaOnlyApi } from '../utils/medusa-only-api';
+import hybridApi from '../utils/api-hybrid';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -14,13 +14,20 @@ export default function Home() {
 
   const fetchKits = async () => {
     try {
-      console.log('Fetching kits do Medusa...');
-      const kitsData = await medusaOnlyApi.getKits();
-      console.log('Kits response:', kitsData);
-      setKits(kitsData);
+      console.log('🔍 Home.js: Fetching kits do Odoo...');
+      const kitsData = await hybridApi.getKits();
+      console.log('✅ Home.js: Kits response:', kitsData);
+      console.log('✅ Home.js: Número de kits:', kitsData?.length || 0);
+      if (kitsData && kitsData.length > 0) {
+        console.log('✅ Home.js: Primeiro kit:', kitsData[0]);
+      }
+      setKits(kitsData || []);
     } catch (error) {
-      console.error('Error fetching kits:', error);
-      console.error('Error details:', error.message);
+      console.error('❌ Home.js: Error fetching kits:', error);
+      console.error('❌ Home.js: Error details:', error.message);
+      console.error('❌ Home.js: Error stack:', error.stack);
+      // Não definir kits vazio, manter estado anterior para debug
+      setKits([]);
     }
   };
 

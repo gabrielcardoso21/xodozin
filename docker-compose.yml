@@ -1,52 +1,106 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: xodozin-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: xodozin
+  # Frontend React (Nginx servindo arquivos estáticos)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # REACT_APP_ODOO_URL não é passado - o código usa window.location.origin em runtime
+        - REACT_APP_ODOO_DATABASE=xodozin
+        - REACT_APP_ODOO_USERNAME=admin
+        - REACT_APP_ODOO_PASSWORD=admin
+    container_name: xodozin-frontend
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    command: postgres -c max_connections=100 -c ssl=off
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d xodozin"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
+      - "80:80"
+    depends_on:
+      - odoo
+    restart: unless-stopped
     networks:
       - xodozin-network
 
-  # Redis Cache
+  # Backend Odoo
+  odoo:
+    build:
+      context: .
+      dockerfile: odoo/Dockerfile
+    container_name: xodozin-odoo
+    ports:
+      - "8069:8069"  # Expor diretamente também (opcional)
+    environment:
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-odoo}
+      - DB_PASSWORD=${DB_PASSWORD:-odoo}
+      - DB_NAME=${DB_NAME:-xodozin}
+      - DB_SSLMODE=prefer
+      - DB_TEMPLATE=template0
+      - DB_MAXCONN=64
+      - DB_FILTER=xodozin
+      - PROXY_MODE=True
+      - WORKERS=${WORKERS:-4}
+      - MAX_CRON_THREADS=${MAX_CRON_THREADS:-2}
+            - INITIAL_LANG=pt_BR
+            - INITIAL_TIMEZONE=America/Sao_Paulo
+            - EMAIL_FROM=odoo@xodozin.com
+            - SMTP_SERVER=smtp
+            - SMTP_PORT=587
+            - SMTP_USER=False
+            - SMTP_PASSWORD=False
+            - SMTP_SSL=False
+    volumes:
+      - odoo-filestore:/var/lib/odoo/filestore:Z
+      - odoo-logs:/var/log/odoo:Z
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - xodozin-network
+
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15
+    container_name: xodozin-db
+    environment:
+      - POSTGRES_DB=${DB_NAME:-xodozin}
+      - POSTGRES_USER=${DB_USER:-odoo}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-odoo}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data:Z
+    restart: unless-stopped
+    networks:
+      - xodozin-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-odoo} -d ${DB_NAME:-xodozin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache
   redis:
     image: redis:7-alpine
     container_name: xodozin-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - xodozin-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 10
-    networks:
-      - xodozin-network
-
-  # Medusa Backend - Rodando localmente (fora do Docker)
-  # Para iniciar o Medusa localmente, execute:
-  # cd xodozin && yarn dev
+      retries: 5
 
 volumes:
-  postgres_data:
-  redis_data:
+  odoo-filestore:
+  odoo-db-data:
+  odoo-logs:
 
 networks:
   xodozin-network:
     driver: bridge
+

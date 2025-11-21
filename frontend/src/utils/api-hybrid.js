@@ -1,114 +1,102 @@
 /**
- * ⚠️ DEPRECADO: Este arquivo está sendo descontinuado.
- * 
- * Sistema híbrido de API - Detecta automaticamente qual backend usar
- * Tenta Medusa.js primeiro, se falhar usa FastAPI como fallback
- * 
- * MIGRAÇÃO: Use `medusa-only-api.js` ao invés deste arquivo.
- * Todos os componentes foram migrados para usar exclusivamente o Medusa.
- * 
- * Este arquivo será removido em uma versão futura.
+ * API Híbrida - Usa Odoo como backend principal
+ * Mantém compatibilidade com interface anterior
  */
 
-import { storeApi } from './medusa-api';
+import odooApi from './odoo-api';
+import { adaptProducts, adaptCollections, adaptQuizSuggestion, adaptCart } from './odoo-adapter';
 import axios from 'axios';
-import { API_BASE_URL as FASTAPI_URL } from './api';
-import { adaptProducts, adaptCollections, adaptQuizSuggestion } from './medusa-adapter';
 
-// Flag para controlar qual API usar
-let useMedusa = process.env.REACT_APP_USE_MEDUSA === 'true';
-let medusaAvailable = null; // null = não testado, true/false = resultado do teste
+let odooAvailable = null; // null = não testado, true/false = resultado do teste
 
 /**
- * Testa se Medusa está disponível
- * Força novo teste se necessário
+ * Testa se Odoo está disponível
+ * @param {boolean} force - Força novo teste
+ * @returns {Promise<boolean>}
  */
-async function testMedusaAvailability(force = false) {
-  // Se já foi testado e não é forçado, retorna cache
-  if (medusaAvailable !== null && !force) {
-    console.log('🔍 Medusa já testado anteriormente:', medusaAvailable);
-    return medusaAvailable;
+async function testOdooAvailability(force = false) {
+  if (odooAvailable !== null && !force) {
+    return odooAvailable;
   }
 
-  const medusaUrl = process.env.REACT_APP_MEDUSA_BACKEND_URL || 'http://localhost:9000';
-  console.log('🔍 Testando disponibilidade do Medusa em:', medusaUrl);
+  // Use window.location.origin to go through Nginx proxy (avoids CORS)
+  // Nginx proxy at /jsonrpc adds CORS headers
+  // IMPORTANT: Always use window.location.origin in runtime, never hardcode localhost:8069
+  let odooUrl;
+  if (typeof window !== 'undefined' && window.location) {
+    odooUrl = window.location.origin;
+  } else {
+    // Fallback only for SSR or tests
+    const envUrl = process.env.REACT_APP_ODOO_URL;
+    // If env URL points to localhost:8069, ignore it and use localhost (via Nginx)
+    if (envUrl && envUrl.includes('localhost:8069')) {
+      odooUrl = 'http://localhost';
+    } else {
+      odooUrl = envUrl || 'http://localhost';
+    }
+  }
   
-  if (!medusaUrl) {
-    console.warn('⚠️ REACT_APP_MEDUSA_BACKEND_URL não configurado');
-    medusaAvailable = false;
+  if (!odooUrl) {
+    console.warn('⚠️ REACT_APP_ODOO_URL não configurado');
+    odooAvailable = false;
     return false;
   }
 
   try {
-    // Testar health check primeiro (mais rápido e confiável)
-    console.log('🔍 Testando /health...');
-    const healthResponse = await axios.get(`${medusaUrl}/health`, {
+    // Testar se Odoo está respondendo via JSON-RPC (mais confiável)
+    const jsonrpcUrl = odooUrl.includes('://') ? `${odooUrl}/jsonrpc` : `${odooUrl}/jsonrpc`;
+    const response = await axios.post(jsonrpcUrl, {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: {
+        service: 'common',
+        method: 'login',
+        args: [process.env.REACT_APP_ODOO_DATABASE || 'xodozin', process.env.REACT_APP_ODOO_USERNAME || 'admin', process.env.REACT_APP_ODOO_PASSWORD || 'admin'],
+      },
+      id: 1,
+    }, {
       timeout: 3000,
-      validateStatus: () => true
+      validateStatus: () => true,
     });
     
-    console.log('📊 Health check status:', healthResponse.status);
-    console.log('📊 Health check data:', healthResponse.data);
-    
-    if (healthResponse.status === 200) {
-      console.log('✅ Medusa está disponível (health check OK)');
-      medusaAvailable = true;
-      return true;
-    }
-    
-    // Se health check falhou, tentar products como fallback
-    console.log('🔍 Health check falhou, testando /store/products...');
-    const productsResponse = await axios.get(`${medusaUrl}/store/products`, {
-      timeout: 3000,
-      validateStatus: () => true
-    });
-    
-    console.log('📊 Products status:', productsResponse.status);
-    
-    // Se retornou 200 ou 404 (404 significa que API existe, só não tem produtos)
-    medusaAvailable = productsResponse.status === 200 || productsResponse.status === 404;
-    console.log(medusaAvailable ? '✅ Medusa está disponível' : '❌ Medusa não está disponível');
-    return medusaAvailable;
+    odooAvailable = response.status === 200 && response.data && response.data.result;
+    console.log(odooAvailable ? '✅ Odoo está disponível' : '❌ Odoo não está disponível');
+    return odooAvailable;
   } catch (error) {
-    console.error('❌ Erro ao testar Medusa:', error.message);
-    console.error('❌ Detalhes:', error);
-    medusaAvailable = false;
+    console.error('❌ Erro ao testar Odoo:', error.message);
+    odooAvailable = false;
     return false;
   }
 }
 
 /**
- * Reseta o cache de disponibilidade do Medusa
+ * Reseta o cache de disponibilidade do Odoo
  */
-export function resetMedusaCache() {
-  medusaAvailable = null;
-  console.log('🔄 Cache do Medusa resetado');
+export function resetOdooCache() {
+  odooAvailable = null;
+  console.log('🔄 Cache do Odoo resetado');
 }
 
 /**
- * API Híbrida - Usa Medusa se disponível, senão usa FastAPI
+ * API Híbrida - Usa Odoo como backend
  */
 export const hybridApi = {
   /**
    * Listar kits/collections
    */
   getKits: async () => {
-    const useMedusaNow = useMedusa && await testMedusaAvailability();
+    const useOdoo = await testOdooAvailability();
     
-    if (useMedusaNow) {
+    if (useOdoo) {
       try {
-        const response = await storeApi.getCollections();
+        const response = await odooApi.getCollections();
         return adaptCollections(response.collections || []);
       } catch (error) {
-        console.warn('Medusa falhou, usando FastAPI como fallback:', error);
-        // Fallback para FastAPI
-        const response = await axios.get(`${FASTAPI_URL}/kits`);
-        return response.data;
+        console.error('Erro ao buscar collections do Odoo:', error);
+        throw error;
       }
     } else {
-      // Usa FastAPI diretamente
-      const response = await axios.get(`${FASTAPI_URL}/kits`);
-      return response.data;
+      throw new Error('Odoo não está disponível. Verifique se REACT_APP_ODOO_URL está configurado e se o servidor está rodando.');
     }
   },
 
@@ -116,29 +104,23 @@ export const hybridApi = {
    * Listar produtos
    */
   getProducts: async (category = null) => {
-    const useMedusaNow = useMedusa && await testMedusaAvailability();
+    const useOdoo = await testOdooAvailability();
     
-    if (useMedusaNow) {
+    if (useOdoo) {
       try {
-        const params = category ? { 'metadata[category]': category } : {};
-        const response = await storeApi.getProducts(params);
-        return adaptProducts(response.products || []);
+        if (category) {
+          const response = await odooApi.getProductsByCategory(category);
+          return adaptProducts(response.products || []);
+        } else {
+          const response = await odooApi.getProducts();
+          return adaptProducts(response.products || []);
+        }
       } catch (error) {
-        console.warn('Medusa falhou, usando FastAPI como fallback:', error);
-        // Fallback para FastAPI
-        const url = category 
-          ? `${FASTAPI_URL}/products/category/${category}`
-          : `${FASTAPI_URL}/products`;
-        const response = await axios.get(url);
-        return response.data;
+        console.error('Erro ao buscar produtos do Odoo:', error);
+        throw error;
       }
     } else {
-      // Usa FastAPI diretamente
-      const url = category 
-        ? `${FASTAPI_URL}/products/category/${category}`
-        : `${FASTAPI_URL}/products`;
-      const response = await axios.get(url);
-      return response.data;
+      throw new Error('Odoo não está disponível. Verifique se REACT_APP_ODOO_URL está configurado e se o servidor está rodando.');
     }
   },
 
@@ -146,114 +128,90 @@ export const hybridApi = {
    * Sugestão de produtos baseado no quiz
    */
   getQuizSuggestion: async (answers) => {
-    console.log('🎯 Iniciando getQuizSuggestion...');
-    console.log('📝 useMedusa flag:', useMedusa);
-    console.log('📝 REACT_APP_MEDUSA_BACKEND_URL:', process.env.REACT_APP_MEDUSA_BACKEND_URL);
+    console.log('🎯 Iniciando getQuizSuggestion com Odoo...');
     
-    // Força novo teste se o cache está como false (pode ter sido testado antes do backend estar pronto)
-    const forceTest = medusaAvailable === false;
-    if (forceTest) {
-      console.log('🔄 Forçando novo teste do Medusa (cache estava false)...');
-    }
+    const forceTest = odooAvailable === false;
+    const useOdoo = await testOdooAvailability(forceTest);
     
-    const useMedusaNow = useMedusa && await testMedusaAvailability(forceTest);
-    console.log('📝 useMedusaNow resultado:', useMedusaNow);
-    
-    if (useMedusaNow) {
+    if (useOdoo) {
       try {
-        console.log('🎯 Usando Medusa para quiz...');
-        const response = await storeApi.getQuizSuggestion(answers);
-        console.log('✅ Medusa respondeu com sucesso:', response);
+        console.log('🎯 Usando Odoo para quiz...');
+        const response = await odooApi.getQuizSuggestions(answers);
+        console.log('✅ Odoo respondeu com sucesso:', response);
         return adaptQuizSuggestion(response);
       } catch (error) {
-        console.error('❌ Erro ao usar Medusa:', error.message);
-        console.error('❌ Detalhes do erro:', error);
-        // Resetar cache para forçar novo teste na próxima vez
-        medusaAvailable = null;
-        throw new Error(`Erro ao conectar com Medusa: ${error.message}. Verifique se o backend está rodando em http://localhost:9000`);
+        console.error('❌ Erro ao usar Odoo:', error.message);
+        odooAvailable = null;
+        throw new Error(`Erro ao conectar com Odoo: ${error.message}. Verifique se o backend está rodando.`);
       }
     } else {
-      // Se Medusa não está disponível, mostra erro claro
-      console.error('❌ Medusa não está disponível ou não está habilitado');
-      console.error('📝 useMedusa:', useMedusa);
-      console.error('📝 medusaAvailable:', medusaAvailable);
-      throw new Error('Medusa não está disponível. Verifique se REACT_APP_USE_MEDUSA=true e se o backend está rodando em http://localhost:9000');
+      console.error('❌ Odoo não está disponível');
+      throw new Error('Odoo não está disponível. Verifique se REACT_APP_ODOO_URL está configurado e se o servidor está rodando.');
     }
   },
 
   /**
    * Criar pedido (checkout)
-   * Tenta usar Medusa Cart API, se falhar usa FastAPI
+   * Usa Odoo Cart API
    */
   createOrder: async (orderData) => {
-    const useMedusaNow = useMedusa && await testMedusaAvailability();
+    const useOdoo = await testOdooAvailability();
     
-    if (useMedusaNow) {
+    if (useOdoo) {
       try {
-        // Criar carrinho no Medusa
-        const cart = await storeApi.createCart('br'); // Região Brasil
+        // Criar carrinho no Odoo
+        const cart = await odooApi.createCart();
+        const cartId = cart.id;
         
         // Adicionar itens ao carrinho
         for (const item of orderData.items) {
-          // Se tiver variant_id, usar; senão buscar primeiro produto
-          if (item.variant_id) {
-            await storeApi.addToCart(cart.cart.id, item.variant_id, 1);
-          } else {
-            // Buscar produto e pegar primeira variante
-            const product = await storeApi.getProduct(item.product_id);
-            if (product.product?.variants?.[0]?.id) {
-              await storeApi.addToCart(cart.cart.id, product.product.variants[0].id, 1);
-            }
+          const productId = item.variant_id || item.product_id;
+          if (productId) {
+            await odooApi.addToCart(cartId, productId, item.quantity || 1);
           }
         }
         
-        // Atualizar carrinho com dados de entrega e cliente
-        await storeApi.updateCart(cart.cart.id, {
-          email: orderData.recipient.email,
+        // Preparar dados do cliente
+        const customerData = {
+          email: orderData.recipient?.email || orderData.email,
           shipping_address: {
-            first_name: orderData.recipient.name.split(' ')[0] || orderData.recipient.name,
-            last_name: orderData.recipient.name.split(' ').slice(1).join(' ') || '',
-            address_1: orderData.delivery_address.split(',')[0] || orderData.delivery_address,
-            city: 'São Paulo',
+            first_name: (orderData.recipient?.name || '').split(' ')[0] || orderData.recipient?.name || '',
+            last_name: (orderData.recipient?.name || '').split(' ').slice(1).join(' ') || '',
+            address_1: orderData.delivery_address || '',
+            city: 'São Paulo', // TODO: Extrair da delivery_address
             country_code: 'br',
-            postal_code: orderData.delivery_address.match(/\d{5}-?\d{3}/)?.[0] || '',
-            phone: orderData.recipient.phone,
-            metadata: {
-              dedication: orderData.dedication,
-              whatsapp_updates: orderData.recipient.whatsapp_updates
-            }
-          }
-        });
+            postal_code: (orderData.delivery_address || '').match(/\d{5}-?\d{3}/)?.[0] || '',
+            phone: orderData.recipient?.phone || '',
+          },
+        };
         
-        // Finalizar pedido
-        const order = await storeApi.completeCart(cart.cart.id);
+        // Completar pedido
+        const order = await odooApi.completeCart(cartId, customerData);
+        const adaptedCart = adaptCart(order);
         
         // Adaptar resposta para formato esperado pelo frontend
         return {
-          id: order.order.id,
-          order_id: order.order.display_id || order.order.id,
-          ritual_name: order.order.metadata?.ritual_name || orderData.ritual_name,
-          items: order.order.items?.map(item => ({
-            product_id: item.variant?.product_id,
+          id: adaptedCart.id,
+          order_id: adaptedCart.id,
+          ritual_name: orderData.ritual_name || '',
+          items: adaptedCart.items?.map(item => ({
+            product_id: item.variant?.id || item.variant?.product?.id,
             product_name: item.title,
-            price: item.unit_price / 100
+            price: item.unit_price / 100,
+            quantity: item.quantity,
           })) || orderData.items,
-          total: order.order.total / 100,
-          dedication: order.order.metadata?.dedication || orderData.dedication,
-          delivery_address: orderData.delivery_address,
-          recipient: orderData.recipient,
-          created_at: order.order.created_at
+          total: adaptedCart.total / 100,
+          dedication: orderData.dedication || '',
+          delivery_address: orderData.delivery_address || '',
+          recipient: orderData.recipient || {},
+          created_at: adaptedCart.created_at,
         };
       } catch (error) {
-        console.warn('Medusa Cart API falhou, usando FastAPI como fallback:', error);
-        // Fallback para FastAPI
-        const response = await axios.post(`${FASTAPI_URL}/orders`, orderData);
-        return response.data;
+        console.error('Erro ao criar pedido no Odoo:', error);
+        throw error;
       }
     } else {
-      // Usa FastAPI diretamente
-      const response = await axios.post(`${FASTAPI_URL}/orders`, orderData);
-      return response.data;
+      throw new Error('Odoo não está disponível. Verifique se REACT_APP_ODOO_URL está configurado e se o servidor está rodando.');
     }
   },
 
@@ -261,11 +219,33 @@ export const hybridApi = {
    * Buscar pedido
    */
   getOrder: async (orderId) => {
-    // Por enquanto sempre usa FastAPI
-    const response = await axios.get(`${FASTAPI_URL}/orders/${orderId}`);
-    return response.data;
-  }
+    const useOdoo = await testOdooAvailability();
+    
+    if (useOdoo) {
+      try {
+        const order = await odooApi.getCart(orderId);
+        const adaptedCart = adaptCart(order);
+        
+        return {
+          id: adaptedCart.id,
+          order_id: adaptedCart.id,
+          items: adaptedCart.items?.map(item => ({
+            product_id: item.variant?.id || item.variant?.product?.id,
+            product_name: item.title,
+            price: item.unit_price / 100,
+            quantity: item.quantity,
+          })) || [],
+          total: adaptedCart.total / 100,
+          created_at: adaptedCart.created_at,
+        };
+      } catch (error) {
+        console.error('Erro ao buscar pedido no Odoo:', error);
+        throw error;
+      }
+    } else {
+      throw new Error('Odoo não está disponível. Verifique se REACT_APP_ODOO_URL está configurado e se o servidor está rodando.');
+    }
+  },
 };
 
 export default hybridApi;
-

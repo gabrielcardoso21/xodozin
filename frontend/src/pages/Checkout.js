@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import AddressForm from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
 import { formatPhone, cleanPhone } from '../utils/viaCep';
-import { medusaOnlyApi } from '../utils/medusa-only-api';
+import hybridApi from '../utils/api-hybrid';
 
 export default function Checkout() {
   const location = useLocation();
@@ -128,7 +128,7 @@ export default function Checkout() {
         }
       };
 
-      const response = await medusaOnlyApi.createOrder(orderData);
+      const response = await hybridApi.createOrder(orderData);
       toast.success('Pedido realizado com sucesso!');
       navigate('/confirmation', { state: { order: response } });
     } catch (error) {

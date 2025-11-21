@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, Gift, Leaf, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
-import { medusaOnlyApi } from '../utils/medusa-only-api';
+import hybridApi from '../utils/api-hybrid';
 
 const kitCategories = {
   'autocuidado': { label: 'Autocuidado & Reconexão', icon: Heart, color: 'text-pink-600' },
@@ -23,7 +23,7 @@ export default function Kits() {
 
   const fetchKits = async () => {
     try {
-      const kitsData = await medusaOnlyApi.getKits();
+      const kitsData = await hybridApi.getKits();
       setKits(kitsData);
     } catch (error) {
       console.error('Error fetching kits:', error);

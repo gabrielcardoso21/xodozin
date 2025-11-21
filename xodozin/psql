@@ -1,1 +1,0 @@
-postgres -h localhost -U postgres -W -l

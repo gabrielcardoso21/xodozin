@@ -1,102 +1,201 @@
-# Xodozin - E-commerce com Medusa.js
+# Xodozin - E-commerce com Odoo v18
+
+Sistema de e-commerce para venda de rituais de presente personalizados, utilizando Odoo v18 como backend e React como frontend.
 
 ## 🚀 Início Rápido
 
 ### Pré-requisitos
 - Docker e Docker Compose instalados
-- Node.js 20+ (para desenvolvimento local)
+- Git
 
-### Iniciar o Projeto
-
-```bash
-# Iniciar todos os serviços
-docker-compose up -d
-
-# Aguardar inicialização (2-3 minutos)
-# Acessar Admin Panel: http://localhost:9000/app
-```
-
-### Inicialização Manual (Primeira Vez)
-
-```bash
-# Executar setup inicial
-./INICIALIZAR-MEDUSA.sh
-```
-
-## 📁 Estrutura do Projeto
+### Estrutura do Projeto
 
 ```
 xodozin/
-├── docker-compose.yml      # Configuração Docker
-├── xodozin/                # Backend Medusa v2
-│   ├── medusa-config.ts   # Configuração do Medusa
-│   └── src/
-│       ├── admin/         # Customizações do Admin Panel
-│       ├── api/           # Endpoints customizados
-│       └── scripts/       # Scripts de setup
-├── frontend/              # Frontend React
-└── INICIALIZAR-MEDUSA.sh  # Script de inicialização
+├── frontend/              # Frontend React (servido por Nginx)
+│   ├── src/
+│   │   └── utils/
+│   │       ├── odoo-api.js      # API Odoo (JSON-RPC)
+│   │       ├── odoo-adapter.js  # Adaptador de dados
+│   │       └── api-hybrid.js    # API híbrida (usa Odoo)
+│   └── Dockerfile
+├── odoo/                  # Backend Odoo v18 (Doodba)
+│   ├── Dockerfile
+│   ├── prod.yaml          # Configurações de produção
+│   ├── devel.yaml         # Configurações de desenvolvimento
+│   ├── repos.yaml         # Repositórios de módulos
+│   ├── ENV-VARIABLES.md   # Documentação de variáveis
+│   └── odoo/custom/src/private/  # Módulos customizados
+├── docker/                # Configurações Docker
+│   ├── nginx-frontend.conf  # Configuração Nginx
+│   └── odoo.conf          # Configuração Odoo
+├── docker-compose.yml     # Docker Compose para produção
+├── docker-compose.dev.yml # Docker Compose para desenvolvimento
+├── scripts/               # Scripts de automação
+│   ├── setup-odoo-contabo.sh
+│   ├── deploy-odoo-contabo.sh
+│   └── configure-frontend-odoo.sh
+└── README.md              # Este arquivo
 ```
 
 ## 🌐 URLs
 
-- **Admin Panel**: http://localhost:9000/app
-- **Store API**: http://localhost:9000/store
-- **Admin API**: http://localhost:9000/admin
-- **Health Check**: http://localhost:9000/health
+### Desenvolvimento Local (Docker Compose)
+- **Frontend + Odoo**: http://localhost (porta 80)
+- **Odoo direto**: http://localhost:8069
+- **PostgreSQL**: localhost:5432
+- **Redis**: localhost:6379
+
+### Produção (Contabo)
+- **Odoo**: http://193.203.15.173:8069 (ou configurar domínio)
+- **Frontend**: http://193.203.15.173 (ou configurar domínio)
 
 ## ⚙️ Configuração
 
 ### Variáveis de Ambiente
 
-As variáveis de ambiente estão configuradas no `docker-compose.yml`:
-- `DATABASE_URL`: PostgreSQL
-- `REDIS_URL`: Redis
-- `JWT_SECRET`: Secret para JWT
-- `COOKIE_SECRET`: Secret para cookies
-- `STORE_CORS`: CORS para Store API
-- `ADMIN_CORS`: CORS para Admin Panel
+Crie um arquivo `.env` na raiz do projeto:
 
-### Configurar Brasil
+```env
+# Odoo
+ADMIN_PASSWORD=admin
+DB_USER=odoo
+DB_PASSWORD=odoo
+DB_NAME=xodozin
 
-Após inicializar, execute:
+# Frontend (usado em runtime, não em build)
+REACT_APP_ODOO_DATABASE=xodozin
+REACT_APP_ODOO_USERNAME=admin
+REACT_APP_ODOO_PASSWORD=admin
+```
+
+**Importante**: O frontend usa `window.location.origin` em runtime para determinar a URL do Odoo, então não precisa configurar `REACT_APP_ODOO_URL` (o Nginx faz proxy automaticamente).
+
+## 🚀 Setup Local
+
+### Opção 1: Docker Compose (Recomendado)
 
 ```bash
-docker exec xodozin-medusa sh -c "cd /app && DATABASE_URL='postgresql://postgres:postgres@postgres:5432/xodozin?sslmode=disable' yarn medusa exec ./src/scripts/setup-brasil.ts"
+# Construir e iniciar todos os serviços
+docker compose up --build -d
+
+# Ver logs
+docker compose logs -f
+
+# Parar serviços
+docker compose down
 ```
+
+O frontend estará disponível em `http://localhost` e o Odoo em `http://localhost:8069`.
+
+**Primeira inicialização do Odoo:**
+Na primeira vez, o Odoo precisa inicializar o banco de dados. Isso pode levar alguns minutos. Verifique os logs:
+
+```bash
+docker compose logs -f odoo
+```
+
+Quando o Odoo estiver pronto, acesse `http://localhost:8069` e configure o banco de dados.
+
+### Opção 2: Desenvolvimento (Frontend separado)
+
+```bash
+# Iniciar apenas Odoo e banco
+docker compose up db redis odoo -d
+
+# No frontend, instalar dependências e iniciar dev server
+cd frontend
+yarn install
+yarn start
+```
+
+## 📦 Deploy no Contabo
+
+### Setup Inicial
+
+```bash
+# Executar script de setup
+./scripts/setup-odoo-contabo.sh
+
+# Configurar .env no servidor
+ssh root@193.203.15.173
+cd /opt/xodozin
+nano .env  # Configurar variáveis
+
+# Iniciar serviços
+docker compose up -d
+```
+
+### Deploy de Atualizações
+
+```bash
+# Executar script de deploy
+./scripts/deploy-odoo-contabo.sh
+```
+
+## 📚 Documentação
+
+### Manuais de Uso (para usuários finais)
+- [📚 Manual Índice](./MANUAL-INDICE.md) - Índice principal com visão geral
+- [📦 Manual de Produtos](./MANUAL-PRODUTOS.md) - Como criar e gerenciar produtos
+- [🎁 Manual de Kits](./MANUAL-KITS.md) - Como criar e gerenciar kits
+- [✨ Manual de Rituais](./MANUAL-RITUAIS.md) - Como configurar rituais
+- [⚙️ Configurações Avançadas](./MANUAL-CONFIGURACOES-AVANCADAS.md) - Configurações avançadas
+
+### Documentação Técnica
+- [🐳 Docker Setup](./DOCKER-SETUP.md) - Guia completo de setup Docker
+- [🔧 Odoo Setup](./ODOO-SETUP.md) - Guia completo de setup do Odoo
+- [🔗 Integração Frontend](./ODOO-INTEGRACAO.md) - Guia de integração frontend
+- [🚀 Deploy Contabo](./ODOO-DEPLOY.md) - Guia de deploy no Contabo
+- [🎯 Conceitos Nativos Odoo](./ODOO-CONCEITOS-NATIVOS.md) - Como usar conceitos nativos do Odoo
+- [📝 Variáveis de Ambiente](./odoo/ENV-VARIABLES.md) - Documentação de variáveis
 
 ## 🔧 Troubleshooting
 
-### Admin Panel não carrega
+### Odoo não inicia
+1. Verificar logs: `docker compose logs odoo`
+2. Verificar banco de dados: `docker compose logs db`
+3. Verificar variáveis de ambiente no `.env`
 
-1. Verificar se o container está rodando: `docker ps`
-2. Verificar logs: `docker logs xodozin-medusa`
-3. Aguardar 2-3 minutos após iniciar (compilação do Vite)
+### Frontend não conecta ao Odoo
+1. Verificar se Odoo está rodando: `curl http://localhost:8069/web/webclient/version_info`
+2. Verificar logs do Nginx: `docker compose logs frontend`
+3. Verificar se o proxy Nginx está funcionando: `curl http://localhost/jsonrpc`
 
-### Erros de WebSocket
+### Erros de CORS
+O Nginx já está configurado para adicionar headers CORS automaticamente. Se ainda houver problemas:
+1. Verificar `docker/nginx-frontend.conf`
+2. Verificar se o frontend está usando `window.location.origin` (não hardcoded `localhost:8069`)
 
-Os erros de WebSocket são apenas avisos (HMR não funciona no Docker). O Admin Panel funciona normalmente, apenas sem atualizações automáticas.
+### Produtos/Kits não aparecem no site
+1. Verificar se estão marcados como "Pode ser Vendido" no Odoo
+2. Verificar se estão marcados como "Publicado no Website" no Odoo
+3. Verificar se o tipo do kit é "Combo" (para kits)
 
-### Problemas de i18n
+## 🛠️ Tecnologias
 
-Se houver erro de i18n, verificar se o arquivo `src/admin/i18n/index.ts` existe:
-
-```bash
-docker exec xodozin-medusa sh -c "cd /app && ls -la src/admin/i18n/"
-```
+- **Backend**: Odoo v18 (Doodba)
+- **Frontend**: React 19 + Radix UI
+- **Banco de Dados**: PostgreSQL 15
+- **Cache**: Redis 7
+- **Web Server**: Nginx (para frontend e proxy reverso)
+- **Deploy**: Docker + Docker Compose
+- **Servidor**: Contabo (193.203.15.173)
 
 ## 📝 Próximos Passos
 
-1. ✅ Configurar região Brasil
-2. ⏳ Migrar dados do MongoDB para PostgreSQL
-3. ⏳ Configurar métodos de pagamento (Mercado Pago, Pix)
-4. ⏳ Integrar API de NF (Focus NFe ou NFe.io)
-5. ⏳ Configurar deploy em produção
+1. ✅ Setup básico do Odoo v18
+2. ✅ Integração frontend com Odoo
+3. ✅ Manuais de uso completos
+4. ⏳ Configurar métodos de pagamento
+5. ⏳ Configurar métodos de envio
+6. ⏳ Módulo de quiz customizado
+7. ⏳ Integração Focus NFe
 
-## 📚 Documentação Adicional
+## 🤝 Contribuindo
 
-- [Configuração](./CONFIGURACAO.md) - Configuração do Medusa e Brasil
-- [Integração Frontend](./INTEGRACAO.md) - Integração do frontend com Medusa
-- [Troubleshooting](./TROUBLESHOOTING.md) - Solução de problemas comuns
-- [Configurar Brasil](./CONFIGURAR-MEDUSA-BRASIL.md) - Configuração específica do Brasil
-- [Orquestração Containers](./ORQUESTRACAO-CONTAINERS-MVP.md) - Opções de orquestração para MVP
+Este é um projeto privado. Para dúvidas ou sugestões, entre em contato com o mantenedor.
+
+## 📄 Licença
+
+Proprietário - Todos os direitos reservados.
