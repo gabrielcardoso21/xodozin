@@ -3,6 +3,7 @@ import { Heart, Sparkles, Gift, Leaf, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useEffect, useState } from 'react';
 import hybridApi from '../utils/api-hybrid';
+import { Skeleton } from '../components/ui/skeleton';
 
 const kitCategories = {
   'autocuidado': { label: 'Autocuidado & Reconexão', icon: Heart, color: 'text-pink-600' },
@@ -16,6 +17,7 @@ export default function Kits() {
   const navigate = useNavigate();
   const [kits, setKits] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchKits();
@@ -23,10 +25,14 @@ export default function Kits() {
 
   const fetchKits = async () => {
     try {
+      setIsLoading(true);
       const kitsData = await hybridApi.getKits();
-      setKits(kitsData);
+      setKits(kitsData || []);
     } catch (error) {
       console.error('Error fetching kits:', error);
+      setKits([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,64 +97,85 @@ export default function Kits() {
         </div>
 
         {/* Kits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredKits.map((kit) => {
-            const Icon = kitIcons[kit.tier] || Gift;
-            const price = kit.price_max || kit.price_min;
-            
-            return (
-              <div
-                key={kit.id}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="relative h-48 bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f]">
-                  {kit.image_url && (
-                    <img
-                      src={kit.image_url}
-                      alt={kit.name}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-                      <Icon className="h-5 w-5 text-[#da2c38]" />
-                    </div>
-                  </div>
-                </div>
-                
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <Skeleton className="w-full h-48" />
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-[#Da2c38] mb-2 font-serif">
-                    {kit.name}
-                  </h3>
-                  <p className="text-[#463f3a] mb-4 leading-relaxed">
-                    {kit.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-2xl font-bold text-[#da2c38]">
-                        R$ {price.toFixed(2)}
-                      </span>
-                      {kit.price_max && (
-                        <span className="text-sm text-[#463f3a]/60 ml-2">
-                          (R$ {kit.price_min.toFixed(2)} - R$ {kit.price_max.toFixed(2)})
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => navigate('/quiz', { state: { selectedKit: kit } })}
-                    className="w-full bg-[#da2c38] text-white hover:bg-[#c02530]"
-                  >
-                    Criar Ritual Personalizado
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <Skeleton className="h-8 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-5/6 mb-4" />
+                  <Skeleton className="h-6 w-1/3 mb-4" />
+                  <Skeleton className="h-10 w-full" />
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list" aria-label="Lista de kits">
+            {filteredKits.map((kit) => {
+              const Icon = kitIcons[kit.tier] || Gift;
+              const price = kit.price_max || kit.price_min;
+              
+              return (
+                <article
+                  key={kit.id}
+                  role="listitem"
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 focus-within:ring-2 focus-within:ring-[#da2c38] focus-within:outline-none"
+                  tabIndex={0}
+                >
+                  <div className="relative h-48 bg-gradient-to-br from-[#F2cc8f] to-[#F2cc8f] overflow-hidden">
+                    {kit.image_url && (
+                      <img
+                        src={kit.image_url}
+                        alt={kit.name}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                        loading="lazy"
+                      />
+                    )}
+                    <div className="absolute top-4 right-4" aria-label={`Categoria: ${kit.tier}`}>
+                      <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
+                        <Icon className="h-5 w-5 text-[#da2c38]" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold text-[#Da2c38] mb-2 font-serif">
+                      {kit.name}
+                    </h3>
+                    <p className="text-[#463f3a] mb-4 leading-relaxed line-clamp-3">
+                      {kit.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <span className="text-2xl font-bold text-[#da2c38]" aria-label={`Preço: R$ ${price.toFixed(2)}`}>
+                          R$ {price.toFixed(2)}
+                        </span>
+                        {kit.price_max && (
+                          <span className="text-sm text-[#463f3a]/60 ml-2" aria-label={`Faixa de preço: R$ ${kit.price_min.toFixed(2)} a R$ ${kit.price_max.toFixed(2)}`}>
+                            (R$ {kit.price_min.toFixed(2)} - R$ {kit.price_max.toFixed(2)})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() => navigate('/quiz', { state: { selectedKit: kit } })}
+                      className="w-full bg-[#da2c38] text-white hover:bg-[#c02530] focus:outline-none focus:ring-2 focus:ring-[#da2c38] focus:ring-offset-2 transition-all"
+                      aria-label={`Criar ritual personalizado para ${kit.name}`}
+                    >
+                      Criar Ritual Personalizado
+                      <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                    </Button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
 
         {filteredKits.length === 0 && (
           <div className="text-center py-12">

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_website_page_tree" model="ir.ui.view">
+        <field name="name">website.page.tree</field>
+        <field name="model">website.page</field>
+        <field name="arch" type="xml">
+            <tree string="Website Pages">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="url"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_website_page_form" model="ir.ui.view">
+        <field name="name">website.page.form</field>
+        <field name="model">website.page</field>
+        <field name="arch" type="xml">
+            <form string="Website Page">
+                <header>
+                    <button name="toggle_active" type="object" string="Archive" class="oe_highlight" 
+                            attrs="{'invisible': [('active', '=', False)]}"/>
+                    <button name="toggle_active" type="object" string="Unarchive" 
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="url"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="seo_title" placeholder="SEO Title"/>
+                            <field name="seo_description" placeholder="SEO Description"/>
+                            <field name="og_image" widget="image" options="{'preview_image': 'og_image', 'size': [1024, 512]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content Items">
+                            <field name="content_item_ids" nolabel="1">
+                                <tree>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="item_type"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </tree>
+                                <form>
+                                    <field name="page_id" invisible="1"/>
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="item_type"/>
+                                            <field name="sequence"/>
+                                            <field name="active"/>
+                                        </group>
+                                        <group>
+                                            <field name="spacing_top"/>
+                                            <field name="spacing_bottom"/>
+                                            <field name="max_width"/>
+                                            <field name="animation_type"/>
+                                        </group>
+                                    </group>
+                                    <notebook>
+                                        <page string="Content">
+                                            <group>
+                                                <field name="title"/>
+                                                <field name="subtitle"/>
+                                                <field name="content" widget="html"/>
+                                                <field name="image" widget="image"/>
+                                                <field name="image_url"/>
+                                            </group>
+                                        </page>
+                                        <page string="Visual Settings">
+                                            <group>
+                                                <field name="background_color"/>
+                                                <field name="text_align"/>
+                                                <field name="css_classes"/>
+                                            </group>
+                                        </page>
+                                        <page string="Button/CTA" attrs="{'invisible': [('item_type', 'not in', ['button', 'cta_banner'])]}">
+                                            <group>
+                                                <field name="button_text"/>
+                                                <field name="button_url"/>
+                                                <field name="button_action"/>
+                                            </group>
+                                        </page>
+                                        <page string="Gallery" attrs="{'invisible': [('item_type', '!=', 'gallery')]}">
+                                            <field name="gallery_image_ids" nolabel="1">
+                                                <tree>
+                                                    <field name="sequence" widget="handle"/>
+                                                    <field name="image" widget="image"/>
+                                                    <field name="image_url"/>
+                                                    <field name="alt_text"/>
+                                                    <field name="caption"/>
+                                                </tree>
+                                            </field>
+                                        </page>
+                                        <page string="Testimonials" attrs="{'invisible': [('item_type', '!=', 'testimonials')]}">
+                                            <field name="testimonial_ids" nolabel="1">
+                                                <tree>
+                                                    <field name="sequence" widget="handle"/>
+                                                    <field name="name"/>
+                                                    <field name="role"/>
+                                                    <field name="rating"/>
+                                                </tree>
+                                                <form>
+                                                    <field name="item_id" invisible="1"/>
+                                                    <group>
+                                                        <group>
+                                                            <field name="name"/>
+                                                            <field name="role"/>
+                                                            <field name="rating"/>
+                                                            <field name="image" widget="image"/>
+                                                        </group>
+                                                        <group>
+                                                            <field name="content" nolabel="1"/>
+                                                        </group>
+                                                    </group>
+                                                </form>
+                                            </field>
+                                        </page>
+                                        <page string="Pricing Plans" attrs="{'invisible': [('item_type', '!=', 'pricing')]}">
+                                            <field name="pricing_plan_ids" nolabel="1">
+                                                <tree>
+                                                    <field name="sequence" widget="handle"/>
+                                                    <field name="name"/>
+                                                    <field name="price"/>
+                                                    <field name="highlighted"/>
+                                                </tree>
+                                                <form>
+                                                    <field name="item_id" invisible="1"/>
+                                                    <group>
+                                                        <group>
+                                                            <field name="name"/>
+                                                            <field name="price"/>
+                                                            <field name="currency"/>
+                                                            <field name="period"/>
+                                                            <field name="highlighted"/>
+                                                        </group>
+                                                        <group>
+                                                            <field name="description"/>
+                                                            <field name="features" widget="html"/>
+                                                            <field name="button_text"/>
+                                                            <field name="button_url"/>
+                                                        </group>
+                                                    </group>
+                                                </form>
+                                            </field>
+                                        </page>
+                                        <page string="FAQ Items" attrs="{'invisible': [('item_type', '!=', 'faq')]}">
+                                            <field name="faq_item_ids" nolabel="1">
+                                                <tree>
+                                                    <field name="sequence" widget="handle"/>
+                                                    <field name="question"/>
+                                                </tree>
+                                                <form>
+                                                    <field name="item_id" invisible="1"/>
+                                                    <field name="question"/>
+                                                    <field name="answer" widget="html" nolabel="1"/>
+                                                </form>
+                                            </field>
+                                        </page>
+                                    </notebook>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_website_page" model="ir.actions.act_window">
+        <field name="name">Website Pages</field>
+        <field name="res_model">website.page</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new website page
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_website_pages"
+              name="Website Pages"
+              parent="website.menu_website_configuration"
+              action="action_website_page"
+              sequence="10"/>
+</odoo>
