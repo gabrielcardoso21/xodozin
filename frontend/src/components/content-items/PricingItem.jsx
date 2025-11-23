@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { Check } from 'lucide-react';
 
 export default function PricingItem({ item }) {
   const navigate = useNavigate();

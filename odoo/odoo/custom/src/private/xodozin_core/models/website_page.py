@@ -4,8 +4,8 @@ from odoo import models, fields, api
 
 
 class WebsitePage(models.Model):
-    _name = 'website.page'
-    _description = 'Website Page'
+    _name = 'xodozin.website.page'
+    _description = 'Xodozin Website Page'
     _order = 'sequence, name'
 
     name = fields.Char(string='Page Name', required=True, translate=True)
@@ -21,7 +21,7 @@ class WebsitePage(models.Model):
     
     # Content Items
     content_item_ids = fields.One2many(
-        'website.page.content.item',
+        'xodozin.website.page.content.item',
         'page_id',
         string='Content Items',
         help='Content items that will be rendered on this page'
@@ -41,3 +41,7 @@ class WebsitePage(models.Model):
     def get_page_by_url(self, url):
         """Get page by URL"""
         return self.search([('url', '=', url), ('active', '=', True)], limit=1)
+    
+    def toggle_active(self):
+        """Toggle active state"""
+        self.active = not self.active

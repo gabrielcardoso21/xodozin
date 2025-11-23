@@ -4,12 +4,12 @@ from odoo import models, fields, api
 
 
 class WebsitePageContentItem(models.Model):
-    _name = 'website.page.content.item'
-    _description = 'Website Page Content Item'
+    _name = 'xodozin.website.page.content.item'
+    _description = 'Xodozin Website Page Content Item'
     _order = 'sequence, id'
 
     name = fields.Char(string='Item Name', required=True, translate=True)
-    page_id = fields.Many2one('website.page', string='Page', required=True, ondelete='cascade')
+    page_id = fields.Many2one('xodozin.website.page', string='Page', required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     active = fields.Boolean(string='Active', default=True)
     
@@ -116,11 +116,11 @@ class WebsitePageContentItem(models.Model):
 
 
 class WebsitePageContentItemGalleryImage(models.Model):
-    _name = 'website.page.content.item.gallery.image'
+    _name = 'xodozin.website.page.content.item.gallery.image'
     _description = 'Gallery Image'
     _order = 'sequence, id'
 
-    item_id = fields.Many2one('website.page.content.item', string='Content Item', required=True, ondelete='cascade')
+    item_id = fields.Many2one('xodozin.website.page.content.item', string='Content Item', required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     image = fields.Binary(string='Image', required=True)
     image_filename = fields.Char(string='Image Filename')
@@ -130,11 +130,11 @@ class WebsitePageContentItemGalleryImage(models.Model):
 
 
 class WebsitePageContentItemTestimonial(models.Model):
-    _name = 'website.page.content.item.testimonial'
+    _name = 'xodozin.website.page.content.item.testimonial'
     _description = 'Testimonial'
     _order = 'sequence, id'
 
-    item_id = fields.Many2one('website.page.content.item', string='Content Item', required=True, ondelete='cascade')
+    item_id = fields.Many2one('xodozin.website.page.content.item', string='Content Item', required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     name = fields.Char(string='Name', required=True, translate=True)
     role = fields.Char(string='Role/Title', translate=True)
@@ -145,11 +145,11 @@ class WebsitePageContentItemTestimonial(models.Model):
 
 
 class WebsitePageContentItemPricingPlan(models.Model):
-    _name = 'website.page.content.item.pricing.plan'
+    _name = 'xodozin.website.page.content.item.pricing.plan'
     _description = 'Pricing Plan'
     _order = 'sequence, id'
 
-    item_id = fields.Many2one('website.page.content.item', string='Content Item', required=True, ondelete='cascade')
+    item_id = fields.Many2one('xodozin.website.page.content.item', string='Content Item', required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     name = fields.Char(string='Plan Name', required=True, translate=True)
     price = fields.Float(string='Price', required=True)
@@ -163,11 +163,11 @@ class WebsitePageContentItemPricingPlan(models.Model):
 
 
 class WebsitePageContentItemFAQ(models.Model):
-    _name = 'website.page.content.item.faq'
+    _name = 'xodozin.website.page.content.item.faq'
     _description = 'FAQ Item'
     _order = 'sequence, id'
 
-    item_id = fields.Many2one('website.page.content.item', string='Content Item', required=True, ondelete='cascade')
+    item_id = fields.Many2one('xodozin.website.page.content.item', string='Content Item', required=True, ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     question = fields.Char(string='Question', required=True, translate=True)
     answer = fields.Html(string='Answer', required=True, translate=True)
