@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_xodozin_website_page_manager,xodozin.website.page.manager,model_xodozin_website_page,base.group_user,1,1,1,1
+access_xodozin_website_page_content_item_manager,xodozin.website.page.content.item.manager,model_xodozin_website_page_content_item,base.group_user,1,1,1,1
+access_xodozin_website_page_content_item_gallery_image_manager,xodozin.website.page.content.item.gallery.image.manager,model_xodozin_website_page_content_item_gallery_image,base.group_user,1,1,1,1
+access_xodozin_website_page_content_item_testimonial_manager,xodozin.website.page.content.item.testimonial.manager,model_xodozin_website_page_content_item_testimonial,base.group_user,1,1,1,1
+access_xodozin_website_page_content_item_pricing_plan_manager,xodozin.website.page.content.item.pricing.plan.manager,model_xodozin_website_page_content_item_pricing_plan,base.group_user,1,1,1,1
+access_xodozin_website_page_content_item_faq_manager,xodozin.website.page.content.item.faq.manager,model_xodozin_website_page_content_item_faq,base.group_user,1,1,1,1

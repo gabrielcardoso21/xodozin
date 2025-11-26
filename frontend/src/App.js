@@ -1,17 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import '@/App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Quiz from './pages/Quiz';
-import CustomRitual from './pages/CustomRitual';
-import Checkout from './pages/Checkout';
-import Confirmation from './pages/Confirmation';
-import Kits from './pages/Kits';
-import Sobre from './pages/Sobre';
-import Rituais from './pages/Rituais';
 import { Toaster } from './components/ui/sonner';
 import Sidebar from './components/Sidebar';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Skeleton } from './components/ui/skeleton';
+
+// Code splitting - lazy load pages
+const Home = lazy(() => import('./pages/Home'));
+const Quiz = lazy(() => import('./pages/Quiz'));
+const CustomRitual = lazy(() => import('./pages/CustomRitual'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Confirmation = lazy(() => import('./pages/Confirmation'));
+const Kits = lazy(() => import('./pages/Kits'));
+const Sobre = lazy(() => import('./pages/Sobre'));
+const Rituais = lazy(() => import('./pages/Rituais'));
+
+// Loading component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="text-center">
+      <Skeleton className="w-64 h-8 mb-4 mx-auto" />
+      <Skeleton className="w-96 h-4 mb-2 mx-auto" />
+      <Skeleton className="w-80 h-4 mx-auto" />
+    </div>
+  </div>
+);
 
 function App() {
   useEffect(() => {
@@ -55,16 +69,18 @@ function App() {
           <div className="flex min-h-screen">
             <Sidebar />
             <main className="flex-1 lg:ml-0">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/kits" element={<Kits />} />
-                <Route path="/rituais" element={<Rituais />} />
-                <Route path="/sobre" element={<Sobre />} />
-                <Route path="/quiz" element={<Quiz />} />
-                <Route path="/custom-ritual" element={<CustomRitual />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/confirmation" element={<Confirmation />} />
-              </Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/kits" element={<Kits />} />
+                  <Route path="/rituais" element={<Rituais />} />
+                  <Route path="/sobre" element={<Sobre />} />
+                  <Route path="/quiz" element={<Quiz />} />
+                  <Route path="/custom-ritual" element={<CustomRitual />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/confirmation" element={<Confirmation />} />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </BrowserRouter>
